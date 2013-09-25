@@ -1,0 +1,23 @@
+{% extends "site_base.html" %}
+{% load url from future %}
+
+{% block content %}
+
+	<script type="text/javascript">
+	jQuery(function() {
+		jQuery('#id_start_date').datepicker({ dateFormat: 'mm/dd/yy' });
+		jQuery('#id_end_date').datepicker({ dateFormat: 'mm/dd/yy' });
+	        
+	});
+	</script>
+	
+    <form action="{% url 'export' %}" method="post">{% csrf_token %}
+	<div style="width:250px;">
+		<h3>Export Turnstile Data</h3>
+		{{ form.as_p }}
+		<label>Start Date</label><input type="text" class="datePicker" id="id_start_date" name="start_date" />
+		<label>End Date</label><input type="text" class="datePicker" id="id_end_date" name="end_date" />
+		<input type="submit" value="Get CSV"/>
+	</div>
+	</form>
+{% endblock %}

@@ -1,0 +1,9 @@
+Django
+pyPdf
+django-taggit
+south
+python-dateutil
+python-magic
+#django-tracking
+MySQL-python
+cx_Oracle
