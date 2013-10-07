@@ -21,35 +21,12 @@ from django.core import serializers
 import random, string, csv, sys
 from forms import DataExportForm
 from models import LibraryVisit
+from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, ProgramTable, PlanTable, ClassTable
+from django_tables2 import RequestConfig
 
 def index(request):
-    context = RequestContext(request, {})
-    export_form = DataExportForm(request.POST)
-    if export_form.is_valid():
-        context = RequestContext(request, {'form': export_form})
-    
-    return render_to_response('libraryuse/home.html', context)
-
-def get_usage(request, dim):
-    context = RequestContext(request, {})
-    
-    result = None
-    if dim == 'department':
-        result = LibraryVisit.objects.values('dprt_n').annotate(Count('dprt_n')).order_by('-dprt_n__count')
-    elif dim == 'division':
-        result = LibraryVisit.objects.values('dvsn_n').annotate(Count('dvsn_n')).order_by('-dvsn_n__count')
-    elif dim == 'prsntype':
-        result = LibraryVisit.objects.values('prsn_e_type').annotate(Count('prsn_e_type')).order_by('-prsn_e_type__count')     
-        
-    #evidently can't serialize ValuesQuerySet - surprising limitation   
-    data_dict = ValuesQuerySetToDict(result)
-    #data_json = serializers.serialize('json', data_dict)
-    data_json =  simplejson.dumps(data_dict)
-
-    return HttpResponse(data_json, content_type='application/json')
-
-def ValuesQuerySetToDict(vqs):
-    return [item for item in vqs]
+    context = {}
+    return render_to_response('libraryuse/summary.html', context)
 
 def export(request):
     context = RequestContext(request, {})
@@ -92,15 +69,79 @@ def export(request):
         
     return render_to_response('libraryuse/export.html', context)
 
-def reports(request):
-    #context = RequestContext(request, {'dept_data': get_usage(request, 'department') })
-    context = {}
-    return render_to_response('libraryuse/reports.html', context)
+def summary(request):
 
-def test(request):
-    context = {}
-    return render_to_response('libraryuse/simple-pie.html', context)
-
-
+    pt_t = PersonTypeTable(_usage('person_type'))
+    RequestConfig(request).configure(pt_t)
     
+    dpt_t = DepartmentTable(_usage('department'))
+    RequestConfig(request).configure(dpt_t)    
+
+    div_t = DivisionTable(_usage('division'))
+    RequestConfig(request).configure(div_t)
+
+    pgm_t = ProgramTable(_usage('program'))
+    RequestConfig(request).configure(pgm_t)
+    
+    pln_t = ProgramTable(_usage('plan'))
+    RequestConfig(request).configure(pln_t)
+    
+    cls_t = ProgramTable(_usage('class'))
+    RequestConfig(request).configure(cls_t)       
+
+    context = {'person_type': pt_t,
+               'department': dpt_t,
+               'division': div_t, 
+               'program': pgm_t,
+               'plan': pln_t,
+               'class': cls_t,
+               }
+    return render(request, 'libraryuse/summary.html', context)
+
+def visualize(request):
+    context = {}
+    return render_to_response('libraryuse/visualize.html', context)
+
+def usage(request, dim):
+    return HttpResponse(_usage(dim), content_type='application/json')
+
+#try tables.py, and count as string
+def _usage(dim):
+    
+    def crunch(attr):
+        #return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr).values()
+        
+        return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr)
+        #.extra(select={'percent': 'count(prsn_e_type)* 100 /(select count(*) from libraryvisit_mv)'})
+        
+    result = None
+    if dim == 'department':
+        result = crunch('dprt_n')
+    elif dim == 'division':
+        result = crunch('dvsn_n')
+    elif dim == 'person_type':        
+        result = crunch('prsn_e_type')
+    elif dim == 'program':
+        result = crunch('acpr_n')
+    elif dim == 'plan':
+        result = crunch('acpl_n')
+    elif dim == 'class':
+        result = crunch('stdn_e_clas')
+    #else return null  
+
+    return result
+
+def _values_query_set_to_dict(vqs):
+    return [item for item in vqs]
+
+def _result_to_json(request, result):        
+      
+    data_dict = _values_query_set_to_dict(result)
+    
+    #evidently can't serialize ValuesQuerySet - surprising limitation 
+    #data_json = serializers.serialize('json', data_dict)
+    data_json =  simplejson.dumps(data_dict)
+
+    return HttpResponse(data_json, content_type='application/json')
+
     

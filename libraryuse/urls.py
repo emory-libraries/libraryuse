@@ -6,10 +6,11 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', views.index, name='index'),
+    #url(r'^$', views.index, name='index'),
+    url(r'^$', views.summary, name='index'),
+    url(r'^summary$', views.summary, name='summary'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^export$', views.export, name='export'),
-    url(r'^reports$', views.reports, name='reports'),
-    url(r'^usage/(?P<dim>.+)/$', views.get_usage, name='usage'),
-    url(r'^test$', views.test, name='test'),
+    url(r'^visualize$', views.visualize, name='visualize'),
+    url(r'^usage/(?P<dim>.+)/$', views.usage, name='usage'),
 )

@@ -36,8 +36,7 @@ a[name] {
     padding: 20px 0;
 }
 
-/***** charts *****/
-
+/***** visualize *****/
 .axis path,
 .axis line {
   fill: none;
@@ -51,4 +50,29 @@ a[name] {
 
 .x.axis path {
   display: none;
+}
+
+.arc {
+	color: #fff;
+}
+.arc path {
+    stroke: #fff;
+}
+
+#control {
+	display: inline-block;
+	float: right;
+}
+
+#chart {
+	display: inline-block;
+	vertical-align: top;
+}
+
+/***** summary *****/
+.result {
+	margin: 5px;
+	display: inline-block;
+	vertical-align: top;
+	
 }

@@ -7,3 +7,4 @@ python-magic
 #django-tracking
 MySQL-python
 cx_Oracle
+django-tables2

@@ -57,6 +57,8 @@ env.remote_path = '/home/httpd/sites/libraryuse'
 env.url_prefix = None
 env.remote_proxy = None
 env.remote_acct = 'libraryuse'
+env.ld_library_path = '/opt/instantclient_11_2'
+env.oracle_home = '/opt/instantclient_11_2'
 
 def configure(path=None, user=None, url_prefix=None, remote_proxy=None):
     'Configuration settings used internally for the build.'
@@ -144,7 +146,12 @@ def setup_virtualenv():
             % env, user=env.remote_acct)
         # activate the environment and install required packages
         with prefix('source env/bin/activate'):
-            pip_cmd = 'pip install -r pip-install-req.txt'
+
+            setenv_cmd = 'export LD_LIBRARY_PATH=%(ld_library_path)s \
+                && export ORACLE_HOME=%(oracle_home)s' % env
+            #sudo(setenv_cmd, user=env.remote_acct)
+
+            pip_cmd = setenv_cmd + '; pip install -r pip-install-req.txt'
             if env.remote_proxy:
                 pip_cmd += ' --proxy=%(remote_proxy)s' % env
             sudo(pip_cmd, user=env.remote_acct)

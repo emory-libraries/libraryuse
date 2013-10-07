@@ -113,7 +113,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.markup',
     'django.contrib.humanize',
-    #'south',
+    'django_tables2',
     'libraryuse',
 
 )
