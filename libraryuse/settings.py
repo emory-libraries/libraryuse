@@ -111,7 +111,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
-    'django.contrib.markup',
+    #'django.contrib.markup',
     'django.contrib.humanize',
     'django_tables2',
     'libraryuse',
