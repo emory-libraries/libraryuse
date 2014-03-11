@@ -102,6 +102,9 @@ TEMPLATE_DIRS = (
     
 )
 
+LOGIN_URL = '/admin'
+#LOGIN_REDIRECT_URL = '/'
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.admin',
@@ -114,6 +117,8 @@ INSTALLED_APPS = (
     #'django.contrib.markup',
     'django.contrib.humanize',
     'django_tables2',
+    'south',
+    'eullocal.django.emory_ldap',
     'libraryuse',
 
 )
@@ -151,3 +156,10 @@ TEST_RUNNER = 'digitizedbooks.testutil.ManagedModelTestRunner'
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False
 
+AUTH_USER_MODEL = 'emory_ldap.EmoryLDAPUser'
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'eullocal.django.emory_ldap.backends.EmoryLDAPBackend',
+)

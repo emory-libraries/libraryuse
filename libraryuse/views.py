@@ -24,10 +24,12 @@ from models import LibraryVisit
 from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, ProgramTable, PlanTable, ClassTable
 from django_tables2 import RequestConfig
 
+@login_required
 def index(request):
     context = {}
     return render_to_response('libraryuse/summary.html', context)
 
+@login_required
 def export(request):
     context = RequestContext(request, {})
     export_form = None
@@ -41,6 +43,7 @@ def export(request):
             
             start_date = export_form.cleaned_data['start_date']
             end_date = export_form.cleaned_data['end_date']
+            print(start_date)
             #visits = LibraryVisit.objects.all()
             visits = LibraryVisit.objects.filter(visit_time__range=[start_date, end_date])
             
@@ -67,8 +70,14 @@ def export(request):
     else:
         export_form = DataExportForm()
         
+    q = LibraryVisit.objects.filter(visit_time__range=['2014-02-02', '2014-02-03'])
+    print('HELLO')
+    for r in q:
+        print(r.location)
+    
     return render_to_response('libraryuse/export.html', context)
 
+@login_required
 def summary(request):
 
     pt_t = PersonTypeTable(_usage('person_type'))
@@ -98,10 +107,12 @@ def summary(request):
                }
     return render(request, 'libraryuse/summary.html', context)
 
+@login_required
 def visualize(request):
     context = {}
     return render_to_response('libraryuse/visualize.html', context)
 
+@login_required
 def usage(request, dim):
     return HttpResponse(_usage(dim), content_type='application/json')
 
@@ -134,6 +145,7 @@ def _usage(dim):
 def _values_query_set_to_dict(vqs):
     return [item for item in vqs]
 
+@login_required
 def _result_to_json(request, result):        
       
     data_dict = _values_query_set_to_dict(result)
@@ -143,5 +155,3 @@ def _result_to_json(request, result):
     data_json =  simplejson.dumps(data_dict)
 
     return HttpResponse(data_json, content_type='application/json')
-
-    
