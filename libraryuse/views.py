@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.db import models
+from django.db.models import Max, Min
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -23,6 +24,11 @@ from forms import DataExportForm
 from models import LibraryVisit
 from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, ProgramTable, PlanTable, ClassTable
 from django_tables2 import RequestConfig
+
+import pprint
+
+from datetime import datetime
+import time
 
 @login_required
 def index(request):
@@ -43,10 +49,9 @@ def export(request):
             
             start_date = export_form.cleaned_data['start_date']
             end_date = export_form.cleaned_data['end_date']
-            print(start_date)
-            #visits = LibraryVisit.objects.all()
-            visits = LibraryVisit.objects.filter(visit_time__range=[start_date, end_date])
             
+            visits = LibraryVisit.objects.filter(visit_time__range=[start_date, end_date])
+                
             writer.writerow(['visit_time', 'term_number', 'location', 'prsn_c_type', \
                              'prsn_e_type', 'emjo_c_clsf', 'dprt_c', \
                              'edprt_n', 'dvsn_i', 'dvsn_n', \
@@ -70,12 +75,13 @@ def export(request):
     else:
         export_form = DataExportForm()
         
-    q = LibraryVisit.objects.filter(visit_time__range=['2014-02-02', '2014-02-03'])
-    print('HELLO')
-    for r in q:
-        print(r.location)
+    #q = LibraryVisit.objects.filter(visit_time__range=['2014-02-02', '2014-02-03'])
+    #print('HELLO')
+    #for r in q:
+    #    print(r.location)
     
-    return render_to_response('libraryuse/export.html', context)
+    #return render_to_response('libraryuse/export.html', context)
+    return render(request, 'libraryuse/export.html', {'form': export_form,})
 
 @login_required
 def summary(request):
@@ -114,16 +120,50 @@ def visualize(request):
 
 @login_required
 def usage(request, dim):
-    return HttpResponse(_usage(dim), content_type='application/json')
+    qset = _usage(dim,)
+    # {labels:[], datasets[{data}]}
+    data= {}
+    data['labels'] = []
+    data['datasets'] = []
+    dataset = {}
+    dataset['data'] = []
+    #data['datasets'].append('data')
+    for e in qset.all():
+        #print('type = %s, count = %s ' % (e['prsn_e_type'], e['prsn_e_type__count']))
+        data['labels'].append(e['prsn_e_type'])
+        dataset['data'].append(e['prsn_e_type__count'])
+    data['datasets'].append(dataset)
+    my_list = list(qset)
+    data_json =  simplejson.dumps(data)
+    return HttpResponse(data_json, content_type='application/json')
+
+#@login_required
+def usage_json(request, dim, start, end):
+    name_map = {'visittime': 'visittime', 'total': 'total', 'pk': 'id'}
+    numbers = LibraryVisit.objects.raw('SELECT id, UNIX_TIMESTAMP(visit_time) AS visittime, COUNT(*) AS total FROM libraryvisit_bk WHERE visit_time BETWEEN "%s" AND "%s" GROUP BY visit_time' % (start, end), translations=name_map)
+
+    foo = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end])
+    
+ #   data = []
+ #   data.append('{"data":[')
+ #   for bar in foo[:-1]:
+ #       dt = datetime.strptime(str(bar['visit_time']), '%Y-%m-%d %H:%M:%S')
+ #       stamp = int(time.mktime(dt.timetuple()))
+ #       data.append('[%s00,%s],' % (stamp, bar['total']))
+ #   data.append('[%s000,%s]]}' % (stamp, bar['total']))
+
+    data = []
+    data.append('{"data":[')
+    for n in numbers[:-1]:
+        data.append('[%s000,%s],' % (n.visittime, n.total))
+    data.append('[%s000,%s]]}' % (numbers[-1].visittime, numbers[-1].total))
+    #data.append(']}')
+    return HttpResponse(data, content_type='application/json')
 
 #try tables.py, and count as string
 def _usage(dim):
-    
     def crunch(attr):
-        #return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr).values()
-        
-        return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr)
-        #.extra(select={'percent': 'count(prsn_e_type)* 100 /(select count(*) from libraryvisit_mv)'})
+        return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr)#.filter(visit_time__range=[start, end])
         
     result = None
     if dim == 'department':
@@ -155,3 +195,14 @@ def _result_to_json(request, result):
     data_json =  simplejson.dumps(data_dict)
 
     return HttpResponse(data_json, content_type='application/json')
+
+@login_required
+def daterange_json(request):
+    #q = LibraryVisit.objects.filter(visit_time__range=['2014-02-02', '2014-02-03'])
+    #data_dict = _values_query_set_to_dict(q)
+    pt_t = _usage('person_type')
+    #RequestConfig(request).configure(pt_t)
+    #pp = pprint.PrettyPrinter(depth=6)
+    #pp.pprint(pt_t)
+    #data_dict = _values_query_set_to_dict(pt_t)
+    return HttpResponse(pt_t, content_type='application/json')
