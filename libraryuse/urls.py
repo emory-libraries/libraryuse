@@ -12,7 +12,7 @@ urlpatterns = patterns(
     url(r'^admin/', include(admin.site.urls)),
     url(r'^export$', views.export, name='export'),
     url(r'^visualize$', views.visualize, name='visualize'),
-    url(r'^usage/(?P<dim>.+)/$', views.usage, name='usage'),
-    url(r'^usage_json/(?P<dim>.+)/$', views.usage_json, name='usage_json'),
+    url(r'^usage/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage, name='usage'),
+    url(r'^usage_json/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage_json, name='usage_json'),
     url(r'^daterange_json$', views.daterange_json, name='daterange'),
 )

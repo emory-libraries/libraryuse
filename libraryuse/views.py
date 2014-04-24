@@ -6,7 +6,6 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.db import models
-from django.db.models import Max, Min
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
@@ -49,9 +48,11 @@ def export(request):
             
             start_date = export_form.cleaned_data['start_date']
             end_date = export_form.cleaned_data['end_date']
-            
+            print(start_date)
+            #visits = LibraryVisit.objects.all()
             visits = LibraryVisit.objects.filter(visit_time__range=[start_date, end_date])
-                
+            #visits = LibraryVisit.objects.filter(Q(visit_time__range=[start_date, end_date]) and Q(acpl_n='Business Administration'))
+            
             writer.writerow(['visit_time', 'term_number', 'location', 'prsn_c_type', \
                              'prsn_e_type', 'emjo_c_clsf', 'dprt_c', \
                              'edprt_n', 'dvsn_i', 'dvsn_n', \
@@ -80,8 +81,7 @@ def export(request):
     #for r in q:
     #    print(r.location)
     
-    #return render_to_response('libraryuse/export.html', context)
-    return render(request, 'libraryuse/export.html', {'form': export_form,})
+    return render_to_response('libraryuse/export.html', context)
 
 @login_required
 def summary(request):
@@ -120,7 +120,7 @@ def visualize(request):
 
 @login_required
 def usage(request, dim):
-    qset = _usage(dim,)
+    qset = _usage(dim)
     # {labels:[], datasets[{data}]}
     data= {}
     data['labels'] = []
@@ -133,6 +133,7 @@ def usage(request, dim):
         data['labels'].append(e['prsn_e_type'])
         dataset['data'].append(e['prsn_e_type__count'])
     data['datasets'].append(dataset)
+    print(data)
     my_list = list(qset)
     data_json =  simplejson.dumps(data)
     return HttpResponse(data_json, content_type='application/json')
@@ -155,7 +156,9 @@ def usage_json(request, dim, start, end):
     data = []
     data.append('{"data":[')
     for n in numbers[:-1]:
-        data.append('[%s000,%s],' % (n.visittime, n.total))
+        #print(n.total)
+        #print(n.visittime)
+	data.append('[%s000,%s],' % (n.visittime, n.total))
     data.append('[%s000,%s]]}' % (numbers[-1].visittime, numbers[-1].total))
     #data.append(']}')
     return HttpResponse(data, content_type='application/json')
@@ -163,8 +166,9 @@ def usage_json(request, dim, start, end):
 #try tables.py, and count as string
 def _usage(dim):
     def crunch(attr):
-        return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr)#.filter(visit_time__range=[start, end])
-        
+        #return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr).filter(visit_time__range=[start, end])
+        return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr)
+
     result = None
     if dim == 'department':
         result = crunch('dprt_n')

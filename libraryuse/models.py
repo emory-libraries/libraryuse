@@ -82,5 +82,5 @@ class LibraryVisit(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'libraryvisit_bk'
+        db_table = 'libraryvisit_mv'
         app_label = 'libraryuse'
