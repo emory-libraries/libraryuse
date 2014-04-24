@@ -103,7 +103,7 @@ TEMPLATE_DIRS = (
 )
 
 LOGIN_URL = '/admin'
-#LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = '/'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
