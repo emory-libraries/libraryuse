@@ -161,7 +161,7 @@ jQuery(function($){
 		'Jul','Aug','Sep','Okt','Nov','Dec'],
 		dayNames: ['Nedelja','Ponedeljak','Utorak','Srijeda','Četvrtak','Petak','Subota'],
 		dayNamesShort: ['Ned','Pon','Uto','Sri','Čet','Pet','Sub'],
-		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','Su'],
+		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','S],
 		weekHeader: 'Wk',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
@@ -231,9 +231,9 @@ jQuery(function($){
 		'Gorffennaf','Awst','Medi','Hydref','Tachwedd','Rhagfyr'],
 		monthNamesShort: ['Ion', 'Chw', 'Maw', 'Ebr', 'Mai', 'Meh',
 		'Gor', 'Aws', 'Med', 'Hyd', 'Tac', 'Rha'],
-		dayNames: ['Dydd Sul', 'Dydd Llun', 'Dydd Mawrth', 'Dydd Mercher', 'Dydd Iau', 'Dydd Gwener', 'Dydd Sadwrn'],
-		dayNamesShort: ['Sul', 'Llu', 'Maw', 'Mer', 'Iau', 'Gwe', 'Sad'],
-		dayNamesMin: ['Su','Ll','Ma','Me','Ia','Gw','Sa'],
+		dayNames: ['Dydd Sul', 'Dydd Llun', 'Dydd Mawrth', 'Dydd Mercher', 'Dydd Ia, 'Dydd Gwener', 'Dydd Sadwrn'],
+		dayNamesShort: ['Sul', 'Ll, 'Maw', 'Mer', 'Ia, 'Gwe', 'Sad'],
+		dayNamesMin: ['S,'Ll','Ma','Me','Ia','Gw','Sa'],
 		weekHeader: 'Wy',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
@@ -318,7 +318,7 @@ jQuery(function($){
 /* English/Australia initialisation for the jQuery UI date picker plugin. */
 /* Based on the en-GB initialisation. */
 jQuery(function($){
-	$.datepicker.regional['en-AU'] = {
+	$.datepicker.regional['en-A] = {
 		closeText: 'Done',
 		prevText: 'Prev',
 		nextText: 'Next',
@@ -328,15 +328,15 @@ jQuery(function($){
 		monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
 		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 		dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-		dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-		dayNamesMin: ['Su','Mo','Tu','We','Th','Fr','Sa'],
+		dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Th, 'Fri', 'Sat'],
+		dayNamesMin: ['S,'Mo','T,'We','Th','Fr','Sa'],
 		weekHeader: 'Wk',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
 		isRTL: false,
 		showMonthAfterYear: false,
 		yearSuffix: ''};
-	$.datepicker.setDefaults($.datepicker.regional['en-AU']);
+	$.datepicker.setDefaults($.datepicker.regional['en-A]);
 });
 
 /* English/UK initialisation for the jQuery UI date picker plugin. */
@@ -352,8 +352,8 @@ jQuery(function($){
 		monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
 		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 		dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-		dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-		dayNamesMin: ['Su','Mo','Tu','We','Th','Fr','Sa'],
+		dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Th, 'Fri', 'Sat'],
+		dayNamesMin: ['S,'Mo','T,'We','Th','Fr','Sa'],
 		weekHeader: 'Wk',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
@@ -376,8 +376,8 @@ jQuery(function($){
 		monthNamesShort: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
 		'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 		dayNames: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-		dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-		dayNamesMin: ['Su','Mo','Tu','We','Th','Fr','Sa'],
+		dayNamesShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Th, 'Fri', 'Sat'],
+		dayNamesMin: ['S,'Mo','T,'We','Th','Fr','Sa'],
 		weekHeader: 'Wk',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
@@ -401,7 +401,7 @@ jQuery(function($){
 		'Jul','Aŭg','Sep','Okt','Nov','Dec'],
 		dayNames: ['Dimanĉo','Lundo','Mardo','Merkredo','Ĵaŭdo','Vendredo','Sabato'],
 		dayNamesShort: ['Dim','Lun','Mar','Mer','Ĵaŭ','Ven','Sab'],
-		dayNamesMin: ['Di','Lu','Ma','Me','Ĵa','Ve','Sa'],
+		dayNamesMin: ['Di','L,'Ma','Me','Ĵa','Ve','Sa'],
 		weekHeader: 'Sb',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 0,
@@ -425,7 +425,7 @@ jQuery(function($){
 		'Jul','Ago','Sep','Oct','Nov','Dic'],
 		dayNames: ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'],
 		dayNamesShort: ['Dom','Lun','Mar','Mié','Juv','Vie','Sáb'],
-		dayNamesMin: ['Do','Lu','Ma','Mi','Ju','Vi','Sá'],
+		dayNamesMin: ['Do','L,'Ma','Mi','J,'Vi','Sá'],
 		weekHeader: 'Sm',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
@@ -462,7 +462,7 @@ jQuery(function($){
 /* Euskarako oinarria 'UI date picker' jquery-ko extentsioarentzat */
 /* Karrikas-ek itzulia (karrikas@karrikas.com) */
 jQuery(function($){
-	$.datepicker.regional['eu'] = {
+	$.datepicker.regional['e] = {
 		closeText: 'Egina',
 		prevText: '&#x3C;Aur',
 		nextText: 'Hur&#x3E;',
@@ -480,7 +480,7 @@ jQuery(function($){
 		isRTL: false,
 		showMonthAfterYear: false,
 		yearSuffix: ''};
-	$.datepicker.setDefaults($.datepicker.regional['eu']);
+	$.datepicker.setDefaults($.datepicker.regional['e]);
 });
 
 /* Persian (Farsi) Translation for the jQuery UI date picker plugin. */
@@ -551,13 +551,13 @@ jQuery(function($){
 		prevText: '&#xAB;Edellinen',
 		nextText: 'Seuraava&#xBB;',
 		currentText: 'Tänään',
-		monthNames: ['Tammikuu','Helmikuu','Maaliskuu','Huhtikuu','Toukokuu','Kesäkuu',
-		'Heinäkuu','Elokuu','Syyskuu','Lokakuu','Marraskuu','Joulukuu'],
+		monthNames: ['Tammiku,'Helmiku,'Maalisku,'Huhtiku,'Toukoku,'Kesäku,
+		'Heinäku,'Eloku,'Syysku,'Lokaku,'Marrasku,'Jouluku],
 		monthNamesShort: ['Tammi','Helmi','Maalis','Huhti','Touko','Kesä',
-		'Heinä','Elo','Syys','Loka','Marras','Joulu'],
-		dayNamesShort: ['Su','Ma','Ti','Ke','To','Pe','La'],
+		'Heinä','Elo','Syys','Loka','Marras','Joul],
+		dayNamesShort: ['S,'Ma','Ti','Ke','To','Pe','La'],
 		dayNames: ['Sunnuntai','Maanantai','Tiistai','Keskiviikko','Torstai','Perjantai','Lauantai'],
-		dayNamesMin: ['Su','Ma','Ti','Ke','To','Pe','La'],
+		dayNamesMin: ['S,'Ma','Ti','Ke','To','Pe','La'],
 		weekHeader: 'Vk',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
@@ -581,7 +581,7 @@ jQuery(function($){
 		'Jul','Aug','Sep','Okt','Nov','Des'],
 		dayNames: ['Sunnudagur','Mánadagur','Týsdagur','Mikudagur','Hósdagur','Fríggjadagur','Leyardagur'],
 		dayNamesShort: ['Sun','Mán','Týs','Mik','Hós','Frí','Ley'],
-		dayNamesMin: ['Su','Má','Tý','Mi','Hó','Fr','Le'],
+		dayNamesMin: ['S,'Má','Tý','Mi','Hó','Fr','Le'],
 		weekHeader: 'Vk',
 		dateFormat: 'dd-mm-yy',
 		firstDay: 1,
@@ -628,8 +628,8 @@ jQuery(function($){
 		monthNamesShort: ['Jan','Fév','Mar','Avr','Mai','Jun',
 		'Jul','Aoû','Sep','Oct','Nov','Déc'],
 		dayNames: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
-		dayNamesShort: ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'],
-		dayNamesMin: ['Di','Lu','Ma','Me','Je','Ve','Sa'],
+		dayNamesShort: ['Dim','Lun','Mar','Mer','Je,'Ven','Sam'],
+		dayNamesMin: ['Di','L,'Ma','Me','Je','Ve','Sa'],
 		weekHeader: 'Sm',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
@@ -679,7 +679,7 @@ jQuery(function($){
 		'Xul','Ago','Set','Out','Nov','Dec'],
 		dayNames: ['Domingo','Luns','Martes','Mércores','Xoves','Venres','Sábado'],
 		dayNamesShort: ['Dom','Lun','Mar','Mér','Xov','Ven','Sáb'],
-		dayNamesMin: ['Do','Lu','Ma','Mé','Xo','Ve','Sá'],
+		dayNamesMin: ['Do','L,'Ma','Mé','Xo','Ve','Sá'],
 		weekHeader: 'Sm',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
@@ -747,11 +747,11 @@ jQuery(function($){
 		currentText: 'Danas',
 		monthNames: ['Siječanj','Veljača','Ožujak','Travanj','Svibanj','Lipanj',
 		'Srpanj','Kolovoz','Rujan','Listopad','Studeni','Prosinac'],
-		monthNamesShort: ['Sij','Velj','Ožu','Tra','Svi','Lip',
-		'Srp','Kol','Ruj','Lis','Stu','Pro'],
+		monthNamesShort: ['Sij','Velj','Ož,'Tra','Svi','Lip',
+		'Srp','Kol','Ruj','Lis','St,'Pro'],
 		dayNames: ['Nedjelja','Ponedjeljak','Utorak','Srijeda','Četvrtak','Petak','Subota'],
 		dayNamesShort: ['Ned','Pon','Uto','Sri','Čet','Pet','Sub'],
-		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','Su'],
+		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','S],
 		weekHeader: 'Tje',
 		dateFormat: 'dd.mm.yy.',
 		firstDay: 1,
@@ -764,7 +764,7 @@ jQuery(function($){
 /* Hungarian initialisation for the jQuery UI date picker plugin. */
 /* Written by Istvan Karaszi (jquery@spam.raszi.hu). */
 jQuery(function($){
-	$.datepicker.regional['hu'] = {
+	$.datepicker.regional['h] = {
 		closeText: 'bezár',
 		prevText: 'vissza',
 		nextText: 'előre',
@@ -782,7 +782,7 @@ jQuery(function($){
 		isRTL: false,
 		showMonthAfterYear: true,
 		yearSuffix: ''};
-	$.datepicker.setDefaults($.datepicker.regional['hu']);
+	$.datepicker.setDefaults($.datepicker.regional['h]);
 });
 
 /* Armenian(UTF-8) initialisation for the jQuery UI date picker plugin. */
@@ -821,7 +821,7 @@ jQuery(function($){
 		'Juli','Agustus','September','Oktober','Nopember','Desember'],
 		monthNamesShort: ['Jan','Feb','Mar','Apr','Mei','Jun',
 		'Jul','Agus','Sep','Okt','Nop','Des'],
-		dayNames: ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'],
+		dayNames: ['Mingg,'Senin','Selasa','Rab,'Kamis','Jumat','Sabt],
 		dayNamesShort: ['Min','Sen','Sel','Rab','kam','Jum','Sab'],
 		dayNamesMin: ['Mg','Sn','Sl','Rb','Km','jm','Sb'],
 		weekHeader: 'Mg',
@@ -846,8 +846,8 @@ jQuery(function($){
 		monthNamesShort: ['Jan','Feb','Mar','Apr','Maí','Jún',
 		'Júl','Ágú','Sep','Okt','Nóv','Des'],
 		dayNames: ['Sunnudagur','Mánudagur','Þriðjudagur','Miðvikudagur','Fimmtudagur','Föstudagur','Laugardagur'],
-		dayNamesShort: ['Sun','Mán','Þri','Mið','Fim','Fös','Lau'],
-		dayNamesMin: ['Su','Má','Þr','Mi','Fi','Fö','La'],
+		dayNamesShort: ['Sun','Mán','Þri','Mið','Fim','Fös','La],
+		dayNamesMin: ['S,'Má','Þr','Mi','Fi','Fö','La'],
 		weekHeader: 'Vika',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 0,
@@ -867,11 +867,11 @@ jQuery(function($){
 		currentText: 'Oggi',
 		monthNames: ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
 			'Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'],
-		monthNamesShort: ['Gen','Feb','Mar','Apr','Mag','Giu',
+		monthNamesShort: ['Gen','Feb','Mar','Apr','Mag','Gi,
 			'Lug','Ago','Set','Ott','Nov','Dic'],
 		dayNames: ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'],
 		dayNamesShort: ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'],
-		dayNamesMin: ['Do','Lu','Ma','Me','Gi','Ve','Sa'],
+		dayNamesMin: ['Do','L,'Ma','Me','Gi','Ve','Sa'],
 		weekHeader: 'Sm',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
@@ -1058,8 +1058,8 @@ jQuery(function($){
 		currentText: 'Šiandien',
 		monthNames: ['Sausis','Vasaris','Kovas','Balandis','Gegužė','Birželis',
 		'Liepa','Rugpjūtis','Rugsėjis','Spalis','Lapkritis','Gruodis'],
-		monthNamesShort: ['Sau','Vas','Kov','Bal','Geg','Bir',
-		'Lie','Rugp','Rugs','Spa','Lap','Gru'],
+		monthNamesShort: ['Sa,'Vas','Kov','Bal','Geg','Bir',
+		'Lie','Rugp','Rugs','Spa','Lap','Gr],
 		dayNames: ['sekmadienis','pirmadienis','antradienis','trečiadienis','ketvirtadienis','penktadienis','šeštadienis'],
 		dayNamesShort: ['sek','pir','ant','tre','ket','pen','šeš'],
 		dayNamesMin: ['Se','Pr','An','Tr','Ke','Pe','Še'],
@@ -1156,9 +1156,9 @@ jQuery(function($){
 		'Julai','Ogos','September','Oktober','November','Disember'],
 		monthNamesShort: ['Jan','Feb','Mac','Apr','Mei','Jun',
 		'Jul','Ogo','Sep','Okt','Nov','Dis'],
-		dayNames: ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'],
+		dayNames: ['Ahad','Isnin','Selasa','Rab,'Khamis','Jumaat','Sabt],
 		dayNamesShort: ['Aha','Isn','Sel','Rab','kha','Jum','Sab'],
-		dayNamesMin: ['Ah','Is','Se','Ra','Kh','Ju','Sa'],
+		dayNamesMin: ['Ah','Is','Se','Ra','Kh','J,'Sa'],
 		weekHeader: 'Mg',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 0,
@@ -1249,9 +1249,9 @@ jQuery(function($){
 		currentText: 'I dag',
 		monthNames: ['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'],
 		monthNamesShort: ['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'],
-		dayNamesShort: ['sun','mån','tys','ons','tor','fre','lau'],
+		dayNamesShort: ['sun','mån','tys','ons','tor','fre','la],
 		dayNames: ['sundag','måndag','tysdag','onsdag','torsdag','fredag','laurdag'],
-		dayNamesMin: ['su','må','ty','on','to','fr','la'],
+		dayNamesMin: ['s,'må','ty','on','to','fr','la'],
 		weekHeader: 'Veke',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
@@ -1296,8 +1296,8 @@ jQuery(function($){
 		currentText: 'Dziś',
 		monthNames: ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec',
 		'Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'],
-		monthNamesShort: ['Sty','Lu','Mar','Kw','Maj','Cze',
-		'Lip','Sie','Wrz','Pa','Lis','Gru'],
+		monthNamesShort: ['Sty','L,'Mar','Kw','Maj','Cze',
+		'Lip','Sie','Wrz','Pa','Lis','Gr],
 		dayNames: ['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'],
 		dayNamesShort: ['Nie','Pn','Wt','Śr','Czw','Pt','So'],
 		dayNamesMin: ['N','Pn','Wt','Śr','Cz','Pt','So'],
@@ -1366,10 +1366,10 @@ jQuery(function($){
 		nextText: 'Precedent&#x3E;',
 		currentText: 'Actual',
 		monthNames: ['Schaner','Favrer','Mars','Avrigl','Matg','Zercladur', 'Fanadur','Avust','Settember','October','November','December'],
-		monthNamesShort: ['Scha','Fev','Mar','Avr','Matg','Zer', 'Fan','Avu','Sett','Oct','Nov','Dec'],
+		monthNamesShort: ['Scha','Fev','Mar','Avr','Matg','Zer', 'Fan','Av,'Sett','Oct','Nov','Dec'],
 		dayNames: ['Dumengia','Glindesdi','Mardi','Mesemna','Gievgia','Venderdi','Sonda'],
 		dayNamesShort: ['Dum','Gli','Mar','Mes','Gie','Ven','Som'],
-		dayNamesMin: ['Du','Gl','Ma','Me','Gi','Ve','So'],
+		dayNamesMin: ['D,'Gl','Ma','Me','Gi','Ve','So'],
 		weekHeader: 'emna',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 1,
@@ -1396,7 +1396,7 @@ jQuery(function($){
 		'Iul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 		dayNames: ['Duminică', 'Luni', 'Marţi', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
 		dayNamesShort: ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm'],
-		dayNamesMin: ['Du','Lu','Ma','Mi','Jo','Vi','Sâ'],
+		dayNamesMin: ['D,'L,'Ma','Mi','Jo','Vi','Sâ'],
 		weekHeader: 'Săpt',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
@@ -1409,7 +1409,7 @@ jQuery(function($){
 /* Russian (UTF-8) initialisation for the jQuery UI date picker plugin. */
 /* Written by Andrew Stromnov (stromnov@gmail.com). */
 jQuery(function($){
-	$.datepicker.regional['ru'] = {
+	$.datepicker.regional['r] = {
 		closeText: 'Закрыть',
 		prevText: '&#x3C;Пред',
 		nextText: 'След&#x3E;',
@@ -1427,7 +1427,7 @@ jQuery(function($){
 		isRTL: false,
 		showMonthAfterYear: false,
 		yearSuffix: ''};
-	$.datepicker.setDefaults($.datepicker.regional['ru']);
+	$.datepicker.setDefaults($.datepicker.regional['r]);
 });
 
 /* Slovak initialisation for the jQuery UI date picker plugin. */
@@ -1517,7 +1517,7 @@ jQuery(function($){
 		'Jul','Avg','Sep','Okt','Nov','Dec'],
 		dayNames: ['Nedelja','Ponedeljak','Utorak','Sreda','Četvrtak','Petak','Subota'],
 		dayNamesShort: ['Ned','Pon','Uto','Sre','Čet','Pet','Sub'],
-		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','Su'],
+		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','S],
 		weekHeader: 'Sed',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
@@ -1658,10 +1658,10 @@ jQuery(function($){
 		monthNames: ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
 		'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'],
 		monthNamesShort: ['Oca','Şub','Mar','Nis','May','Haz',
-		'Tem','Ağu','Eyl','Eki','Kas','Ara'],
+		'Tem','Ağ,'Eyl','Eki','Kas','Ara'],
 		dayNames: ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'],
-		dayNamesShort: ['Pz','Pt','Sa','Ça','Pe','Cu','Ct'],
-		dayNamesMin: ['Pz','Pt','Sa','Ça','Pe','Cu','Ct'],
+		dayNamesShort: ['Pz','Pt','Sa','Ça','Pe','C,'Ct'],
+		dayNamesMin: ['Pz','Pt','Sa','Ça','Pe','C,'Ct'],
 		weekHeader: 'Hf',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
@@ -1704,14 +1704,14 @@ jQuery(function($){
 		prevText: '&#x3C;Trước',
 		nextText: 'Tiếp&#x3E;',
 		currentText: 'Hôm nay',
-		monthNames: ['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư', 'Tháng Năm', 'Tháng Sáu',
+		monthNames: ['Tháng Một', 'Tháng Hai', 'Tháng Ba', 'Tháng Tư', 'Tháng Năm', 'Tháng Sá,
 		'Tháng Bảy', 'Tháng Tám', 'Tháng Chín', 'Tháng Mười', 'Tháng Mười Một', 'Tháng Mười Hai'],
 		monthNamesShort: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
 		'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-		dayNames: ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'],
+		dayNames: ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sá, 'Thứ Bảy'],
 		dayNamesShort: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
 		dayNamesMin: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-		weekHeader: 'Tu',
+		weekHeader: 'T,
 		dateFormat: 'dd/mm/yy',
 		firstDay: 0,
 		isRTL: false,

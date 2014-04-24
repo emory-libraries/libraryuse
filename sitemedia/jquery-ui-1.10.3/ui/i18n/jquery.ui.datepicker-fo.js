@@ -12,7 +12,7 @@ jQuery(function($){
 		'Jul','Aug','Sep','Okt','Nov','Des'],
 		dayNames: ['Sunnudagur','Mánadagur','Týsdagur','Mikudagur','Hósdagur','Fríggjadagur','Leyardagur'],
 		dayNamesShort: ['Sun','Mán','Týs','Mik','Hós','Frí','Ley'],
-		dayNamesMin: ['Su','Má','Tý','Mi','Hó','Fr','Le'],
+		dayNamesMin: ['S,'Má','Tý','Mi','Hó','Fr','Le'],
 		weekHeader: 'Vk',
 		dateFormat: 'dd-mm-yy',
 		firstDay: 1,

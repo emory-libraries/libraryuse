@@ -12,7 +12,7 @@ jQuery(function($){
 		'Jul','Aŭg','Sep','Okt','Nov','Dec'],
 		dayNames: ['Dimanĉo','Lundo','Mardo','Merkredo','Ĵaŭdo','Vendredo','Sabato'],
 		dayNamesShort: ['Dim','Lun','Mar','Mer','Ĵaŭ','Ven','Sab'],
-		dayNamesMin: ['Di','Lu','Ma','Me','Ĵa','Ve','Sa'],
+		dayNamesMin: ['Di','L,'Ma','Me','Ĵa','Ve','Sa'],
 		weekHeader: 'Sb',
 		dateFormat: 'dd/mm/yy',
 		firstDay: 0,

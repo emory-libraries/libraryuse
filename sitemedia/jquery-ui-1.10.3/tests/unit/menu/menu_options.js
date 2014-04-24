@@ -63,7 +63,7 @@ test( "{ icons: { submenu: 'custom' } }", function() {
 
 // TODO: test position option
 
-test( "{ role: 'menu' } ", function() {
+test( "{ role: 'men } ", function() {
 	var element = $( "#menu1" ).menu(),
 		items = element.find( "li" );
 	expect( 2 + 5 * items.length );
