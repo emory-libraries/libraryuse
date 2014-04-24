@@ -95,11 +95,11 @@ class Command(BaseCommand):
             except:
                 sys.exc_clear() #no problem
 
-            cursor_db.execute('''create table libraryvisit_mv 
+            cmd = ('''create table libraryvisit_mv 
             as select distinct concat(idnumber,substr(term_date,1,16)) as id, 
             idnumber, lastname, firstname, 
-            concat(substr(term_date,1,16),':00') as visit_time, location, 
-            term_number, PRSN_I_PBLC, PRSN_I_ECN, PRSN_I_HR, PRSN8HC_I_HR, 
+            str_to_date(concat(substr(term_date,1,16),':00'), '%%Y-%%m-%%d %%T') as visit_time,
+            location, term_number, PRSN_I_PBLC, PRSN_I_ECN, PRSN_I_HR, PRSN8HC_I_HR, 
             PRSN_I_SA, PRSN_E_TITL_DTRY, PRSN_C_TYPE, PRSN_E_TYPE, 
             EMJO_C_CLSF, DPRT_C, DPRT_N, DVSN_I, DVSN_N, EMPE_C_FCLT_RANK, 
             PRSN_C_TYPE_HC, PRSN_E_TYPE_HC, EMJO8HC_C_CLSF, DPRT8HC_C, 
@@ -107,6 +107,8 @@ class Command(BaseCommand):
             STDN_E_CLAS, STDN_F_UNGR, STDN_F_CMPS_ON  
             from turnstile, esd 
             where replace(turnstile.idnumber,' ', '') = esd.PRSN_I_ECN;''')
+            
+            cursor_db.execute(cmd)
     
         except Exception, e:
             transaction.rollback()
