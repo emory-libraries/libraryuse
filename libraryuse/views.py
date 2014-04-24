@@ -80,8 +80,9 @@ def export(request):
     #print('HELLO')
     #for r in q:
     #    print(r.location)
+
+    return render(request, 'libraryuse/export.html', {'form': export_form,})
     
-    return render_to_response('libraryuse/export.html', context)
 
 @login_required
 def summary(request):
