@@ -11,7 +11,6 @@ class DataExportForm(ModelForm):
         widgets = {'date': forms.DateInput(attrs={'class': 'datePicker'})}
     
     def __init__(self, *args, **kwargs):
-        print(args)
         super(DataExportForm, self).__init__(*args, **kwargs)
         start_date = LibraryVisit.objects.all().aggregate(Min('visit_time'))
         end_date = LibraryVisit.objects.all().aggregate(Max('visit_time'))
