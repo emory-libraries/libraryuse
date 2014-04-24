@@ -1636,7 +1636,7 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
       .parents('li')
       .addClass('active')
 
-    if (active.parent('.dropdown-menu').length) {
+    if (active.parent('.dropdown-men).length) {
       active = active
         .closest('li.dropdown')
         .addClass('active')
@@ -1758,7 +1758,7 @@ if (typeof jQuery === 'undefined') { throw new Error('Bootstrap\'s JavaScript re
         element.removeClass('fade')
       }
 
-      if (element.parent('.dropdown-menu')) {
+      if (element.parent('.dropdown-men)) {
         element.closest('li.dropdown').addClass('active')
       }
 
