@@ -142,8 +142,11 @@ def usage(request, dim):
 #@login_required
 def usage_json(request, dim, start, end):
     name_map = {'visittime': 'visittime', 'total': 'total', 'pk': 'id'}
-    numbers = LibraryVisit.objects.raw('SELECT id, UNIX_TIMESTAMP(visit_time) AS visittime, COUNT(*) AS total FROM libraryvisit_bk WHERE visit_time BETWEEN "%s" AND "%s" GROUP BY visit_time' % (start, end), translations=name_map)
-
+    
+    sql = "SELECT id, UNIX_TIMESTAMP(visit_time) AS visittime, COUNT(*) AS total FROM libraryvisit_mv WHERE (location = '%s') AND (visit_time BETWEEN '%s' AND '%s') GROUP BY visit_time" % (dim, start, end)
+    
+    numbers = LibraryVisit.objects.raw(sql, translations=name_map)
+    print(sql)
     foo = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end])
     
  #   data = []
@@ -159,7 +162,7 @@ def usage_json(request, dim, start, end):
     for n in numbers[:-1]:
         #print(n.total)
         #print(n.visittime)
-	data.append('[%s000,%s],' % (n.visittime, n.total))
+        data.append('[%s000,%s],' % (n.visittime, n.total))
     data.append('[%s000,%s]]}' % (numbers[-1].visittime, numbers[-1].total))
     #data.append(']}')
     return HttpResponse(data, content_type='application/json')
