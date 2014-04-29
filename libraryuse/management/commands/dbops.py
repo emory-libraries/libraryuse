@@ -98,7 +98,7 @@ class Command(BaseCommand):
             cmd = ('''create table libraryvisit_mv 
             as select distinct concat(idnumber,substr(term_date,1,16)) as id, 
             idnumber, lastname, firstname, 
-            str_to_date(concat(substr(term_date,1,16),':00'), '%%Y-%%m-%%d %%T') as visit_time,
+            str_to_date(concat(substr(term_date,1,16),':00'), '%Y-%m-%d %T') as visit_time,
             location, term_number, PRSN_I_PBLC, PRSN_I_ECN, PRSN_I_HR, PRSN8HC_I_HR, 
             PRSN_I_SA, PRSN_E_TITL_DTRY, PRSN_C_TYPE, PRSN_E_TYPE, 
             EMJO_C_CLSF, DPRT_C, DPRT_N, DVSN_I, DVSN_N, EMPE_C_FCLT_RANK, 
@@ -125,4 +125,3 @@ class Command(BaseCommand):
                 break
             for result in results:
                 yield result
-
