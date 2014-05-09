@@ -21,9 +21,12 @@ import logging
 from optparse import make_option
 import sys
 import os
+from datetime import timedelta
 import cx_Oracle
 from django.db import connection, connections, transaction
 from django.core.management.base import BaseCommand, CommandError
+from libraryuse.models import LibraryVisit
+from django.db.models import Max
 
 class Command(BaseCommand):
     help = "perform database maintenance operations"
@@ -38,18 +41,25 @@ class Command(BaseCommand):
             action='store_true',
             dest='refresh_libraryvisit',
             default=False,
-            help='Refresh libraryvisit_mv materialized view'),                             
+            help='Refresh libraryvisit_mv materialized view'),
+        make_option('--update-libraryvisit',
+            action='store_true',
+            dest='update_libraryvisit',
+            default=False,
+            help='Update libraryvisit_mv materialized view'),
         )
 
     @transaction.commit_manually
     def handle(self, *args, **options):
-        if not (options['refresh_esd'] or options['refresh_libraryvisit']):
+        if not (options['refresh_esd'] or options['refresh_libraryvisit'] or options['update_libraryvisit']):
             sys.exit('Nothing to do')
         
         if options['refresh_esd']:
             self.refresh_esd()
         if options['refresh_libraryvisit']:
             self.refresh_libraryvisit()
+        if options['update_libraryvisit']:
+            self.update_libraryvisit()
 
     @transaction.commit_manually
     def refresh_esd(self):
@@ -107,6 +117,49 @@ class Command(BaseCommand):
             STDN_E_CLAS, STDN_F_UNGR, STDN_F_CMPS_ON  
             from turnstile, esd 
             where replace(turnstile.idnumber,' ', '') = esd.PRSN_I_ECN;''')
+            
+            cursor_db.execute(cmd)
+    
+        except Exception, e:
+            transaction.rollback()
+            cxn_db.close()
+            raise CommandError("problem refreshing db.libraryvisit_mv: %s" % e)
+
+        transaction.commit()
+        cxn_db.close()
+    
+    @transaction.commit_manually
+    def update_libraryvisit(self):
+
+        cxn_db = connections['default']
+        cursor_db = cxn_db.cursor()
+        
+        last_date = LibraryVisit.objects.all().aggregate(Max('visit_time'))
+        search_date = last_date['visit_time__max'] + timedelta(minutes=1)
+
+        try:
+            
+            cmd = '''INSERT INTO libraryvisit_mv (id, idnumber, lastname, firstname,
+            visit_time, location, term_number, prsn_i_pblc, prsn_i_ecn,  
+            prsn_i_hr, prsn8hc_i_hr, prsn_i_sa, prsn_e_titl_dtry, prsn_c_type, 
+            prsn_e_type, emjo_c_clsf, dprt_c, dprt_n, dvsn_i, dvsn_n, 
+            empe_c_fclt_rank, prsn_c_type_hc, prsn_e_type_hc, emjo8hc_c_clsf, 
+            dprt8hc_c, dprt8hc_n, dvsn8hc_i, dvsn8hc_n, acca_i, acpr_n, 
+            acpl_n, stdn_e_clas, stdn_f_ungr, stdn_f_cmps_on)
+            
+            (SELECT concat(turnstile.idnumber,substr(turnstile.term_date,1,16)),
+            turnstile.idnumber, turnstile.lastname, turnstile.firstname,
+            str_to_date(concat(substr(turnstile.term_date,1,16),':00'), '%%Y-%%m-%%d %%T'),
+            turnstile.location, turnstile.term_number, esd.prsn_i_pblc, esd.prsn_i_ecn, esd.prsn_i_hr, esd.prsn8hc_i_hr,
+            esd.prsn_i_sa, esd.prsn_e_titl_dtry, esd.prsn_c_type, esd.prsn_e_type,
+            esd.emjo_c_clsf, esd.dprt_c, esd.dprt_n, esd.dvsn_i, esd.dvsn_n, 
+            esd.empe_c_fclt_rank, esd.prsn_c_type_hc, esd.prsn_e_type_hc, esd.emjo8hc_c_clsf, 
+            esd.dprt8hc_c, esd.dprt8hc_n, esd.dvsn8hc_i, esd.dvsn8hc_n, esd.acca_i, esd.acpr_n, 
+            esd.acpl_n, esd.stdn_e_clas, esd.stdn_f_ungr, esd.stdn_f_cmps_on
+            
+            FROM turnstile, esd 
+            
+            WHERE (replace(turnstile.idnumber,' ', '') = esd.prsn_i_ecn) AND (DATE(turnstile.term_date) > '%s'));''' % (search_date)
             
             cursor_db.execute(cmd)
     
