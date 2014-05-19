@@ -1,0 +1,44 @@
+{% extends "site_base.html" %}
+{% load url from future %}
+{% load render_table from django_tables2 %}
+{% load static %}
+
+{% block content %}
+
+<h3>Usage Reports</h3>
+
+<div class="result">
+	<h4>Person Type</h4>
+	<div>{% render_table person_type %}</div>
+</div>
+
+<div class="result">
+	<h4>Department</h4>
+	<div>{% render_table department %}</div>
+</div>
+
+<div class="result">
+	<h4>Division</h4>
+	
+	<div>{% render_table division %}</div>
+</div>
+
+<div class="result">
+	<h4>Program</h4>
+	
+	<div>{% render_table program %}</div>
+</div>
+
+<div class="result">
+	<h4>Plan</h4>
+	
+	<div>{% render_table plan %}</div>
+</div>
+
+<div class="result">
+	<h4>Class</h4>
+	
+	<div>{% render_table class %}</div>
+</div>
+
+{% endblock %}

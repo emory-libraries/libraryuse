@@ -1,0 +1,18 @@
+from django.conf.urls import patterns, include, url
+from django.contrib import admin
+from libraryuse import views, settings
+
+admin.autodiscover()
+
+urlpatterns = patterns(
+    '',
+    #url(r'^$', views.index, name='index'),
+    url(r'^$', views.summary, name='index'),
+    url(r'^summary$', views.summary, name='summary'),
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^export$', views.export, name='export'),
+    url(r'^visualize$', views.visualize, name='visualize'),
+    url(r'^usage/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage, name='usage'),
+    url(r'^usage_json/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage_json, name='usage_json'),
+    url(r'^daterange_json$', views.daterange_json, name='daterange'),
+)
