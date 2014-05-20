@@ -120,6 +120,8 @@ INSTALLED_APPS = (
     'south',
     'eullocal.django.emory_ldap',
     'libraryuse',
+    'tastypie',
+    'tastypie_mongoengine',
 
 )
 
