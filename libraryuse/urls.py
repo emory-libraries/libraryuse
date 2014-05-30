@@ -6,10 +6,10 @@ from libraryuse import views, settings
 
 admin.autodiscover()
 
-v1_api = Api(api_name='v1')
-v1_api.register(VisitsResource())
-v1_api.register(VisitCountHalfHourResource())
-v1_api.register(VisitCountResource())
+#v1_api = Api(api_name='v1')
+#v1_api.register(VisitsResource())
+#v1_api.register(VisitCountHalfHourResource())
+#v1_api.register(VisitCountResource())
 
 urlpatterns = patterns(
     '',
@@ -22,5 +22,5 @@ urlpatterns = patterns(
     url(r'^usage/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage, name='usage'),
     url(r'^usage_json/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage_json, name='usage_json'),
     url(r'^daterange_json$', views.daterange_json, name='daterange'),
-    url(r'^api/', include(v1_api.urls)),
+    #url(r'^api/', include(v1_api.urls)),
 )
