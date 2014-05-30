@@ -140,10 +140,10 @@ def usage(request, dim):
     return HttpResponse(data_json, content_type='application/json')
 
 #@login_required
-def usage_json(request, dim, start, end):
+def usage_json(request, library, start, end):
     name_map = {'visittime': 'visittime', 'total': 'total', 'pk': 'id'}
     
-    sql = "SELECT id, UNIX_TIMESTAMP(visit_time) AS visittime, COUNT(*) AS total FROM libraryvisit_mv WHERE (location = '%s') AND (visit_time BETWEEN '%s' AND '%s') GROUP BY visit_time" % (dim, start, end)
+    sql = "SELECT id, UNIX_TIMESTAMP(visit_time) AS visittime, COUNT(*) AS total FROM libraryvisit_mv WHERE (location = '%s') AND (visit_time BETWEEN '%s' AND '%s') GROUP BY visit_time" % (library, start, end)
     
     numbers = LibraryVisit.objects.raw(sql, translations=name_map)
     print(sql)
@@ -158,12 +158,12 @@ def usage_json(request, dim, start, end):
  #   data.append('[%s000,%s]]}' % (stamp, bar['total']))
 
     data = []
-    data.append('{"data":[')
+    data.append('dontPanic({"data":[')
     for n in numbers[:-1]:
         #print(n.total)
         #print(n.visittime)
         data.append('[%s000,%s],' % (n.visittime, n.total))
-    data.append('[%s000,%s]]}' % (numbers[-1].visittime, numbers[-1].total))
+    data.append('[%s000,%s]]})' % (numbers[-1].visittime, numbers[-1].total))
     #data.append(']}')
     return HttpResponse(data, content_type='application/json')
 
