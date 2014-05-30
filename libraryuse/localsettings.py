@@ -38,7 +38,7 @@ DATABASES = {
 }
 
 # MongoDB settings
-register_connection(alias='default',name='libraryuse')
+#register_connection(alias='default',name='libraryuse')
 
 #DATABASE_ROUTERS= ['dbrouter.DBRouter']
 
