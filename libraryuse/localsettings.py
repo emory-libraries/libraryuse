@@ -31,10 +31,10 @@ DATABASES = {
         #'HOST': 'localhost',
         'PORT': '',        
     },
-    'mongodb' : {
-        'ENGINE' : 'django_mongodb_engine',
-        'NAME' : 'libraryuse'
-   }
+   # 'mongodb' : {
+   #     'ENGINE' : 'django_mongodb_engine',
+   #     'NAME' : 'libraryuse'
+   #}
 }
 
 # MongoDB settings
