@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from tastypie.api import Api
-from api.resources import VisitsResource, VisitCountHalfHourResource, VisitCountResource
+#from api.resources import VisitsResource, VisitCountHalfHourResource, VisitCountResource
 from libraryuse import views, settings
 
 admin.autodiscover()
