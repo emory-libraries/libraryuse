@@ -31,17 +31,14 @@ DATABASES = {
         #'HOST': 'localhost',
         'PORT': '',        
     },
+    'mongodb' : {
+        'ENGINE' : 'django_mongodb_engine',
+        'NAME' : 'libraryuse'
+   }
 }
 
 # MongoDB settings
-register_connection(
-     alias = 'default',
-     name = 'libraryuse',
-     username = os.environ['OPENSHIFT_MONGODB_DB_USERNAME'],
-     password = os.environ['OPENSHIFT_MONGODB_DB_PASSWORD'],
-     host = os.environ['OPENSHIFT_MONGODB_DB_HOST'],
-     port = int(os.environ['OPENSHIFT_MONGODB_DB_PORT'])
-)
+register_connection(alias='default',name='libraryuse')
 
 #DATABASE_ROUTERS= ['dbrouter.DBRouter']
 
@@ -70,7 +67,7 @@ SITE_ID = 1
 MEDIA_URL = ''
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '12345'
+SECRET_KEY = '12345avria9h0veoinlkdnkalndvlkasndivlskdvjaklsj'
 
 # LDAP configuration
 AUTH_LDAP_SERVER = 'ldaps://vlad.service.emory.edu'

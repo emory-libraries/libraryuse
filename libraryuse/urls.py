@@ -1,7 +1,7 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from tastypie.api import Api
-from api.resources import VisitsResource, VisitCountHalfHourResource
+from api.resources import VisitsResource, VisitCountHalfHourResource, VisitCountResource
 from libraryuse import views, settings
 
 admin.autodiscover()
@@ -9,6 +9,7 @@ admin.autodiscover()
 v1_api = Api(api_name='v1')
 v1_api.register(VisitsResource())
 v1_api.register(VisitCountHalfHourResource())
+v1_api.register(VisitCountResource())
 
 urlpatterns = patterns(
     '',
