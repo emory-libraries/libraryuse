@@ -1,7 +1,7 @@
 # Django local settings for libraryuse project.
 
 import os
-from mongoengine import register_connection
+#from mongoengine import register_connection
 #os.environ['HTTP_PROXY'] = 'http://skoda.library.emory.edu:3128'
 os.environ['ORACLE_HOME'] = '/opt/instantclient_11_2'
 os.environ['LD_LIBRARY_PATH'] = '/opt/instantclient_11_2'

@@ -121,7 +121,7 @@ INSTALLED_APPS = (
     'eullocal.django.emory_ldap',
     'libraryuse',
     'tastypie',
-    'tastypie_mongoengine',
+    #'tastypie_mongoengine',
 
 )
 
