@@ -183,6 +183,16 @@ def on_off_campus(request, library, resident, start, end):
 
     return HttpResponse(data, content_type='application/json')
 
+def classification(request, library, classification, start, end):
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end]).filter(location = location).filter(stdn_e_clas = classification).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+
+    data = chart_data(numbers)
+
+    return HttpResponse(data, content_type='application/json')
+
 #try tables.py, and count as string
 def _usage(dim):
     def crunch(attr):

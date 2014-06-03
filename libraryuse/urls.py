@@ -23,5 +23,6 @@ urlpatterns = patterns(
     url(r'^total_usage/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.total_usage, name='total_usage'),
     url(r'^daterange_json$', views.daterange_json, name='daterange'),
     url(r'^on_off_campus/(?P<library>.+)/(?P<resident>.+)/(?P<start>.+)/(?P<end>.+)/$', views.on_off_campus, name='on_off_campus'),
+    url(r'^classification/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.classification, name='classification'),
     #url(r'^api/', include(v1_api.urls)),
 )
