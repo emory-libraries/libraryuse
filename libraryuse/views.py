@@ -139,32 +139,48 @@ def usage(request, dim):
     data_json =  simplejson.dumps(data)
     return HttpResponse(data_json, content_type='application/json')
 
-#@login_required
-def usage_json(request, library, start, end):
-    name_map = {'visittime': 'visittime', 'total': 'total', 'pk': 'id'}
-    
-    sql = "SELECT id, UNIX_TIMESTAMP(visit_time) AS visittime, COUNT(*) AS total FROM libraryvisit_mv WHERE (location = '%s') AND (visit_time BETWEEN '%s' AND '%s') GROUP BY visit_time" % (library, start, end)
-    
-    numbers = LibraryVisit.objects.raw(sql, translations=name_map)
-    print(sql)
-    foo = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end])
-    
- #   data = []
- #   data.append('{"data":[')
- #   for bar in foo[:-1]:
- #       dt = datetime.strptime(str(bar['visit_time']), '%Y-%m-%d %H:%M:%S')
- #       stamp = int(time.mktime(dt.timetuple()))
- #       data.append('[%s00,%s],' % (stamp, bar['total']))
- #   data.append('[%s000,%s]]}' % (stamp, bar['total']))
-
+def chart_data(numbers):
     data = []
+    visits = []
     data.append('dontPanic({"data":[')
-    for n in numbers[:-1]:
-        #print(n.total)
-        #print(n.visittime)
-        data.append('[%s000,%s],' % (n.visittime, n.total))
-    data.append('[%s000,%s]]})' % (numbers[-1].visittime, numbers[-1].total))
-    #data.append(']}')
+    for n in numbers:
+        dt = datetime.strptime(str(n['visit_time']), '%Y-%m-%d %H:%M:%S')
+        epoch = int(time.mktime(dt.timetuple()))
+        visits.append('[%s000,%s]' % (epoch, n['total']))
+    data.append(', '.join(visits))
+    data.append(']})')
+    
+    return(data)
+
+def location_name(library):
+    if 'woodruff' in library:
+        return('LOCATION: WL TURNSTILE (1&2)')
+    elif 'law' in library:
+        return('LOCATION: LAW ACCESS')
+    elif 'health' in library:
+        return('LOCATION: HEALTH SCIENCES LIBRARY')
+    else:
+        return(None)
+
+#@login_required
+def total_usage(request, library, start, end):
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end]).filter(location = location)
+
+    data = chart_data(numbers)
+
+    return HttpResponse(data, content_type='application/json')
+
+def on_off_campus(request, library, resident, start, end):
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end]).filter(location = location).filter(stdn_f_cmps_on = resident).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+
+    data = chart_data(numbers)
+
     return HttpResponse(data, content_type='application/json')
 
 #try tables.py, and count as string

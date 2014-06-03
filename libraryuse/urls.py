@@ -20,7 +20,8 @@ urlpatterns = patterns(
     url(r'^export$', views.export, name='export'),
     url(r'^visualize$', views.visualize, name='visualize'),
     url(r'^usage/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage, name='usage'),
-    url(r'^usage_json/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage_json, name='usage_json'),
+    url(r'^total_usage/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.total_usage, name='total_usage'),
     url(r'^daterange_json$', views.daterange_json, name='daterange'),
+    url(r'^on_off_campus/(?P<library>.+)/(?P<resident>.+)/(?P<start>.+)/(?P<end>.+)/$', views.on_off_campus, name='on_off_campus'),
     #url(r'^api/', include(v1_api.urls)),
 )
