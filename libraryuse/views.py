@@ -25,6 +25,8 @@ from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, P
 from django_tables2 import RequestConfig
 
 import pprint
+import random
+import string
 
 from datetime import datetime
 import time
@@ -140,9 +142,12 @@ def usage(request, dim):
     return HttpResponse(data_json, content_type='application/json')
 
 def chart_data(numbers):
+    
+    randomstr = ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(3)])
+    
     data = []
     visits = []
-    data.append('dontPanic({"data":[')
+    data.append('%s({"data":[' % randomstr)
     for n in numbers:
         dt = datetime.strptime(str(n['visit_time']), '%Y-%m-%d %H:%M:%S')
         epoch = int(time.mktime(dt.timetuple()))
