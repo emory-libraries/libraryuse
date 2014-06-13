@@ -143,11 +143,11 @@ def usage(request, dim):
 
 def chart_data(numbers):
     
-    randomstr = ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(3)])
+    randomstr = ''.join([random.choice(string.ascii_letters) for n in xrange(3)])
     
     data = []
     visits = []
-    data.append('%s({"data":[' % randomstr)
+    data.append('jsonp%s({"data":[' % randomstr)
     for n in numbers:
         dt = datetime.strptime(str(n['visit_time']), '%Y-%m-%d %H:%M:%S')
         epoch = int(time.mktime(dt.timetuple()))
