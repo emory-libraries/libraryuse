@@ -147,7 +147,7 @@ def chart_data(numbers):
     
     data = []
     visits = []
-    data.append('?({"data":[')
+    data.append('%s({"data":[' % randomstr)
     for n in numbers:
         dt = datetime.strptime(str(n['visit_time']), '%Y-%m-%d %H:%M:%S')
         epoch = int(time.mktime(dt.timetuple()))
