@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils import simplejson
+import json
 from django.shortcuts import redirect 
 from django.db.models import Q, Count
 from django.core.urlresolvers import reverse
@@ -207,6 +208,34 @@ def faculty_staff_class(request, library, classification, start, end):
     data = chart_data(numbers)
 
     return HttpResponse(data, content_type='application/json')
+
+def student_classifications(request):
+    student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
+    acidemic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
+    department = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
+    
+    data = []
+    jsonp = []
+    
+    def add_classes(classes, title):
+        list = [title]
+        class_list = []
+        
+        for item in classes:
+            class_list.append(str('%s' % item))
+        
+        list.append(class_list)
+        return list
+    
+    #data.append('jsonCategories({')
+    data.append(add_classes(student_classes, 'student_classes'))
+    data.append(add_classes(acidemic_plans, 'acidemic_plans'))
+    data.append(add_classes(department, 'department'))
+    #jsonp.append('jsonResponse({')
+    jsonp.append(json.dumps(data))
+    #jsonp.append('})')
+    
+    return HttpResponse(jsonp, content_type='application/json')
 
 #try tables.py, and count as string
 def _usage(dim):
