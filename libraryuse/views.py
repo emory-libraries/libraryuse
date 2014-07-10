@@ -1,9 +1,8 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseRedirect
 from django.template import Context, loader
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render_to_response 
-from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.db import models
 from django.contrib.auth import authenticate, login, logout
@@ -149,10 +148,11 @@ def chart_data(numbers):
     data = []
     visits = []
     data.append('jsonResponse({"data":[')
-    for n in numbers:
-        dt = datetime.strptime(str(n['visit_time']), '%Y-%m-%d %H:%M:%S')
+    for number in numbers:
+        dt = datetime.strptime(str(number['visit_time']), '%Y-%m-%d %H:%M:%S')
         epoch = int(time.mktime(dt.timetuple()))
-        visits.append('[%s000,%s]' % (epoch, n['total']))
+        # We have to add the three zeros to work with HighCharts
+        visits.append('[%s000,%s]' % (epoch, number['total']))
     data.append(', '.join(visits))
     data.append(']})')
     
@@ -178,6 +178,16 @@ def total_usage(request, library, start, end):
     data = chart_data(numbers)
 
     return HttpResponse(data, content_type='application/json')
+
+def total_distinct_usage(request, library, start, end):
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('prsn_i_ecn', distinct=True)).filter(visit_time__range=[start, end]).filter(location = location)
+
+    data = chart_data(numbers)
+
+    return StreamingHttpResponse(data, content_type='application/json')
 
 def on_off_campus(request, library, resident, start, end):
     
@@ -211,11 +221,13 @@ def faculty_staff_class(request, library, classification, start, end):
 
 def student_classifications(request):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
-    acidemic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
-    department = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
+    acidemic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(acpl_n__isnull=True)
+    department = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(dprt_n__isnull=True)
+    acc_career = LibraryVisit.objects.values_list('acca_i', flat=True).distinct().exclude(acca_i__isnull=True).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+    faculty_dvsn_n = LibraryVisit.objects.values_list('dvsn_n', flat=True).distinct().exclude(dvsn_n__isnull=True).filter(Q(prsn_c_type = 'F'))
     
     data = []
-    jsonp = []
+    json_data = []
     
     def add_classes(classes, title):
         list = [title]
@@ -225,17 +237,19 @@ def student_classifications(request):
             class_list.append(str('%s' % item))
         
         list.append(class_list)
-        return list
+        return class_list
     
     #data.append('jsonCategories({')
     data.append(add_classes(student_classes, 'student_classes'))
     data.append(add_classes(acidemic_plans, 'acidemic_plans'))
-    data.append(add_classes(department, 'department'))
+    data.append(add_classes(acc_career, 'acdemic_career'))
+    data.append(add_classes(faculty_dvsn_n, 'faculty_divisions'))
     #jsonp.append('jsonResponse({')
-    jsonp.append(json.dumps(data))
+    json_data.append(json.dumps(data))
     #jsonp.append('})')
+    jsonp = 'jsonClassifications(%s)' % data
     
-    return HttpResponse(jsonp, content_type='application/json')
+    return StreamingHttpResponse(jsonp, content_type='application/json')
 
 #try tables.py, and count as string
 def _usage(dim):
