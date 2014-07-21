@@ -21,7 +21,7 @@ urlpatterns = patterns(
     url(r'^export$', views.export, name='export'),
     url(r'^visualize$', views.visualize, name='visualize'),
     
-    url(r'^student_classifications', views.student_classifications, name='student_classifications'),
+    url(r'^classifications', views.classifications, name='classifications'),
     
     url(r'^usage/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage, name='usage'),
     url(r'^total_usage/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.total_usage, name='total_usage'),
