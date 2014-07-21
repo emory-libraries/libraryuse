@@ -219,7 +219,7 @@ def faculty_staff_class(request, library, classification, start, end):
 
     return HttpResponse(data, content_type='application/json')
 
-def student_classifications(request):
+def classifications(request):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
     acidemic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(acpl_n__isnull=True)
     department = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(dprt_n__isnull=True)
