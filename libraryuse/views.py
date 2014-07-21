@@ -249,7 +249,7 @@ def student_classifications(request):
     #jsonp.append('})')
     jsonp = 'jsonClassifications(%s)' % data
     
-    return StreamingHttpResponse(jsonp, content_type='application/json')
+    return StreamingHttpResponse(json_data, content_type='application/json')
 
 #try tables.py, and count as string
 def _usage(dim):
