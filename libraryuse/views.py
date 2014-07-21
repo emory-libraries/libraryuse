@@ -237,7 +237,7 @@ def classifications(request):
             class_list.append(str('%s' % item))
         
         list.append(class_list)
-        return class_list
+        return list
     
     #data.append('jsonCategories({')
     data.append(add_classes(student_classes, 'student_classes'))
