@@ -15,6 +15,7 @@ v1_api.register(ClassificationsResource())
 urlpatterns = patterns(
     '',
     #url(r'^$', views.index, name='index'),
+    
     url(r'^$', views.summary, name='index'),
     url(r'^summary$', views.summary, name='summary'),
     url(r'^admin/', include(admin.site.urls)),
@@ -25,7 +26,6 @@ urlpatterns = patterns(
     
     url(r'^usage/(?P<dim>.+)/(?P<start>.+)/(?P<end>.+)/$', views.usage, name='usage'),
     url(r'^total_usage/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.total_usage, name='total_usage'),
-    url(r'^total_distinct_usage/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.total_distinct_usage, name='total_distinct_usage'),
     url(r'^daterange_json$', views.daterange_json, name='daterange'),
     url(r'^on_off_campus/(?P<library>.+)/(?P<resident>.+)/(?P<start>.+)/(?P<end>.+)/$', views.on_off_campus, name='on_off_campus'),
     url(r'^student_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.student_class, name='student_class'),
