@@ -159,6 +159,9 @@ def chart_data(numbers, distinct_flag):
             elif number.has_key('dprt_n'):
                 dprt_n = number['dprt_n']
                 visits.append('["%s",%s]' % (dprt_n, number['total']))
+            elif number.has_key('dvsn_n'):
+                dvsn_n = number['dvsn_n']
+                visits.append('["%s",%s]' % (dvsn_n, number['total']))
         data.append(', '.join(visits))
     else:
         data.append(numbers)
@@ -307,6 +310,22 @@ def top_dprtn(request, library, start, end):
     
     numbers = LibraryVisit.objects.values('dprt_n') \
                 .annotate(total=Count('dprt_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location)
+
+    data = chart_data(numbers, distinct_flag)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def top_devision(request, library, start, end):
+    
+    distinct_flag = request.GET.get('distinct', False)
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('dvsn_n') \
+                .annotate(total=Count('dvsn_n')) \
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
