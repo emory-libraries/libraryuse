@@ -30,7 +30,7 @@ urlpatterns = patterns(
     url(r'^on_off_campus/(?P<library>.+)/(?P<resident>.+)/(?P<start>.+)/(?P<end>.+)/$', views.on_off_campus, name='on_off_campus'),
     url(r'^student_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.student_class, name='student_class'),
     url(r'^faculty_staff_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_staff_class, name='faculty_staff_class'),
-    url(r'^top_accidemic_plan/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_accidemic_plan, name='top_accidemic_plan'),
+    url(r'^top_academic_plan/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_academic_plan, name='top_academic_plan'),
     url(r'^top_dprtn/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn, name='top_dprtn'),
 
     url(r'^api/', include(v1_api.urls)),
