@@ -282,7 +282,7 @@ def faculty_staff_class(request, library, classification, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
-def top_accidemic_plan(request, library, start, end):
+def top_academic_plan(request, library, start, end):
     
     distinct_flag = request.GET.get('distinct', False)
     
