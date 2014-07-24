@@ -148,10 +148,17 @@ def chart_data(numbers, distinct_flag):
     
     if distinct_flag is False:
         for number in numbers:
-            dt = datetime.strptime(str(number['visit_time']), '%Y-%m-%d %H:%M:%S')
-            epoch = int(time.mktime(dt.timetuple()))
-            # We have to add the three zeros to work with HighCharts
-            visits.append('[%s000,%s]' % (epoch, number['total']))
+            if number.has_key('visit_time'):
+                dt = datetime.strptime(str(number['visit_time']), '%Y-%m-%d %H:%M:%S')
+                epoch = int(time.mktime(dt.timetuple()))
+                # We have to add the three zeros to work with HighCharts
+                visits.append('[%s000,%s]' % (epoch, number['total']))
+            elif number.has_key('acpl_n'):
+                acpl_n = number['acpl_n']
+                visits.append('["%s",%s]' % (acpl_n, number['total']))
+            elif number.has_key('dprt_n'):
+                dprt_n = number['dprt_n']
+                visits.append('["%s",%s]' % (dprt_n, number['total']))
         data.append(', '.join(visits))
     else:
         data.append(numbers)
@@ -272,6 +279,39 @@ def faculty_staff_class(request, library, classification, start, end):
                     .values("prsn_i_ecn").distinct().count()
 
     data = chart_data(numbers)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def top_accidemic_plan(request, library, start, end):
+    
+    distinct_flag = request.GET.get('distinct', False)
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('acpl_n') \
+                .annotate(total=Count('acpl_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+
+    data = chart_data(numbers, distinct_flag)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def top_dprtn(request, library, start, end):
+    
+    distinct_flag = request.GET.get('distinct', False)
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location)
+
+    data = chart_data(numbers, distinct_flag)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
