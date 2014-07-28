@@ -179,10 +179,6 @@ def location_name(library):
     else:
         return(None)
 
-def student_filter():
-    query = "Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')"
-    return query
-
 #@login_required
 
 def total_usage(request, library, start, end):
@@ -356,8 +352,8 @@ def classifications(request):
     
     #data.append('jsonCategories({')
     data.append(add_classes(student_classes, 'student_classes'))
-    data.append(add_classes(acidemic_plans, 'acidemic_plans'))
-    data.append(add_classes(acc_career, 'acdemic_career'))
+    data.append(add_classes(acidemic_plans, 'academic_plans'))
+    data.append(add_classes(acc_career, 'academic_career'))
     data.append(add_classes(faculty_dvsn_n, 'faculty_divisions'))
     #jsonp.append('jsonResponse({')
     json_data.append(json.dumps(data))
