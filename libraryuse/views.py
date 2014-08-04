@@ -14,7 +14,8 @@ from django.shortcuts import redirect
 from django.db.models import Q, Count
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
-from datetime import timedelta
+from datetime import *
+from dateutil.relativedelta import *
 from django.core.exceptions import PermissionDenied
 from django.core import serializers
 import random, string, csv, sys
@@ -193,6 +194,7 @@ def total_usage(request, library, start, end):
                     .order_by('visit_time') \
                     .filter(visit_time__range=[start, end]) \
                     .filter(location = location)
+        print(numbers.query)
     else:
         numbers = LibraryVisit.objects \
                     .filter(visit_time__range=[start, end]) \
@@ -330,37 +332,97 @@ def top_devision(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
+def averages(request):
+    '''
+    location
+    start_date
+    end_date
+    start_hour
+    end_hour
+    dow
+    
+#calculate the nubmer of weeks in range
+
+start_date = '2014-07-01'
+end_date = '2014-07-28'
+
+start = datetime.strptime(start_date, '%Y-%m-%d').date()
+end = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+date_delta = end - start
+
+weeks = date_delta.days/7
+
+#iterate and make the query
+
+count = 0
+totals = 0
+start_hour = 13
+end_hour = 14
+dow = 3
+    
+while (count <= weeks):
+    start = start+relativedelta(weeks=+count, hour=start_hour)
+    end = start+relativedelta(weeks=+count, hour=end_hour)
+    numbers = LibraryVisit.objects \
+        .values('visit_time') \
+        .annotate(total=Count('visit_time')) \
+        .filter(visit_time__range=[start, end])\
+        .filter(visit_time__week_day = dow)
+    for number in numbers:
+        #print(number['visit_time'])
+        if number['visit_time'].hour != end_hour:
+            totals += number['total']
+    count += 1
+
+average = totals / count
+print(average)
+
+
+from django.db.models import Q, Count
+from datetime import *
+from dateutil.relativedelta import *
+from libraryuse.models import LibraryVisit
+start_date = '2014-07-01'
+end_date = '2014-07-28'
+location = 'LOCATION: WL TURNSTILE (1&2)'
+start = datetime.strptime(start_date, '%Y-%m-%d').date()
+end = datetime.strptime(end_date, '%Y-%m-%d').date()
+date_delta = end - start
+weeks = date_delta.days/7
+count = 0
+totals = 0
+    
+    '''
+
 def classifications(request):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
-    acidemic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(acpl_n__isnull=True)
+    academic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(acpl_n__isnull=True)
     department = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(dprt_n__isnull=True)
-    acc_career = LibraryVisit.objects.values_list('acca_i', flat=True).distinct().exclude(acca_i__isnull=True).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
-    faculty_dvsn_n = LibraryVisit.objects.values_list('dvsn_n', flat=True).distinct().exclude(dvsn_n__isnull=True).filter(Q(prsn_c_type = 'F'))
+    academic_career = LibraryVisit.objects.values_list('acca_i', flat=True).distinct().exclude(acca_i__isnull=True).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+    faculty_divisions = LibraryVisit.objects.values_list('dvsn_n', flat=True).distinct().exclude(dvsn_n__isnull=True).filter(Q(prsn_c_type = 'F'))
     
-    data = []
-    json_data = []
+    jsonp = 'jsonCatagories({'
     
-    def add_classes(classes, title):
-        list = [title]
-        class_list = []
-        
-        for item in classes:
-            class_list.append(str('%s' % item))
-        
-        list.append(class_list)
-        return list
+    jsonp += '"student_classes":["'
+    jsonp += '","'.join(student_classes)
+    jsonp += '"],'
     
-    #data.append('jsonCategories({')
-    data.append(add_classes(student_classes, 'student_classes'))
-    data.append(add_classes(acidemic_plans, 'academic_plans'))
-    data.append(add_classes(acc_career, 'academic_career'))
-    data.append(add_classes(faculty_dvsn_n, 'faculty_divisions'))
-    #jsonp.append('jsonResponse({')
-    json_data.append(json.dumps(data))
-    #jsonp.append('})')
-    jsonp = 'jsonClassifications(%s)' % data
+    jsonp += '"academic_plans":["'
+    jsonp += '","'.join(academic_plans)
+    jsonp += '"],'
     
-    return StreamingHttpResponse(json_data, content_type='application/json')
+    jsonp += '"academic_career":["'
+    jsonp += '","'.join(academic_career)
+    jsonp += '"],'
+    
+    jsonp += '"faculty_divisions":["'
+    jsonp += '","'.join(faculty_divisions)
+    jsonp += '"]'
+    
+    jsonp += '})'
+    
+    return StreamingHttpResponse(jsonp, content_type='application/json')
 
 #try tables.py, and count as string
 def _usage(dim):
