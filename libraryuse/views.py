@@ -402,7 +402,7 @@ def classifications(request):
     academic_career = LibraryVisit.objects.values_list('acca_i', flat=True).distinct().exclude(acca_i__isnull=True).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
     faculty_divisions = LibraryVisit.objects.values_list('dvsn_n', flat=True).distinct().exclude(dvsn_n__isnull=True).filter(Q(prsn_c_type = 'F'))
     
-    jsonp = 'jsonCatagories({'
+    jsonp = 'jsonCategories({'
     
     jsonp += '"student_classes":["'
     jsonp += '","'.join(student_classes)
