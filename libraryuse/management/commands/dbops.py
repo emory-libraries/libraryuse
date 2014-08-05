@@ -92,6 +92,38 @@ class Command(BaseCommand):
         transaction.commit()
         cxn_esd.close()
         cxn_db.close()
+        
+    @transaction.commit_manually
+    def refresh_hash_esd(self):
+        cxn_esd = connections['esd']
+        cursor_esd = cxn_esd.cursor()
+        #cursor_esd.execute("select * from V_LUD_PRSN where rownum <= 10")
+        cursor_esd.execute("select * from V_LUD_PRSN")
+        
+        cxn_db = connections['default']
+        cursor_db = cxn_db.cursor()
+
+        try:
+            cursor_db.execute("truncate esd_hash")
+            for result in self.ResultsIterator(cursor_esd):
+                cursor_db.execute('''insert into esd_hash (PRSN_I_PBLC, PRSN_I_ECN,  
+                PRSN_I_HR, PRSN8HC_I_HR, PRSN_I_SA, PRSN_E_TITL_DTRY, PRSN_C_TYPE, 
+                PRSN_E_TYPE, EMJO_C_CLSF, DPRT_C, DPRT_N, DVSN_I, DVSN_N, 
+                EMPE_C_FCLT_RANK, PRSN_C_TYPE_HC, PRSN_E_TYPE_HC, EMJO8HC_C_CLSF, 
+                DPRT8HC_C, DPRT8HC_N, DVSN8HC_I, DVSN8HC_N, ACCA_I, ACPR_N, 
+                ACPL_N, STDN_E_CLAS, STDN_F_UNGR, STDN_F_CMPS_ON) values ( 
+                %s, md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', result)
+    
+        except Exception, e:
+            transaction.rollback()
+            cxn_esd.close()
+            cxn_db.close()
+            raise CommandError("problem refreshing db.esd: %s" % e)
+
+        transaction.commit()
+        cxn_esd.close()
+        cxn_db.close()
  
     @transaction.commit_manually
     def refresh_libraryvisit(self):
