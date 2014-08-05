@@ -33,6 +33,7 @@ urlpatterns = patterns(
     url(r'^top_academic_plan/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_academic_plan, name='top_academic_plan'),
     url(r'^top_dprtn/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn, name='top_dprtn'),
     url(r'^top_devision/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_devision, name='top_devision'),
+    url(r'^averages/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/(?P<start_hour>.+)/(?P<end_hour>.+)/(?P<dow>.+)/$', views.averages, name='averages'),
 
     url(r'^api/', include(v1_api.urls)),
 )

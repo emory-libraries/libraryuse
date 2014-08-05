@@ -332,7 +332,55 @@ def top_devision(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
-def averages(request):
+def averages(request, library, start, end, start_hour, end_hour, dow):
+    start_date = datetime.strptime(start, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end, '%Y-%m-%d').date()
+    
+    date_delta = end_date - start_date
+    
+    weeks = date_delta.days/7
+    
+    count = 0
+    totals = 0
+    
+    # This translates the MySQL days to dateutil days
+    # In Django MySQL Monday = 2 but 0 in dateutil
+    int_day = {
+        1: 6,
+        2: 0,
+        3: 1,
+        4: 2,
+        5: 3,
+        6: 4,
+        7: 5
+    }
+
+    while (count <= weeks):
+        start_time = start_date+relativedelta(weeks=+count, hour=int(start_hour), weekday=int_day[int(dow)])
+        end_time = start_date+relativedelta(weeks=+count, hour=int(end_hour), weekday=int_day[int(dow)])
+        numbers = LibraryVisit.objects \
+            .values('visit_time') \
+            .annotate(total=Count('visit_time')) \
+            .filter(visit_time__range=[start_time, end_time])\
+            .filter(visit_time__week_day = dow)
+        for number in numbers:
+            if number['visit_time'].hour != end_hour:
+                totals += number['total']
+        count += 1
+    
+    average = totals / count
+    
+    jsonp = 'jsonResponse({'
+    jsonp += '"start_date":"%s",' % start
+    jsonp += '"end_date":"%s",' % end
+    jsonp += '"start_hour":"%s",' % start_hour
+    jsonp += '"end_hour":"%s",' % end_hour
+    jsonp += '"dow":"%s",' % dow
+    jsonp += '"average":"%s"' % average
+    jsonp += '})'
+    
+    return StreamingHttpResponse(jsonp, content_type='application/json')
+
     '''
     location
     start_date
@@ -340,43 +388,6 @@ def averages(request):
     start_hour
     end_hour
     dow
-    
-#calculate the nubmer of weeks in range
-
-start_date = '2014-07-01'
-end_date = '2014-07-28'
-
-start = datetime.strptime(start_date, '%Y-%m-%d').date()
-end = datetime.strptime(end_date, '%Y-%m-%d').date()
-
-date_delta = end - start
-
-weeks = date_delta.days/7
-
-#iterate and make the query
-
-count = 0
-totals = 0
-start_hour = 13
-end_hour = 14
-dow = 3
-    
-while (count <= weeks):
-    start = start+relativedelta(weeks=+count, hour=start_hour)
-    end = start+relativedelta(weeks=+count, hour=end_hour)
-    numbers = LibraryVisit.objects \
-        .values('visit_time') \
-        .annotate(total=Count('visit_time')) \
-        .filter(visit_time__range=[start, end])\
-        .filter(visit_time__week_day = dow)
-    for number in numbers:
-        #print(number['visit_time'])
-        if number['visit_time'].hour != end_hour:
-            totals += number['total']
-    count += 1
-
-average = totals / count
-print(average)
 
 
 from django.db.models import Q, Count
@@ -392,7 +403,79 @@ date_delta = end - start
 weeks = date_delta.days/7
 count = 0
 totals = 0
-    
+
+
+#calculate the nubmer of weeks in range
+
+start = '2014-07-01'
+end = '2014-07-28'
+
+start_date = datetime.strptime(start, '%Y-%m-%d').date()
+end_date = datetime.strptime(end, '%Y-%m-%d').date()
+print('Start = %s, End = %s' % (start, end))
+
+date_delta = end - start
+
+weeks = date_delta.days/7
+
+count = 0
+totals = 0
+start_hour = 13
+end_hour = 15
+dow = 1
+
+dow_alph = ''
+if dow == 1:
+    dow_alph = SU
+elif dow == 2:
+    dow_alph = MO
+elif dow == 3:
+    dow_alph = TU
+elif dow == 4:
+    dow_alph = WE
+elif dow == 5:
+    dow_alph = TH
+elif dow == 6:
+    dow_alph = FR
+elif dow == 7:
+    dow_alph = SA
+
+
+while (count <= weeks):
+    start_time = start_date+relativedelta(weeks=+count, hour=start_hour, weekday = dow_alph(+1))
+    end_time = start_date+relativedelta(weeks=+count, hour=end_hour, weekday = dow_alph(+1))
+    numbers = LibraryVisit.objects \
+        .values('visit_time') \
+        .annotate(total=Count('visit_time')) \
+        .filter(visit_time__range=[start_time, end_time])\
+        .filter(visit_time__week_day = dow)
+    for number in numbers:
+        if number['visit_time'].hour != end_hour:
+            totals += number['total']
+    count += 1
+
+average = totals / count
+print(average)
+
+jsonp = 'jsonResponse({'
+jsonp += '"start_date":"%s",' % start
+jsonp += '"end_date":"%s",' % end
+jsonp += '"start_hour":"%s",' % start_hour
+jsonp += '"end_hour":"%s",' % end_hour
+jsonp += '"dow":"%s",' % dow
+jsonp += '"average":"%s"' % average
+jsonp += '})'
+print(jsonp)
+jsonResponse(
+    {
+        start_date:'YYYY-MM-DD',
+        end_date: 'YYYY-MM-DD',
+        start_hour: '13',
+        end_hour: '14',
+        dow: '4',
+        average: '42'
+     }
+)
     '''
 
 def classifications(request):
