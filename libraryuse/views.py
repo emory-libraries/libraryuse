@@ -9,10 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import timezone
-<<<<<<< HEAD
 from django.utils import simplejson
-=======
->>>>>>> e97388f09647598e1e87cb368aa76100b7ebb4d2
 import json
 from django.shortcuts import redirect 
 from django.db.models import Q, Count
