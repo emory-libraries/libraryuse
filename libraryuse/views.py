@@ -1,22 +1,25 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseRedirect, HttpRequest
 from django.template import Context, loader
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render_to_response 
-from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.db import models
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.utils import timezone
+<<<<<<< HEAD
 from django.utils import simplejson
+=======
+>>>>>>> e97388f09647598e1e87cb368aa76100b7ebb4d2
 import json
 from django.shortcuts import redirect 
 from django.db.models import Q, Count
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
-from datetime import timedelta
+from datetime import *
+from dateutil.relativedelta import *
 from django.core.exceptions import PermissionDenied
 from django.core import serializers
 import random, string, csv, sys
@@ -142,18 +145,31 @@ def usage(request, dim):
     data_json =  simplejson.dumps(data)
     return HttpResponse(data_json, content_type='application/json')
 
-def chart_data(numbers):
-    
-    #randomstr = ''.join([random.choice(string.ascii_letters) for n in xrange(3)])
+def chart_data(numbers, distinct_flag):
     
     data = []
     visits = []
     data.append('jsonResponse({"data":[')
-    for n in numbers:
-        dt = datetime.strptime(str(n['visit_time']), '%Y-%m-%d %H:%M:%S')
-        epoch = int(time.mktime(dt.timetuple()))
-        visits.append('[%s000,%s]' % (epoch, n['total']))
-    data.append(', '.join(visits))
+    
+    if distinct_flag is False:
+        for number in numbers:
+            if number.has_key('visit_time'):
+                dt = datetime.strptime(str(number['visit_time']), '%Y-%m-%d %H:%M:%S')
+                epoch = int(time.mktime(dt.timetuple()))
+                # We have to add the three zeros to work with HighCharts
+                visits.append('[%s000,%s]' % (epoch, number['total']))
+            elif number.has_key('acpl_n'):
+                acpl_n = number['acpl_n']
+                visits.append('["%s",%s]' % (acpl_n, number['total']))
+            elif number.has_key('dprt_n'):
+                dprt_n = number['dprt_n']
+                visits.append('["%s",%s]' % (dprt_n, number['total']))
+            elif number.has_key('dvsn_n'):
+                dvsn_n = number['dvsn_n']
+                visits.append('["%s",%s]' % (dvsn_n, number['total']))
+        data.append(', '.join(visits))
+    else:
+        data.append(numbers)
     data.append(']})')
     
     return(data)
@@ -169,45 +185,331 @@ def location_name(library):
         return(None)
 
 #@login_required
+
 def total_usage(request, library, start, end):
+    
+    distinct_flag = request.GET.get('distinct', False)
     
     location = location_name(library)
     
-    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end]).filter(location = location)
+    if distinct_flag == False:
+        numbers = LibraryVisit.objects.values('visit_time') \
+                    .annotate(total=Count('visit_time')) \
+                    .order_by('visit_time') \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location)
+        print(numbers.query)
+    else:
+        numbers = LibraryVisit.objects \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .values("prsn_i_ecn").distinct().count()
+    
+    data = chart_data(numbers, distinct_flag)
 
-    data = chart_data(numbers)
-
-    return HttpResponse(data, content_type='application/json')
+    return StreamingHttpResponse(data, content_type='application/json')
 
 def on_off_campus(request, library, resident, start, end):
     
+    distinct_flag = request.GET.get('distinct', False)
+    
     location = location_name(library)
     
-    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end]).filter(location = location).filter(stdn_f_cmps_on = resident).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+    if distinct_flag == False:
+        numbers = LibraryVisit.objects.values('visit_time') \
+                    .annotate(total=Count('visit_time')) \
+                    .order_by('visit_time') \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .filter(stdn_f_cmps_on = resident) \
+                    .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+    else:
+        numbers = LibraryVisit.objects \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .filter(stdn_f_cmps_on = resident) \
+                    .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
+                    .values("prsn_i_ecn").distinct().count()
+        
+    data = chart_data(numbers, distinct_flag)
 
-    data = chart_data(numbers)
-
-    return HttpResponse(data, content_type='application/json')
+    return StreamingHttpResponse(data, content_type='application/json')
 
 def student_class(request, library, classification, start, end):
     
+    distinct_flag = request.GET.get('distinct', False)
+    
     location = location_name(library)
     
-    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end]).filter(location = location).filter(stdn_e_clas = classification).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+    if distinct_flag == False:
+        numbers = LibraryVisit.objects.values('visit_time') \
+                    .annotate(total=Count('visit_time')) \
+                    .order_by('visit_time') \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .filter(stdn_e_clas = classification) \
+                    .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+    else:
+        numbers = LibraryVisit.objects \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .filter(stdn_e_clas = classification) \
+                    .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
+                    .values("prsn_i_ecn").distinct().count()
 
-    data = chart_data(numbers)
+    data = chart_data(numbers, distinct_flag)
 
-    return HttpResponse(data, content_type='application/json')
+    return StreamingHttpResponse(data, content_type='application/json')
 
 def faculty_staff_class(request, library, classification, start, end):
     
+    distinct_flag = request.GET.get('distinct', False)
+    
     location = location_name(library)
     
-    numbers = LibraryVisit.objects.values('visit_time').annotate(total=Count('visit_time')).order_by('visit_time').filter(visit_time__range=[start, end]).filter(location = location).filter(prsn_e_type = classification)
+    if distinct_flag == False:
+        numbers = LibraryVisit.objects.values('visit_time') \
+                    .annotate(total=Count('visit_time')) \
+                    .order_by('visit_time') \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .filter(Q(prsn_c_type = 'F')) \
+                    .filter(prsn_e_type = classification)
+    else:
+        numbers = LibraryVisit.objects \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .filter(Q(prsn_c_type = 'F')) \
+                    .filter(prsn_e_type = classification) \
+                    .values("prsn_i_ecn").distinct().count()
 
     data = chart_data(numbers)
 
-    return HttpResponse(data, content_type='application/json')
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def top_academic_plan(request, library, start, end):
+    
+    distinct_flag = request.GET.get('distinct', False)
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('acpl_n') \
+                .annotate(total=Count('acpl_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+
+    data = chart_data(numbers, distinct_flag)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def top_dprtn(request, library, start, end):
+    
+    distinct_flag = request.GET.get('distinct', False)
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location)
+
+    data = chart_data(numbers, distinct_flag)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def top_devision(request, library, start, end):
+    
+    distinct_flag = request.GET.get('distinct', False)
+    
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('dvsn_n') \
+                .annotate(total=Count('dvsn_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location)
+
+    data = chart_data(numbers, distinct_flag)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def averages(request, library, start, end, start_hour, end_hour, dow):
+    start_date = datetime.strptime(start, '%Y-%m-%d').date()
+    end_date = datetime.strptime(end, '%Y-%m-%d').date()
+    
+    date_delta = end_date - start_date
+    
+    weeks = date_delta.days/7
+    
+    count = 0
+    totals = 0
+    
+    # This translates the MySQL days to dateutil days
+    # In Django MySQL Monday = 2 but 0 in dateutil
+    int_day = {
+        1: 6,
+        2: 0,
+        3: 1,
+        4: 2,
+        5: 3,
+        6: 4,
+        7: 5
+    }
+
+    while (count <= weeks):
+        start_time = start_date+relativedelta(weeks=+count, hour=int(start_hour), weekday=int_day[int(dow)])
+        end_time = start_date+relativedelta(weeks=+count, hour=int(end_hour), weekday=int_day[int(dow)])
+        numbers = LibraryVisit.objects \
+            .values('visit_time') \
+            .annotate(total=Count('visit_time')) \
+            .filter(visit_time__range=[start_time, end_time])\
+            .filter(visit_time__week_day = dow)
+        for number in numbers:
+            if number['visit_time'].hour != end_hour:
+                totals += number['total']
+        count += 1
+    
+    average = totals / count
+    
+    jsonp = 'jsonResponse({'
+    jsonp += '"start_date":"%s",' % start
+    jsonp += '"end_date":"%s",' % end
+    jsonp += '"start_hour":"%s",' % start_hour
+    jsonp += '"end_hour":"%s",' % end_hour
+    jsonp += '"dow":"%s",' % dow
+    jsonp += '"average":"%s"' % average
+    jsonp += '})'
+    
+    return StreamingHttpResponse(jsonp, content_type='application/json')
+
+    '''
+    location
+    start_date
+    end_date
+    start_hour
+    end_hour
+    dow
+
+
+from django.db.models import Q, Count
+from datetime import *
+from dateutil.relativedelta import *
+from libraryuse.models import LibraryVisit
+start_date = '2014-07-01'
+end_date = '2014-07-28'
+location = 'LOCATION: WL TURNSTILE (1&2)'
+start = datetime.strptime(start_date, '%Y-%m-%d').date()
+end = datetime.strptime(end_date, '%Y-%m-%d').date()
+date_delta = end - start
+weeks = date_delta.days/7
+count = 0
+totals = 0
+
+
+#calculate the nubmer of weeks in range
+
+start = '2014-07-01'
+end = '2014-07-28'
+
+start_date = datetime.strptime(start, '%Y-%m-%d').date()
+end_date = datetime.strptime(end, '%Y-%m-%d').date()
+print('Start = %s, End = %s' % (start, end))
+
+date_delta = end - start
+
+weeks = date_delta.days/7
+
+count = 0
+totals = 0
+start_hour = 13
+end_hour = 15
+dow = 1
+
+dow_alph = ''
+if dow == 1:
+    dow_alph = SU
+elif dow == 2:
+    dow_alph = MO
+elif dow == 3:
+    dow_alph = TU
+elif dow == 4:
+    dow_alph = WE
+elif dow == 5:
+    dow_alph = TH
+elif dow == 6:
+    dow_alph = FR
+elif dow == 7:
+    dow_alph = SA
+
+
+while (count <= weeks):
+    start_time = start_date+relativedelta(weeks=+count, hour=start_hour, weekday = dow_alph(+1))
+    end_time = start_date+relativedelta(weeks=+count, hour=end_hour, weekday = dow_alph(+1))
+    numbers = LibraryVisit.objects \
+        .values('visit_time') \
+        .annotate(total=Count('visit_time')) \
+        .filter(visit_time__range=[start_time, end_time])\
+        .filter(visit_time__week_day = dow)
+    for number in numbers:
+        if number['visit_time'].hour != end_hour:
+            totals += number['total']
+    count += 1
+
+average = totals / count
+print(average)
+
+jsonp = 'jsonResponse({'
+jsonp += '"start_date":"%s",' % start
+jsonp += '"end_date":"%s",' % end
+jsonp += '"start_hour":"%s",' % start_hour
+jsonp += '"end_hour":"%s",' % end_hour
+jsonp += '"dow":"%s",' % dow
+jsonp += '"average":"%s"' % average
+jsonp += '})'
+print(jsonp)
+jsonResponse(
+    {
+        start_date:'YYYY-MM-DD',
+        end_date: 'YYYY-MM-DD',
+        start_hour: '13',
+        end_hour: '14',
+        dow: '4',
+        average: '42'
+     }
+)
+    '''
+
+def classifications(request):
+    student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
+    academic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(acpl_n__isnull=True)
+    department = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(dprt_n__isnull=True)
+    academic_career = LibraryVisit.objects.values_list('acca_i', flat=True).distinct().exclude(acca_i__isnull=True).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+    faculty_divisions = LibraryVisit.objects.values_list('dvsn_n', flat=True).distinct().exclude(dvsn_n__isnull=True).filter(Q(prsn_c_type = 'F'))
+    
+    jsonp = 'jsonCategories({'
+    
+    jsonp += '"student_classes":["'
+    jsonp += '","'.join(student_classes)
+    jsonp += '"],'
+    
+    jsonp += '"academic_plans":["'
+    jsonp += '","'.join(academic_plans)
+    jsonp += '"],'
+    
+    jsonp += '"academic_career":["'
+    jsonp += '","'.join(academic_career)
+    jsonp += '"],'
+    
+    jsonp += '"faculty_divisions":["'
+    jsonp += '","'.join(faculty_divisions)
+    jsonp += '"]'
+    
+    jsonp += '})'
+    
+    return StreamingHttpResponse(jsonp, content_type='application/json')
 
 def student_classifications(request):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
