@@ -16,7 +16,7 @@ urlpatterns = patterns(
     '',
     #url(r'^$', views.index, name='index'),
     
-    url(r'^$', views.summary, name='index'),
+    url(r'^$', views.index, name='index'),
     url(r'^summary$', views.summary, name='summary'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^export$', views.export, name='export'),

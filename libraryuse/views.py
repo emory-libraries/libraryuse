@@ -35,7 +35,7 @@ import time
 @login_required
 def index(request):
     context = {}
-    return render_to_response('libraryuse/summary.html', context)
+    return render_to_response('libraryuse/dashboard.html', context)
 
 @login_required
 def export(request):
@@ -280,7 +280,7 @@ def faculty_staff_class(request, library, classification, start, end):
                     .filter(prsn_e_type = classification) \
                     .values("prsn_i_ecn").distinct().count()
 
-    data = chart_data(numbers)
+    data = chart_data(numbers, distinct_flag)
 
     return StreamingHttpResponse(data, content_type='application/json')
 

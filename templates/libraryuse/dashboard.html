@@ -1,0 +1,305 @@
+{% load static %}
+<!DOCTYPE html>
+<html> 
+<head>
+  <meta charset="utf-8">
+  <title>My App</title>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/component.css' %}">
+  <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+  <link rel="stylesheet" href="{% static 'js/libs/flipclock/flipclock.css' %}">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <script src="{% static 'js/libs/modernizr.custom.js' %}"></script>
+</head>
+<body>
+
+{% verbatim myblock %}
+  <script type="text/x-handlebars" data-template-name="application">
+			<!-- Push Wrapper -->
+			<div class="mp-pusher" id="mp-pusher">
+				<!-- mp-menu -->
+				<nav id="mp-menu" class="mp-menu">
+					<div class="mp-level filter-all">
+						<h2> <span class="glyphicon glyphicon-filter"></span>All Categories</h2>
+						<ul>
+							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-user"></span> Audience</a>
+								<div class="mp-level filter-audience">
+									<h2><span class="glyphicon glyphicon-user"></span> Audience</h2>
+									<ul>
+										<li class="icon icon-arrow-left">
+											<a href="#"><span class="glyphicon glyphicon-user"></span> Students</a>
+											<div class="mp-level filter-students">
+												<h2><span class="glyphicon glyphicon-user"> Students</h2>
+												<ul>
+													{{#each item in model.student_classes}}
+														{{filter-button title=item}}
+													{{/each}}
+												</ul>
+											</div>
+										</li>
+										<li class="icon icon-arrow-left">
+											<a href="#"><span class="glyphicon glyphicon-fire"></span> Faculty</a>
+											<div class="mp-level filter-faculty">
+												<h2>Faculty</h2>
+												<ul>
+													{{#each item in model.faculty_divisions}}
+														{{filter-button title=item}}
+													{{/each}}
+												</ul>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</li>
+							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-list-alt"></span> Academic Plans</a>
+								<div class="mp-level filter-academic-plan">
+									<h2><span class="glyphicon glyphicon-list-alt"></span> Academic Plans</h2>
+									<ul>
+										{{#each item in model.academic_plans}}
+											{{filter-button title=item}}
+										{{/each}}
+									</ul>
+								</div>
+							</li>
+							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-briefcase"></span> Academic Career</a>
+								<div class="mp-level">
+									<h2><span class="glyphicon glyphicon-briefcase"></span> Academic Career</h2>
+									<ul>
+										{{#each item in model.academic_career}}
+											{{filter-button title=item}}
+										{{/each}}
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</nav>
+				<!-- /mp-menu -->
+				<div class="scroller"><!-- this is for emulating position fixed of the nav -->
+					<div class="scroller-inner">
+						<!-- Top Navigation -->
+						<div class="nav-top clearfix">
+							
+						</div>
+						<header id="header">
+							<h1 class="site-title">{{#link-to "index" classNames="logo"}}<span class="glyphicon glyphicon-signal"></span> Library Use{{/link-to}}</h1>
+						</header>
+						<div class="content clearfix">
+							{{outlet}}
+						</div>
+					</div><!-- /scroller-inner -->
+				</div><!-- /scroller -->
+		</div><!-- /pusher -->
+	
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="components/filter-button">
+  	<li>
+		<a href="#/library/all/{{unbound title}}">{{title}}</a>
+	</li>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name='fourOhFour'>
+  	<h2>404</h2>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="loading">
+	<h1>Loading</h1>
+  </script>
+
+
+  <script type="text/x-handlebars" data-template-name='lib-navigation'>
+  	<nav class="nav-reports">
+		<ul class="nav nav-tabs nav-justified">
+		{{#each item in view.navItems}}
+			<li class="list-group">
+			{{#link-to item.path classNames="list-group-item"}}
+				<h4 class="list-group-item-heading">{{item.name}}</h4>
+				{{! net-change change=item.change}}
+			{{/link-to}}
+			</li>
+		{{/each}}
+		</ul>
+	</nav>
+	<div class="row">
+		<div class="col-xs-12">
+			<a id="trigger" class="btn btn-control btn-filter">
+		  		<span class="glyphicon glyphicon-filter"></span>
+		  	</a>
+	  	</div>
+  	</div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="components/net-change">
+ 	<p {{bind-attr class=':small :net-lib-change change.net_class'}}>{{change.value}}<span class="glyphicon glyphicon-arrow-up"></span></p>
+  </script>
+
+	<script type="text/x-handlebars" id="library">
+
+		{{outlet}}
+	</script>
+
+	<script type="text/x-handlebars" id="library/libraries">
+		{{view App.NavView}}
+
+		<section>
+		<div class="card">
+			{{json-chart}}
+		</div>
+		<div class="card">
+			{{json-table}}
+		</div>
+		<div class="card">
+			<div id="container-lastweek" style="height: 400px; min-width: 400px">
+			
+			</div>
+		</div>
+		</section>
+		<section>
+			{{outlet}}
+		</section>
+	</script>
+
+
+	<script type="text/x-handlebars" data-template-name="components/flip-loading">
+		<div class="loading">
+			<div class="clock"></div>
+		</div>
+	</script>
+
+	<script type="text/x-handlebars" data-template-name="components/filter-tabs">
+		{{!--
+			<div class="toggle-filters">
+				<a href="#"><span class="glyphicon glyphicon-filter"></span></a>
+			</div>
+		--}}
+		<div class="row">
+			<a id="menu-toggle" class="btn btn-clear" data-effect="st-effect-2">
+		  		<span class="glyphicon glyphicon-filter"></span>
+		  	</a>
+	  	</div>
+		<section id="filterTabs" class="default-hidden">
+			<ul class="nav nav-pills">
+			  <li class="active"><a href="#audience" data-toggle="tab">Audience</a></li>
+			  <li><a href="#school" data-toggle="tab">School</a></li>
+			  <li><a href="#dept" data-toggle="tab">Dept</a></li>
+			  <li><a href="#academic" data-toggle="tab">Academic</a></li>
+			</ul>
+
+			<!-- Tab panes -->
+			<div class="tab-content">
+			  <div class="tab-pane fade" id="libs">
+			  	<ul class="nav nav-pills nav-stacked">
+			  		<li><a href="#">Woodruff</a></li>
+			  		<li><a href="#">Business</a></li>
+			  		<li><a href="#">Health Science</a></li>
+			  		<li><a href="#">Law</a></li>
+			  	</ul>
+			  </div>
+			  <div class="tab-pane fade in active" id="audience">
+			  	<div class="tab-content row">
+
+				  	<ul class="nav nav-pills nav-stacked">
+				  		<li><a href="#student-info" data-toggle="tab">Student</a></li>
+				  		<li><a href="#faculty-info" data-toggle="tab">Faculty</a></li>
+				  	</ul>
+
+					<div class="tab-pane fade" id="student-info">
+				  		<select>
+				  			{{#each item in model.student_info}}
+			  					<option {{action "select" model.title}}>{{item}}</option>
+							{{/each}}
+				  		</select>
+			  		</div>
+
+				  	<div class="tab-pane fade" id="faculty-info">
+				  		<ul class="nav nav-pills nav-square nav-toggle">
+					  		{{#each item in model.faculty_info}}
+			  					<li><a {{action "select" model.title}}>{{item}}</a></li>
+							{{/each}}
+			  			</ul>
+				  	</div>
+
+			  	</div>
+			  </div>
+			  <div class="tab-pane fade" id="school">
+			    <ul class="nav nav-pills nav-square nav-toggle">
+			  		{{#each item in model.school_info}}
+	  					<li><a {{action "select" model.title}}>{{item}}</a></li>
+					{{/each}}
+	  			</ul>
+			  </div>
+			  <div class="tab-pane fade" id="dept">
+			    <ul class="nav nav-pills nav-square nav-toggle">
+				  	{{#each item in model.dept_info}}
+	  					<li><a {{action "select" model.title}}>{{item}}</a></li>
+					{{/each}}
+				</ul>
+			  </div>
+			  <div class="tab-pane fade" id="academic">
+			    <ul class="nav nav-pills nav-square nav-toggle">
+				  	{{#each item in model.acad_info}}
+	  					<li><a {{action "select" model.title}}>{{item}}</a></li>
+					{{/each}}
+				</ul>
+			  </div>
+			</div>
+			<div class="control-btn">
+
+				<button class="btn btn-success hidden"><span class="glyphicon glyphicon-ok"></span></button>
+
+				<button class="btn btn-warning refresh-btn"><span class="glyphicon glyphicon-refresh"></span></button>
+			</div>
+		</section>
+	</script>
+
+	<script type="text/x-handlebars" id="library/libraries/report1">
+		<div class="container">
+           <div class="row">
+            <div class="col-xs-12 col-sm-6">
+              <canvas class="chart" height="300" id="myChart" data-source="js/line-chart.json" data-type="bar"></canvas>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+              <h3>Report one</h3>
+              <p>There is, one knows not what sweet mystery about this sea, whose gently awful stirrings seem to speak of some hidden soul beneath; like those fabled undulations of the Ephesian sod over the buried Evangelist St. John. And meet it is, that over these sea-pastures, wide-rolling watery prairies and Potters Fields of all four continents, the waves should rise and fall, and ebb and flow unceasingly; for here, millions of mixed shades and shadows, drowned dreams, somnambulisms, reveries; all that we call lives and souls, lie dreaming, dreaming, still; tossing like slumberers in their beds; the ever-rolling waves but made so by their restlessness.</p>
+            </div>
+          </div>
+        </div>
+	</script>
+
+	<script type="text/x-handlebars" data-template-name="components/json-chart">
+		<div id="container" style="height: 400px; min-width: 400px">
+			{{flip-loading}}
+		</div>
+	</script>
+
+	<script type="text/x-handlebars" data-template-name="components/json-chart-lastweek">
+		<div id="container-lastweek" style="height: 400px; min-width: 400px">
+			{{flip-loading}}
+		</div>
+	</script>
+
+	{% endverbatim myblock %}
+
+  <script src="{% static 'js/libs/jquery-1.10.2.js'  %}"></script>
+  <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+  <script src="{% static 'js/libs/handlebars-1.1.2.js' %}"></script>
+  <script src="{% static 'js/libs/ember-1.5.0.js' %}"></script>
+  <script src="http://code.highcharts.com/stock/highstock.js"></script>
+  <script src="http://code.highcharts.com/modules/exporting.js"></script>
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+  <script src="{% static 'js/libs/flipclock/flipclock.js' %}"></script>
+  <script src="{% static 'js/libs/jquery.easing.js' %}"></script>
+  <script src="{% static 'js/libs/mlpushmenu.js' %}"></script>
+  <script src="{% static 'js/local.js' %}"></script>
+  <script src="{% static 'js/app.js '%}"></script>
+  <!-- to activate the test runner, add the "?test" query string parameter -->
+  <script src="{% static 'tests/runner.js' %}"></script>
+</body>
+</html>
