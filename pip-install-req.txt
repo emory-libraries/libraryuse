@@ -6,7 +6,8 @@ python-dateutil
 python-magic
 #django-tracking
 MySQL-python
-cx_Oracle
+#cx_Oracle
 django-tables2
-http://wilson.library.emory.edu:8080/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.21.0-dev.tar.gz
+http://wilson.library.emory.edu:8080/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
 eulcommon
+django-tastypie
