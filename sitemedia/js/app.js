@@ -18,9 +18,9 @@ App.Router.map(function() {
   });
   this.resource('lib', { path: '/library/:lib' });
 
-  this.resource('demo', { path: '/library/:lib/:demo'});
+  this.resource('demo', { path: '/library/:lib/:category/:demo'});
 
-  this.resource('date', { path: '/library/:lib/:demographic/:date'});
+  this.resource('date', { path: '/library/:lib/:category/:demo/:date'});
 
 
   this.resource('report', { path: '/reports/:report_id' });
@@ -49,14 +49,19 @@ App.ApplicationRoute = Ember.Route.extend({
 var GLOBAL_LIB='';
 
 App.FilterButtonComponent = Ember.Component.extend({
-  layoutName:"filter-button",
-  actions: {
-    select: function(evt) {
-      // evt.stopPropagation();
-      alert('ok');
-    }
-  }
+  layoutName:"components/filter-button"
 });
+
+App.StudentsFilterButtonComponent = Ember.Component.extend({
+  layoutName:"components/filter-button",
+  addon: 'students'
+});
+
+App.FacultyFilterButtonComponent = Ember.Component.extend({
+  layoutName:"components/filter-button",
+  addon: 'faculty'
+});
+
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
@@ -179,7 +184,8 @@ function setJsonParams(options){
 //DEMOGRAPHIC ROOT
 App.DemoRoute = Ember.Route.extend({
   model:function(params){
-    var data = {demo:params.demo};
+    var data = {demo:params.demo, category:params.category};
+    // console.log(params)
     return data;
   },
   afterModel: function (model){
@@ -202,13 +208,18 @@ App.DemoRoute = Ember.Route.extend({
       dataURL.set('names', [library_name]);
       dataURL.set('paths', [library_path]);
     }
-
-    if(model.demo=='lits: library and it services'){
-      dataURL.set('category','faculty_staff_class')
+    
+    if(model.category=='students'){
+      model.category = 'student_class';
+    }
+    else if(model.category=='faculty'){
+      model.category = 'faculty_divisions';
     }
     else{
-      dataURL.set('category','student_class')
+
     }
+
+    dataURL.set('category',[model.category])
 
     dataURL.set('group',[model.demo])
 
@@ -218,6 +229,7 @@ App.DemoRoute = Ember.Route.extend({
       this.render('library/libraries');
   }
 });
+
 
 //Date ROOT
 App.DateRoute = Ember.Route.extend({
@@ -234,46 +246,13 @@ App.DateRoute = Ember.Route.extend({
   }
 });
 
-// var classJson = [];
-
-// var classificationsData = function(key){
-//   k = 'student_classes';
-//   var json = ['nope'];
-//       $.ajax({
-//       url: 'js/data/classifications.json',
-//       type:'GET',
-//       dataType: 'json',
-//       success: function(data){  
-//         classJson= {
-//           students:data.student_classes,
-//           faculty:data.faculty_divisions,
-//           academic:data.academic_plans
-//         }
-
-//       },
-//       error:function(xhr, status, error){
-//         console.log(xhr.status)
-//       }
-//     });
-// }();
-
-
 //Woodruff
 App.LibraryWoodruffRoute = Ember.Route.extend({
   model:function(){
-    // var student_classes = classJson.students.sort(),
-    //     faculty_classes = classJson.faculty.sort(),
-    //     school_classes = classJson.faculty.sort(),
-    //     academic_plans = classJson.academic.sort();
-        
+
      var data = {
-              title: 'Woodruff',
-              // student_info:student_classes,
-              // faculty_info:faculty_classes,
-              // school_info:school_classes,
-              // dept_info:['Dept1','Dept2','Dept3'],
-              // acad_info:academic_plans
-            }
+          title: 'Woodruff'
+        }
         dataURL.set('names', [data.title]);
         dataURL.set('paths', ["woodruff"]);
         dataURL.set('category',['total_usage'])
@@ -435,8 +414,8 @@ function SUPERCHART(url){
 
     $.each(names, function(i, name) {
 
-      console.log(path[i])
-      console.log(uri_path+uri_category+path[i]+'/'+uri_users+date_range);
+      // console.log(path[i])
+      // console.log(uri_path+uri_category+path[i]+'/'+uri_users+date_range);
 
       $.ajax({
           url: uri_path+uri_category+path[i]+'/'+uri_users+date_range,
@@ -465,8 +444,7 @@ function SUPERCHART(url){
           else{
             d = data;
           }
-
-          console.log(name)
+          // console.log(name)
           var color = colors[i];
 
           if(name=='Woodruff'){
@@ -479,33 +457,38 @@ function SUPERCHART(url){
             color='#5AA689';
           }
 
+          if(d.length!==0){
 
-          seriesOptions[i] = {
-            name: name,
-            data: d,
-            color:color,
-            fillColor : {
-              linearGradient : {
-                x1: 0, 
-                y1: 0, 
-                x2: 0, 
-                y2: 1
+            seriesOptions[i] = {
+              name: name,
+              data: d,
+              color:color,
+              fillColor : {
+                linearGradient : {
+                  x1: 0, 
+                  y1: 0, 
+                  x2: 0, 
+                  y2: 1
+                },
+                stops : [
+                  [0, 'rgb(65, 73, 85)'], 
+                  [1, 'rgb(65, 73, 85)']
+                ]
               },
-              stops : [
-                [0, 'rgb(65, 73, 85)'], 
-                [1, 'rgb(65, 73, 85)']
-              ]
-            },
-            pointInterval: 36 * 1000
-          };
+              pointInterval: 36 * 1000
+            };
 
-          // As we're loading the data asynchronously, we don't know what order it will arrive. So
-          // we keep a counter and create the chart when all the data is loaded.
-          seriesCounter++;
+            // As we're loading the data asynchronously, we don't know what order it will arrive. So
+            // we keep a counter and create the chart when all the data is loaded.
+            seriesCounter++;
 
-          if (seriesCounter == names.length) {
-            drawChart(seriesOptions);
-            drawChartLastWeek(seriesOptions);
+            if (seriesCounter == names.length) {
+              drawChart(seriesOptions);
+              drawChartLastWeek(seriesOptions);
+            }
+          }
+          else{
+            console.log('There are no returns for this category in '+name+'.');
           }
         }
 
@@ -788,7 +771,8 @@ App.JsonChartComponent = Ember.Component.extend({
         path = hash.split('/');
 
         var $this = $(this),
-            newURL = path[0]+"/"+path[1]+"/"+path[2]+"/"+$this.text();
+            category = $this.parents('ul').first().attr('class')||'other',
+            newURL = path[0]+"/"+path[1]+"/"+path[2]+"/"+category+"/"+$this.text();
           $this.attr('href',newURL);
       });
 
@@ -803,7 +787,7 @@ App.JsonChartComponent = Ember.Component.extend({
 
     var hash = window.location.hash
     SUPERCHART(url);
-    setTab(hash);
+    updateFilterLinks(hash);
     $(window).hashchange( function(){
 
       updateFilterLinks(hash);
