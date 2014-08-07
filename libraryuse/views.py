@@ -1,34 +1,16 @@
-from django.http import HttpResponse, StreamingHttpResponse, HttpResponseRedirect, HttpRequest
-from django.template import Context, loader
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.models import User, Group
+from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import render_to_response 
 from django.template import RequestContext
-from django.db import models
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
-from django.utils import timezone
-from django.utils import simplejson
-import json
-from django.shortcuts import redirect 
+import json 
 from django.db.models import Q, Count
-from django.core.urlresolvers import reverse
-from django.core.mail import send_mail
-from datetime import *
-from dateutil.relativedelta import *
-from django.core.exceptions import PermissionDenied
-from django.core import serializers
-import random, string, csv, sys
+from datetime import datetime
+from dateutil.relativedelta import relativedelta, weekday
+import csv
 from forms import DataExportForm
 from models import LibraryVisit
-from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, ProgramTable, PlanTable, ClassTable
+from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, ProgramTable
 from django_tables2 import RequestConfig
-
-import pprint
-import random
-import string
-
 from datetime import datetime
 import time
 
@@ -52,9 +34,7 @@ def export(request):
             start_date = export_form.cleaned_data['start_date']
             end_date = export_form.cleaned_data['end_date']
             print(start_date)
-            #visits = LibraryVisit.objects.all()
             visits = LibraryVisit.objects.filter(visit_time__range=[start_date, end_date])
-            #visits = LibraryVisit.objects.filter(Q(visit_time__range=[start_date, end_date]) and Q(acpl_n='Business Administration'))
             
             writer.writerow(['visit_time', 'term_number', 'location', 'prsn_c_type', \
                              'prsn_e_type', 'emjo_c_clsf', 'dprt_c', \
@@ -78,11 +58,6 @@ def export(request):
         
     else:
         export_form = DataExportForm()
-        
-    #q = LibraryVisit.objects.filter(visit_time__range=['2014-02-02', '2014-02-03'])
-    #print('HELLO')
-    #for r in q:
-    #    print(r.location)
 
     return render(request, 'libraryuse/export.html', {'form': export_form,})
     
@@ -116,31 +91,6 @@ def summary(request):
                'class': cls_t,
                }
     return render(request, 'libraryuse/summary.html', context)
-
-@login_required
-def visualize(request):
-    context = {}
-    return render_to_response('libraryuse/visualize.html', context)
-
-@login_required
-def usage(request, dim):
-    qset = _usage(dim)
-    # {labels:[], datasets[{data}]}
-    data= {}
-    data['labels'] = []
-    data['datasets'] = []
-    dataset = {}
-    dataset['data'] = []
-    #data['datasets'].append('data')
-    for e in qset.all():
-        #print('type = %s, count = %s ' % (e['prsn_e_type'], e['prsn_e_type__count']))
-        data['labels'].append(e['prsn_e_type'])
-        dataset['data'].append(e['prsn_e_type__count'])
-    data['datasets'].append(dataset)
-    print(data)
-    my_list = list(qset)
-    data_json =  simplejson.dumps(data)
-    return HttpResponse(data_json, content_type='application/json')
 
 def chart_data(numbers, distinct_flag):
     
@@ -382,103 +332,6 @@ def averages(request, library, start, end, start_hour, end_hour, dow):
     
     return StreamingHttpResponse(jsonp, content_type='application/json')
 
-    '''
-    location
-    start_date
-    end_date
-    start_hour
-    end_hour
-    dow
-
-
-from django.db.models import Q, Count
-from datetime import *
-from dateutil.relativedelta import *
-from libraryuse.models import LibraryVisit
-start_date = '2014-07-01'
-end_date = '2014-07-28'
-location = 'LOCATION: WL TURNSTILE (1&2)'
-start = datetime.strptime(start_date, '%Y-%m-%d').date()
-end = datetime.strptime(end_date, '%Y-%m-%d').date()
-date_delta = end - start
-weeks = date_delta.days/7
-count = 0
-totals = 0
-
-
-#calculate the nubmer of weeks in range
-
-start = '2014-07-01'
-end = '2014-07-28'
-
-start_date = datetime.strptime(start, '%Y-%m-%d').date()
-end_date = datetime.strptime(end, '%Y-%m-%d').date()
-print('Start = %s, End = %s' % (start, end))
-
-date_delta = end - start
-
-weeks = date_delta.days/7
-
-count = 0
-totals = 0
-start_hour = 13
-end_hour = 15
-dow = 1
-
-dow_alph = ''
-if dow == 1:
-    dow_alph = SU
-elif dow == 2:
-    dow_alph = MO
-elif dow == 3:
-    dow_alph = TU
-elif dow == 4:
-    dow_alph = WE
-elif dow == 5:
-    dow_alph = TH
-elif dow == 6:
-    dow_alph = FR
-elif dow == 7:
-    dow_alph = SA
-
-
-while (count <= weeks):
-    start_time = start_date+relativedelta(weeks=+count, hour=start_hour, weekday = dow_alph(+1))
-    end_time = start_date+relativedelta(weeks=+count, hour=end_hour, weekday = dow_alph(+1))
-    numbers = LibraryVisit.objects \
-        .values('visit_time') \
-        .annotate(total=Count('visit_time')) \
-        .filter(visit_time__range=[start_time, end_time])\
-        .filter(visit_time__week_day = dow)
-    for number in numbers:
-        if number['visit_time'].hour != end_hour:
-            totals += number['total']
-    count += 1
-
-average = totals / count
-print(average)
-
-jsonp = 'jsonResponse({'
-jsonp += '"start_date":"%s",' % start
-jsonp += '"end_date":"%s",' % end
-jsonp += '"start_hour":"%s",' % start_hour
-jsonp += '"end_hour":"%s",' % end_hour
-jsonp += '"dow":"%s",' % dow
-jsonp += '"average":"%s"' % average
-jsonp += '})'
-print(jsonp)
-jsonResponse(
-    {
-        start_date:'YYYY-MM-DD',
-        end_date: 'YYYY-MM-DD',
-        start_hour: '13',
-        end_hour: '14',
-        dow: '4',
-        average: '42'
-     }
-)
-    '''
-
 def classifications(request):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
     academic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(acpl_n__isnull=True)
@@ -526,60 +379,9 @@ def student_classifications(request):
         list.append(class_list)
         return list
     
-    #data.append('jsonCategories({')
     data.append(add_classes(student_classes, 'student_classes'))
     data.append(add_classes(acidemic_plans, 'acidemic_plans'))
     data.append(add_classes(department, 'department'))
-    #jsonp.append('jsonResponse({')
     jsonp.append(json.dumps(data))
-    #jsonp.append('})')
     
     return HttpResponse(jsonp, content_type='application/json')
-
-#try tables.py, and count as string
-def _usage(dim):
-    def crunch(attr):
-        #return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr).filter(visit_time__range=[start, end])
-        return LibraryVisit.objects.values(attr).annotate(Count(attr)).order_by('-%s__count' % attr)
-
-    result = None
-    if dim == 'department':
-        result = crunch('dprt_n')
-    elif dim == 'division':
-        result = crunch('dvsn_n')
-    elif dim == 'person_type':        
-        result = crunch('prsn_e_type')
-    elif dim == 'program':
-        result = crunch('acpr_n')
-    elif dim == 'plan':
-        result = crunch('acpl_n')
-    elif dim == 'class':
-        result = crunch('stdn_e_clas')
-    #else return null  
-
-    return result
-
-def _values_query_set_to_dict(vqs):
-    return [item for item in vqs]
-
-@login_required
-def _result_to_json(request, result):        
-      
-    data_dict = _values_query_set_to_dict(result)
-    
-    #evidently can't serialize ValuesQuerySet - surprising limitation 
-    #data_json = serializers.serialize('json', data_dict)
-    data_json =  simplejson.dumps(data_dict)
-
-    return HttpResponse(data_json, content_type='application/json')
-
-@login_required
-def daterange_json(request):
-    #q = LibraryVisit.objects.filter(visit_time__range=['2014-02-02', '2014-02-03'])
-    #data_dict = _values_query_set_to_dict(q)
-    pt_t = _usage('person_type')
-    #RequestConfig(request).configure(pt_t)
-    #pp = pprint.PrettyPrinter(depth=6)
-    #pp.pprint(pt_t)
-    #data_dict = _values_query_set_to_dict(pt_t)
-    return HttpResponse(pt_t, content_type='application/json')
