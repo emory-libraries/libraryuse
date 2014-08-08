@@ -213,7 +213,7 @@ App.DemoRoute = Ember.Route.extend({
       model.category = 'student_class';
     }
     else if(model.category=='faculty'){
-      model.category = 'faculty_divisions';
+      model.category = 'faculty_staff_class';
     }
     else{
 
@@ -415,7 +415,7 @@ function SUPERCHART(url){
     $.each(names, function(i, name) {
 
       // console.log(path[i])
-      // console.log(uri_path+uri_category+path[i]+'/'+uri_users+date_range);
+      console.log(uri_path+uri_category+path[i]+'/'+uri_users+date_range);
 
       $.ajax({
           url: uri_path+uri_category+path[i]+'/'+uri_users+date_range,
