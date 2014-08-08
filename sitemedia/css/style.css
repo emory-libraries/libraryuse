@@ -274,41 +274,8 @@ a.list-group-item .list-group-item-heading {
     /*overflow: hidden;*/
 }
 
-
-.submenu{
-  display: block;
-  position: relative;
-  float: left;
-  width: 100%;
-}
-
-.submenu+.tab-content {
-    float: left;
-    position: relative;
-    display: block;
-    width: 100%;
-    background: red;
-}
-
-.submenu .options>li{
-  float: left;
-  width: 100%;
-}
-
-.submenu,
-.submenu+.tab-content .second-level,
-.submenu+.tab-content .second-level.active-panel~.tab-pane>.third-level {
-    margin-left: 100%;
-    display: none;
-}
-
-.submenu.active-panel,
-.submenu+.tab-content ul.active-panel{
-  margin-left: 0%;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
+.options-date-range form{
+  margin-top: 2em;
 }
 
 .toggle-filters {

@@ -3,7 +3,10 @@
 <html> 
 <head>
   <meta charset="utf-8">
-  <title>My App</title>
+  <title>Library Use</title>
+
+  <link id="siteFavIcon" rel="shortcut icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
@@ -25,6 +28,48 @@
 						<h2> <span class="glyphicon glyphicon-filter"></span>All Categories</h2>
 						<ul>
 							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a>
+								<div class="mp-level filter-settings">
+									<h2><span class="glyphicon glyphicon-cog"></span> Settings</h2>
+									<ul>
+										<li class="icon icon-arrow-left">
+											<a href="#"><span class="glyphicon glyphicon-adjust"></span> Unique Users</a>
+											<div class="mp-level options-unique-users">
+												<h2><span class="glyphicon glyphicon-adjust"></span> Unique Users</h2>
+
+												<div class="switch">
+												<div class="col-xs-5">
+													<label for="cmn-toggle-1">Display Unique Only</label>
+												</div>
+												<div class="col-xs-5">
+												  <input id="cmn-toggle-1" class="cmn-toggle cmn-toggle-round" type="checkbox">
+												  <label for="cmn-toggle-1"></label>
+												</div>
+												</div>
+											</div>
+										</li>
+										<li class="icon icon-arrow-left">
+											<a href="#"><span class="glyphicon glyphicon-time"></span> Date Range</a>
+											<div class="mp-level options-date-range">
+												<h2><span class="glyphicon glyphicon-time"></span> Date Range</h2>
+												<form class="col-xs-12" role="form">
+												  <div class="form-group">
+												    <label class="sr-only" for="date1">Start Date</label>
+												    <input type="date" class="form-control" id="date1" placeholder="Start Date">
+												  </div>
+												  <div class="form-group">
+												    <label class="sr-only" for="date2">End Date</label>
+												    <input type="date" class="form-control" id="date2" placeholder="End Date">
+												  </div>
+												  
+												  <button type="submit" class="btn btn-default">Fetch Data</button>
+												</form>
+											</div>
+										</li>
+									</ul>
+								</div>
+							</li>
+							<li class="icon icon-arrow-left">
 								<a href="#"><span class="glyphicon glyphicon-user"></span> Audience</a>
 								<div class="mp-level filter-audience">
 									<h2><span class="glyphicon glyphicon-user"></span> Audience</h2>
@@ -33,9 +78,9 @@
 											<a href="#"><span class="glyphicon glyphicon-user"></span> Students</a>
 											<div class="mp-level filter-students">
 												<h2><span class="glyphicon glyphicon-user"> Students</h2>
-												<ul>
+												<ul class="students">
 													{{#each item in model.student_classes}}
-														{{filter-button title=item}}
+														{{students-filter-button title=item}}
 													{{/each}}
 												</ul>
 											</div>
@@ -44,9 +89,9 @@
 											<a href="#"><span class="glyphicon glyphicon-fire"></span> Faculty</a>
 											<div class="mp-level filter-faculty">
 												<h2>Faculty</h2>
-												<ul>
+												<ul class="faculty">
 													{{#each item in model.faculty_divisions}}
-														{{filter-button title=item}}
+														{{faculty-filter-button title=item}}
 													{{/each}}
 												</ul>
 											</div>
@@ -100,7 +145,11 @@
 
   <script type="text/x-handlebars" data-template-name="components/filter-button">
   	<li>
+  		{{#if addon}}
+  		<a href="#/library/all/{{unbound addon}}/{{unbound title}}">{{title}}</a>
+  		{{else}}
 		<a href="#/library/all/{{unbound title}}">{{title}}</a>
+		{{/if}}
 	</li>
   </script>
 
@@ -140,7 +189,6 @@
   </script>
 
 	<script type="text/x-handlebars" id="library">
-
 		{{outlet}}
 	</script>
 
