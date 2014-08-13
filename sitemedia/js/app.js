@@ -406,7 +406,7 @@ function SUPERCHART(url){
       names = dataURL.get('names'),
       // colors = Highcharts.getOptions().colors;
       colors= ['#FB715E','#7994FF','#5AA689','#FFD340','#796499'],
-      uri_path = 'http://libraryuse-jay.apps.emory.edu/',
+      uri_path = '/',
       today = new Date(), 
       monthsAgo = 3,
       start_date = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate());
@@ -461,6 +461,7 @@ function SUPERCHART(url){
 
             seriesOptions[i] = {
               name: name,
+              id: name,
               data: d,
               color:color,
               fillColor : {
@@ -483,6 +484,28 @@ function SUPERCHART(url){
             seriesCounter++;
 
             if (seriesCounter == names.length) {
+             //  Timeline Events are possible!
+              // seriesOptions.push(
+              // {
+              //     name : "Flaged Events", 
+              //     color: '#999',
+              //     type : 'flags',
+              //     data : [
+              //       {
+              //         x : 1405536180000,      // Point where the flag appears
+              //         title : 'Timeline Event 1', // Title of flag displayed on the chart 
+              //         text : 'Description for timeline event.'   // Text displayed when the flag are highlighted.
+              //       },
+              //       {
+              //         x : 1407272940000,      // Point where the flag appears
+              //         title : 'Timeline Event 2', // Title of flag displayed on the chart 
+              //         text : 'Description for timeline event.'   // Text displayed when the flag are highlighted.
+              //       }
+              //     ],
+              //     onSeries : '',  // Id of which series it should be placed on. If not defined 
+              //                     // the flag series will be put on the X axis
+              //     shape : 'flag'  // Defines the shape of the flags.
+              // });
               drawChart(seriesOptions);
               drawChartLastWeek(seriesOptions);
             }
@@ -649,7 +672,9 @@ function SUPERCHART(url){
                     type: 'all',
                     text: 'All'
                   }],
-                  selected: 1
+                  selected: 1,
+                  inputDateFormat: '%b -%e %Y',
+                  inputEditDateFormat: '%Y-%m-%d'
                 },
 
             yAxis: {
@@ -669,9 +694,11 @@ function SUPERCHART(url){
                     dataGrouping:{
                       approximation:'sum',
                       smoothed:false,
-                      forced:true,
-                      groupPixelWidth:30
-                    }
+                      forced:false,
+                      groupPixelWidth:300,
+                      units: [ ['minute',[15]],['hour', [1]],['day',[1]] ]
+                    },
+
                 }
             },
             
@@ -680,22 +707,7 @@ function SUPERCHART(url){
                 changeDecimals: 2,
                 valueDecimals: 0
             },
-            inputDateFormat: '%H:%M:%S.%L',
-            inputEditDateFormat: '%H:%M:%S.%L',
-            // Custom parser to parse the %H:%M:%S.%L format
-            inputDateParser: function(value) {
-                value = value.split(/[:\.]/);
-                return Date.UTC(
-                    1970, 
-                    0, 
-                    1, 
-                    parseInt(value[0]),
-                    parseInt(value[1]),
-                    parseInt(value[2]),
-                    parseInt(value[3])
-                );
-            },
-
+            
             title: {
                 text: '',
                 floating: true
