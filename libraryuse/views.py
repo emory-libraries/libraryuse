@@ -221,13 +221,13 @@ def faculty_staff_class(request, library, classification, start, end):
                     .filter(visit_time__range=[start, end]) \
                     .filter(location = location) \
                     .filter(Q(prsn_c_type = 'F')) \
-                    .filter(prsn_e_type = classification)
+                    .filter(dvsn_n = classification)
     else:
         numbers = LibraryVisit.objects \
                     .filter(visit_time__range=[start, end]) \
                     .filter(location = location) \
                     .filter(Q(prsn_c_type = 'F')) \
-                    .filter(prsn_e_type = classification) \
+                    .filter(dvsn_n = classification) \
                     .values("prsn_i_ecn").distinct().count()
 
     data = chart_data(numbers, distinct_flag)
