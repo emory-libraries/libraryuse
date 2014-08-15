@@ -673,8 +673,8 @@ function SUPERCHART(url){
                     text: 'All'
                   }],
                   selected: 1,
-                  inputDateFormat: '%b -%e %Y',
-                  inputEditDateFormat: '%Y-%m-%d'
+                  inputDateFormat: '%b %e %Y',
+                  inputEditDateFormat: '%Y-%m-%d
                 },
 
             yAxis: {
