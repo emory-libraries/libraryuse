@@ -674,7 +674,7 @@ function SUPERCHART(url){
                   }],
                   selected: 1,
                   inputDateFormat: '%b %e %Y',
-                  inputEditDateFormat: '%Y-%m-%d
+                  inputEditDateFormat: '%Y-%m-%d'
                 },
 
             yAxis: {
