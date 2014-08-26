@@ -2,6 +2,7 @@ from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.utils.text import slugify
 import json
 from django.db.models import Q, Count
 from datetime import datetime
@@ -129,6 +130,44 @@ def location_name(library):
         return('LOCATION: HEALTH SCIENCES LIBRARY')
     else:
         return(None)
+
+def get_classifications(filter_by):
+
+    if filter_by == 'stdn_e_clas':
+        return LibraryVisit.objects \
+            .values_list('stdn_e_clas', flat=True) \
+            .distinct() \
+            .exclude(stdn_e_clas__isnull=True) \
+            .order_by('stdn_e_clas')
+
+    elif filter_by == 'acpl_n':
+        return LibraryVisit.objects \
+            .values_list('acpl_n', flat=True) \
+            .distinct() \
+            .exclude(acpl_n__isnull=True) \
+            .order_by('acpl_n')
+
+    elif filter_by == 'dprt_n':
+        return LibraryVisit.objects \
+            .values_list('dprt_n', flat=True) \
+            .distinct() \
+            .exclude(dprt_n__isnull=True) \
+            .order_by('dprt_n')
+
+    elif filter_by == 'acca_i':
+        return LibraryVisit.objects \
+            .values_list('acca_i', flat=True) \
+            .distinct().exclude(acca_i__isnull=True) \
+            .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
+            .order_by('acca_i')
+
+    elif filter_by == 'dvsn_n':
+        return LibraryVisit.objects \
+            .values_list('dvsn_n', flat=True) \
+            .distinct() \
+            .exclude(dvsn_n__isnull=True) \
+            .filter(Q(prsn_c_type = 'F')) \
+            .order_by('dvsn_n')
 
 #@login_required
 
@@ -295,24 +334,36 @@ def calculate_dates(start, end):
     return data
 
 def int_day(dow):
-    # This translates the MySQL days to dateutil days
-    # In Django MySQL Monday = 2 but 0 in dateutil
-    if dow == 1:
-        return 6
-    elif dow == 2:
-        return 0
-    elif dow == 3:
-        return 1
-    elif dow == 4:
-        return 2
-    elif dow == 5:
-        return 3
-    elif dow == 6:
-        return 4
-    elif dow == 7:
-        return 5
+    # This translates the MySQL days to dateutil days.
+    # In Django MySQL Monday = 2 but 0 in dateutil.
+    dow_ints = {
+        1 : 6,
+        2 : 0,
+        3 : 1,
+        4 : 2,
+        5 : 3,
+        6 : 4,
+        7 : 5
+    }
 
-def averages(request, library, start, end, start_hour, end_hour, dow):
+    return int(dow_ints[dow])
+
+def alph_day(dow):
+    # This translates the MySQL days to dateutil days.
+    # In Django MySQL Monday = 2 but 0 in dateutil.
+    dow_alphs = {
+        '1' : 'Sunday',
+        '2' : 'Monday',
+        '3' : 'Tuesday',
+        '4' : 'Wednesday',
+        '5' : 'Thursday',
+        '6' : 'Friday',
+        '7' : 'Saturday'
+    }
+
+    return dow_alphs[dow]
+
+def total_averages(request, library, start, end, start_hour, end_hour, dow):
 
     dates = calculate_dates(start, end)
 
@@ -322,15 +373,14 @@ def averages(request, library, start, end, start_hour, end_hour, dow):
     totals = 0
 
     while (count <= dates['weeks']):
-        start_time = dates['start_date']+relativedelta(weeks=+count, hour=int(start_hour), weekday=int_day(dow))
-        end_time = dates['start_date']+relativedelta(weeks=+count, hour=int(end_hour), weekday=int_day(dow))
+        start_time = dates['start_date']+relativedelta(weeks=+count, hour=int(start_hour), weekday=int_day(int(dow)))
+        end_time = dates['start_date']+relativedelta(weeks=+count, hour=int(end_hour), weekday=int_day(int(dow)))
         numbers = LibraryVisit.objects \
             .values('visit_time') \
             .annotate(total=Count('visit_time')) \
             .filter(visit_time__range=[start_time, end_time])\
             .filter(visit_time__week_day = dow) \
             .filter(location = location)
-        print(numbers)
         for number in numbers:
             if number['visit_time'].hour != end_hour:
                 totals += number['total']
@@ -349,12 +399,65 @@ def averages(request, library, start, end, start_hour, end_hour, dow):
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 
+def averages(request, library, start, end, start_hour, end_hour, dow, filter_on):
+    dates = calculate_dates(start, end)
+
+    location = location_name(library)
+
+    count = 0
+    totals = 0
+
+    student_classes = get_classifications(filter_on)
+
+    jsonp = 'jsonResponse({"data":{'
+    counts = []
+
+    for classification in student_classes:
+
+        while (count <= dates['weeks']):
+            start_time = dates['start_date']+relativedelta(weeks=+count, hour=int(start_hour), weekday=int_day(int(dow)))
+            end_time = dates['start_date']+relativedelta(weeks=+count, hour=int(end_hour), weekday=int_day(int(dow)))
+            numbers = LibraryVisit.objects \
+                .values('visit_time') \
+                .annotate(total=Count('visit_time')) \
+                .filter(visit_time__range=[start_time, end_time])\
+                .filter(visit_time__week_day = dow) \
+                .filter(location = location) \
+                .filter(**{ filter_on: classification })
+            for number in numbers:
+                if number['visit_time'].hour != end_hour:
+                    totals += number['total']
+            count += 1
+
+        average = totals / count
+        counts.append('"%s":{"label":"%s","value":%s}' % (slugify(classification), classification, average))
+        count = 0
+        totals = 0
+
+    jsonp += ', '.join(counts)
+    jsonp += '},'
+    jsonp += '"meta":{'
+    jsonp += '"strt_date":["%s"],' % start
+    jsonp += '"end_date":["%s"],' % end
+    jsonp += '"strt_hour":["%s"],' % start_hour
+    jsonp += '"end_hour":["%s"],' % end_hour
+    jsonp += '"dow":["%s"],' % alph_day(dow)
+    jsonp += '"queried_at":["%s"]' % datetime.now()
+    jsonp += '}})'
+
+    return StreamingHttpResponse(jsonp, content_type='application/json')
+
 def classifications(request):
-    student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
-    academic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(acpl_n__isnull=True)
-    departments = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(dprt_n__isnull=True)
-    academic_career = LibraryVisit.objects.values_list('acca_i', flat=True).distinct().exclude(acca_i__isnull=True).filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
-    faculty_divisions = LibraryVisit.objects.values_list('dvsn_n', flat=True).distinct().exclude(dvsn_n__isnull=True).filter(Q(prsn_c_type = 'F'))
+
+    student_classes = get_classifications('stdn_e_clas')
+
+    academic_plans = get_classifications('acpl_n')
+
+    departments = get_classifications('dprt_n')
+
+    academic_career = get_classifications('acca_i')
+
+    faculty_divisions = get_classifications('dvsn_n')
 
     jsonp = 'jsonCategories({'
 
@@ -372,7 +475,7 @@ def classifications(request):
 
     jsonp += '"faculty_divisions":["'
     jsonp += '","'.join(faculty_divisions)
-    jsonp += '"]',
+    jsonp += '"],'
 
     jsonp += '"departments":["'
     jsonp += '","'.join(departments)
