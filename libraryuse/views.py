@@ -1,22 +1,28 @@
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.db.models import Q, Count
 from django.http import HttpResponse, StreamingHttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
-import json
-from django.db.models import Q, Count
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-import csv
-from forms import DataExportForm
-from models import LibraryVisit
-from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, ProgramTable
 from django_tables2 import RequestConfig
+from forms import DataExportForm
+from libraryuse.tables import PersonTypeTable, DepartmentTable, DivisionTable, ProgramTable
+from models import LibraryVisit
+import csv
+import json
 import time
 
 @login_required
 def index(request):
     context = {}
     return render_to_response('libraryuse/dashboard.html', context)
+
+@login_required
+def reports_index(request):
+    context = {}
+    return redirect('/#/reports')
 
 @login_required
 def export(request):
