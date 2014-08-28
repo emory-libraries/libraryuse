@@ -18,9 +18,9 @@ urlpatterns = patterns(
 
     url(r'^$', views.index, name='index'),
     url(r'^reports$', views.reports_index, name='reports_index'),
-    url(r'^summary$', views.summary, name='summary'),
+    #url(r'^summary$', views.summary, name='summary'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^export$', views.export, name='export'),
+    #url(r'^export$', views.export, name='export'),
 
     url(r'^student_classifications', views.student_classifications, name='student_classifications'),
     url(r'^classifications', views.classifications, name='classifications'),
