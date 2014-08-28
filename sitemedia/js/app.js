@@ -23,20 +23,14 @@ App.Router.map(function() {
   this.resource('date', { path: '/library/:lib/:category/:demo/:date'});
 
 
-  this.resource('report', { path: '/reports/:report_id' });
+  this.resource('reports', { path: 'reports' });
   this.resource('json');
   // this.route("fourOhFour", { path: "*path"});
 });
 
 
-App.ReportRoute = Ember.Route.extend({
-  model: function(params) {
-    return {title:'Report: '+ params.report_id, path: '/reports/'+params.report_id};
-  }
-});
-
 App.ApplicationRoute = Ember.Route.extend({
-   model: function() {
+  model: function() {
     return Ember.$.getJSON('static/js/data/classifications.json');
   },
   actions:{
@@ -79,6 +73,37 @@ App.IndexRoute = Ember.Route.extend({
   }
 });
 
+
+
+App.reportStore = Ember.Object.extend({});
+
+
+
+App.ReportsRoute = Ember.Route.extend({
+  model: function(params) {
+  }
+});
+
+App.JsonSparklineComponent = Ember.Component.extend({
+  didInsertElement: function(url){
+    url = '';
+    $.ajax({
+      url: url,
+      dataType: 'jsonp',
+      jsonpCallback:'jsonResponse',
+      success:function(data){
+        console.log(data)
+        var $container = $('#table-sparkline'),
+            $table = $("<tbody/>").attr('id','tbody-sparkline');
+        $(data).each(function(i){
+          $table.append(this.data);
+        });
+        console.log($table)
+        $container.append($table);
+      }
+    });
+  }//end didInsertElement
+});
 
 //LIBRARY ROOT
 App.LibraryRoute = Ember.Route.extend({
@@ -272,11 +297,6 @@ App.LibraryWoodruffView = Ember.View.create({
 });
 
 
-function funFunction(msg){
-  console.log(msg);
-}
-
-
 //Business
 App.LibraryBusinessRoute = Ember.Route.extend({
   model:function(){
@@ -381,6 +401,7 @@ App.NetChangeComponent = Ember.Component.extend({
 
 var selection = []
 
+// function that builds both the charts on the Library pages
 function SUPERCHART(url){
     var path = dataURL.get('paths'),
         d = '',
@@ -408,7 +429,7 @@ function SUPERCHART(url){
       colors= ['#FB715E','#7994FF','#5AA689','#FFD340','#796499'],
       uri_path = '/',
       today = new Date(), 
-      monthsAgo = 3,
+      monthsAgo = 12,
       start_date = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate());
       date_range = '/'+formatDate(start_date)+'/'+formatDate(today)+'/';
 
@@ -674,7 +695,7 @@ function SUPERCHART(url){
                   }],
                   selected: 1,
                   inputDateFormat: '%b %e %Y',
-                  inputEditDateFormat: '%Y-%m-%d'
+                  inputEditDateFormat: '%Y-%m-%d' 
                 },
 
             yAxis: {
@@ -756,8 +777,8 @@ function SUPERCHART(url){
         }//end drawChart
 
     })//end $.each
+}//end SUPERCHART
 
-  }//end SUPERCHART
 
 App.JsonChartComponent = Ember.Component.extend({
   didInsertElement: function(url){

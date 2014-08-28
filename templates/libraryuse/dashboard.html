@@ -133,6 +133,16 @@
 						</div>
 						<header id="header">
 							<h1 class="site-title">{{#link-to "index" classNames="logo"}}<span class="glyphicon glyphicon-signal"></span> Library Use{{/link-to}}</h1>
+							<nav class="pull-right">
+								<ul class="nav navbar-nav">
+									{{#link-to "library.all" tagName="li"}}
+									    <a {{bind-attr href="view.href"}}>Charts</a>
+									{{/link-to}}
+									{{#link-to "reports" tagName="li"}}
+									    <a {{bind-attr href="view.href"}}>Reports</a>
+									{{/link-to}}
+								</ul>
+							</nav>
 						</header>
 						<div class="content clearfix">
 							{{outlet}}
@@ -306,18 +316,32 @@
 		</section>
 	</script>
 
-	<script type="text/x-handlebars" id="library/libraries/report1">
+	<script type="text/x-handlebars" id="reports">
 		<div class="container">
            <div class="row">
-            <div class="col-xs-12 col-sm-6">
-              <canvas class="chart" height="300" id="myChart" data-source="js/line-chart.json" data-type="bar"></canvas>
-            </div>
-            <div class="col-xs-12 col-sm-6">
+            
+            <div class="col-xs-12 col-sm-4">
               <h3>Report one</h3>
               <p>There is, one knows not what sweet mystery about this sea, whose gently awful stirrings seem to speak of some hidden soul beneath; like those fabled undulations of the Ephesian sod over the buried Evangelist St. John. And meet it is, that over these sea-pastures, wide-rolling watery prairies and Potters Fields of all four continents, the waves should rise and fall, and ebb and flow unceasingly; for here, millions of mixed shades and shadows, drowned dreams, somnambulisms, reveries; all that we call lives and souls, lie dreaming, dreaming, still; tossing like slumberers in their beds; the ever-rolling waves but made so by their restlessness.</p>
             </div>
+            <div class="col-xs-12 col-sm-8">
+              {{!-- {{json-sparkline}} --}}
+            </div>
           </div>
         </div>
+	</script>
+
+	<script type="text/x-handlebars" data-template-name="components/json-sparkline">
+		<div id="result"></div>
+		<table id="table-sparkline">
+		    <thead>
+		        <tr>
+		            <th>Classifications</th>
+		            <th>Total Visits</th>
+		            <th>Unique Visits</th>
+		        </tr>
+		    </thead>
+		</table>
 	</script>
 
 	<script type="text/x-handlebars" data-template-name="components/json-chart">
@@ -337,14 +361,21 @@
   <script src="{% static 'js/libs/jquery-1.10.2.js'  %}"></script>
   <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+
   <script src="{% static 'js/libs/handlebars-1.1.2.js' %}"></script>
   <script src="{% static 'js/libs/ember-1.5.0.js' %}"></script>
+
   <script src="http://code.highcharts.com/stock/highstock.js"></script>
+  <script src="http://code.highcharts.com/highcharts.js"></script>
+
   <script src="http://code.highcharts.com/modules/exporting.js"></script>
+
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+
   <script src="{% static 'js/libs/flipclock/flipclock.js' %}"></script>
   <script src="{% static 'js/libs/jquery.easing.js' %}"></script>
   <script src="{% static 'js/libs/mlpushmenu.js' %}"></script>
+
   <script src="{% static 'js/local.js' %}"></script>
   <script src="{% static 'js/app.js '%}"></script>
   <!-- to activate the test runner, add the "?test" query string parameter -->

@@ -14,11 +14,14 @@ body >.ember-view{
     width: 100%;
 }
 
-
 section {
     width: 100%;
     float: left;
     background: transparent;
+}
+
+a{
+  cursor: pointer;
 }
 
 #header {
@@ -48,6 +51,27 @@ section {
   margin-right: 9px;
   font-size: 0.85em;
 }
+
+#header .navbar-nav>li {
+    float: left;
+    position:relative;
+}
+
+@media (max-width:767px){
+    #header .navbar-nav{
+        padding-right:15px;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+}
+
+@media (min-width: 768px){
+    #header .navbar-nav>li>a {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}
+
 
 .st-menu .active{
     background-color: #A0FFCD;
@@ -358,5 +382,41 @@ a.list-group-item .list-group-item-heading {
   100%   { top: 100px; left: 0px; opacity: 0;}
 }
 
+
+
+/******
+  Test
+******/
+
+#result {
+  text-align: right;
+  color: gray;
+  min-height: 2em;
+}
+#table-sparkline {
+  margin: 0 auto;
+    border-collapse: collapse;
+}
+th {
+    font-weight: bold;
+    text-align: left;
+}
+td, th {
+    padding: 5px;
+    border-bottom: 1px solid silver;
+    height: 20px;
+}
+
+thead th {
+    border-top: 2px solid gray;
+    border-bottom: 2px solid gray;
+}
+.highcharts-tooltip>span {
+  background: white;
+  border: 1px solid silver;
+  border-radius: 3px;
+  box-shadow: 1px 1px 2px #888;
+  padding: 8px;
+}
 
 
