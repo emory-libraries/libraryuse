@@ -17,6 +17,11 @@ def index(request):
     context = {}
     return render_to_response('libraryuse/dashboard.html', context)
 
+@login_required
+def reports_index(request):
+    context = {}
+    return redirect('/#/reports')
+
 def chart_data(numbers, distinct, start, end, library):
 
     data = []
