@@ -102,7 +102,7 @@ def chart_data(numbers, distinct_flag):
 
     data = []
     visits = []
-    data.append('jsonResponse({"data":[')
+    data.append('{"data":[')
 
     if distinct_flag is False:
         for number in numbers:
@@ -123,7 +123,7 @@ def chart_data(numbers, distinct_flag):
         data.append(', '.join(visits))
     else:
         data.append(numbers)
-    data.append('],"queried_at":["%s"]})' % datetime.now())
+    data.append('],"queried_at":["%s"]}' % datetime.now())
 
     return(data)
 
@@ -465,7 +465,7 @@ def classifications(request):
 
     faculty_divisions = get_classifications('dvsn_n')
 
-    jsonp = 'jsonCategories({'
+    jsonp = '{'
 
     jsonp += '"student_classes":["'
     jsonp += '","'.join(student_classes)
@@ -487,7 +487,7 @@ def classifications(request):
     jsonp += '","'.join(departments)
     jsonp += '"]'
 
-    jsonp += '})'
+    jsonp += '}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 

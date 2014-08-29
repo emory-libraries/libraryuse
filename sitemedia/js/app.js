@@ -29,14 +29,34 @@ App.Router.map(function() {
 });
 
 
+
+App.classificationsStore = Ember.Object.extend({});
+
+var test = 'nope';
+
+$.ajax({
+  url: '/classifications',
+  dataType: 'jsonp',
+  jsonpCallback:'jsonResponse',
+  success:function(data){
+    test = data;
+  }
+});
+
 App.ApplicationRoute = Ember.Route.extend({
   model: function() {
-    return Ember.$.getJSON('static/js/data/classifications.json');
+    return Ember.$.getJSON('/classifications')
   },
   actions:{
     error: function () {
       this.transitionTo('catchall', "application-error");
     }
+  }
+});
+
+App.NavComponent = Ember.Component.extend({
+  didInsertElement:function(){
+    
   }
 });
 
@@ -81,29 +101,10 @@ App.reportStore = Ember.Object.extend({});
 
 App.ReportsRoute = Ember.Route.extend({
   model: function(params) {
+    return Ember.$.getJSON('/top_dprtn/woodruff/2013-8-28/2014-8-28/')
   }
 });
 
-App.JsonSparklineComponent = Ember.Component.extend({
-  didInsertElement: function(url){
-    url = '';
-    $.ajax({
-      url: url,
-      dataType: 'jsonp',
-      jsonpCallback:'jsonResponse',
-      success:function(data){
-        console.log(data)
-        var $container = $('#table-sparkline'),
-            $table = $("<tbody/>").attr('id','tbody-sparkline');
-        $(data).each(function(i){
-          $table.append(this.data);
-        });
-        console.log($table)
-        $container.append($table);
-      }
-    });
-  }//end didInsertElement
-});
 
 //LIBRARY ROOT
 App.LibraryRoute = Ember.Route.extend({
@@ -133,7 +134,11 @@ App.LibraryAllRoute = Ember.Route.extend({
      var data = {
               title: 'All Libraries'
             }
-        dataURL.set('names', ['Woodruff','Health Sciences','Law']);
+        dataURL.set('names', [
+          'Woodruff',
+          'Health Sciences',
+          'Law'
+          ]);
         dataURL.set('paths', [
           'woodruff',
           'health',
@@ -429,21 +434,21 @@ function SUPERCHART(url){
       colors= ['#FB715E','#7994FF','#5AA689','#FFD340','#796499'],
       uri_path = '/',
       today = new Date(), 
-      monthsAgo = 12,
+      monthsAgo = 6,
       start_date = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate());
       date_range = '/'+formatDate(start_date)+'/'+formatDate(today)+'/';
 
     $.each(names, function(i, name) {
 
-      // console.log(path[i])
-      console.log(uri_path+uri_category+path[i]+'/'+uri_users+date_range);
+      console.log(path[i])
+      console.log(uri_path+uri_category+path[i]+uri_users+date_range);
 
       $.ajax({
-          url: uri_path+uri_category+path[i]+'/'+uri_users+date_range,
-          dataType: 'jsonp',
-          jsonpCallback:'jsonResponse',
+          url: uri_path+uri_category+path[i]+uri_users+date_range,
+          dataType: 'json',
           success:function(data){jsonResponse(data)},
-          error: function(){
+          error: function(xhr, status, error){
+            console.log(xhr.responseText)
             var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, it's taking a while to load.</p>");
             $error.append($("<a/>").attr({'href':'#','class':'btn btn-warning btn-refresh'}).append('Refresh'));
             $container.html($error);
@@ -460,7 +465,6 @@ function SUPERCHART(url){
           d = data;
           if(data.data !== undefined){
             d = data.data;
-            // console.log(d);
           }
           else{
             d = data;

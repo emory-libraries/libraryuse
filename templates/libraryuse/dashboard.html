@@ -23,107 +23,7 @@
 			<!-- Push Wrapper -->
 			<div class="mp-pusher" id="mp-pusher">
 				<!-- mp-menu -->
-				<nav id="mp-menu" class="mp-menu">
-					<div class="mp-level filter-all">
-						<h2> <span class="glyphicon glyphicon-filter"></span>All Categories</h2>
-						<ul>
-							<li class="icon icon-arrow-left">
-								<a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a>
-								<div class="mp-level filter-settings">
-									<h2><span class="glyphicon glyphicon-cog"></span> Settings</h2>
-									<ul>
-										<li class="icon icon-arrow-left">
-											<a href="#"><span class="glyphicon glyphicon-adjust"></span> Unique Users</a>
-											<div class="mp-level options-unique-users">
-												<h2><span class="glyphicon glyphicon-adjust"></span> Unique Users</h2>
-
-												<div class="switch">
-												<div class="col-xs-5">
-													<label for="cmn-toggle-1">Display Unique Only</label>
-												</div>
-												<div class="col-xs-5">
-												  <input id="cmn-toggle-1" class="cmn-toggle cmn-toggle-round" type="checkbox">
-												  <label for="cmn-toggle-1"></label>
-												</div>
-												</div>
-											</div>
-										</li>
-										<li class="icon icon-arrow-left">
-											<a href="#"><span class="glyphicon glyphicon-time"></span> Date Range</a>
-											<div class="mp-level options-date-range">
-												<h2><span class="glyphicon glyphicon-time"></span> Date Range</h2>
-												<form class="col-xs-12" role="form">
-												  <div class="form-group">
-												    <label class="sr-only" for="date1">Start Date</label>
-												    <input type="date" class="form-control" id="date1" placeholder="Start Date">
-												  </div>
-												  <div class="form-group">
-												    <label class="sr-only" for="date2">End Date</label>
-												    <input type="date" class="form-control" id="date2" placeholder="End Date">
-												  </div>
-												  
-												  <button type="submit" class="btn btn-default">Fetch Data</button>
-												</form>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</li>
-							<li class="icon icon-arrow-left">
-								<a href="#"><span class="glyphicon glyphicon-user"></span> Audience</a>
-								<div class="mp-level filter-audience">
-									<h2><span class="glyphicon glyphicon-user"></span> Audience</h2>
-									<ul>
-										<li class="icon icon-arrow-left">
-											<a href="#"><span class="glyphicon glyphicon-user"></span> Students</a>
-											<div class="mp-level filter-students">
-												<h2><span class="glyphicon glyphicon-user"> Students</h2>
-												<ul class="students">
-													{{#each item in model.student_classes}}
-														{{students-filter-button title=item}}
-													{{/each}}
-												</ul>
-											</div>
-										</li>
-										<li class="icon icon-arrow-left">
-											<a href="#"><span class="glyphicon glyphicon-fire"></span> Faculty</a>
-											<div class="mp-level filter-faculty">
-												<h2>Faculty</h2>
-												<ul class="faculty">
-													{{#each item in model.faculty_divisions}}
-														{{faculty-filter-button title=item}}
-													{{/each}}
-												</ul>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</li>
-							<li class="icon icon-arrow-left">
-								<a href="#"><span class="glyphicon glyphicon-list-alt"></span> Degree</a>
-								<div class="mp-level filter-academic-plan">
-									<h2><span class="glyphicon glyphicon-list-alt"></span> Degree</h2>
-									<ul>
-										{{#each item in model.academic_plans}}
-											{{filter-button title=item}}
-										{{/each}}
-									</ul>
-								</div>
-							</li>
-							<li class="icon icon-arrow-left">
-								<a href="#"><span class="glyphicon glyphicon-briefcase"></span> School</a>
-								<div class="mp-level">
-									<h2><span class="glyphicon glyphicon-briefcase"></span> School</h2>
-									<ul>
-										{{#each item in model.academic_career}}
-											{{filter-button title=item}}
-										{{/each}}
-									</ul>
-								</div>
-							</li>
-						</ul>
-					</div>
-				</nav>
+					{{nav model=model}}
 				<!-- /mp-menu -->
 				<div class="scroller"><!-- this is for emulating position fixed of the nav -->
 					<div class="scroller-inner">
@@ -151,6 +51,110 @@
 				</div><!-- /scroller -->
 		</div><!-- /pusher -->
 	
+  </script>
+
+  <script type="text/javascript" data-template-name="components/nav">
+	  <nav id="mp-menu" class="mp-menu">
+		<div class="mp-level filter-all">
+			<h2> <span class="glyphicon glyphicon-filter"></span>All Categories</h2>
+			<ul>
+				<li class="icon icon-arrow-left">
+					<a href="#"><span class="glyphicon glyphicon-cog"></span> Settings</a>
+					<div class="mp-level filter-settings">
+						<h2><span class="glyphicon glyphicon-cog"></span> Settings</h2>
+						<ul>
+							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-adjust"></span> Unique Users</a>
+								<div class="mp-level options-unique-users">
+									<h2><span class="glyphicon glyphicon-adjust"></span> Unique Users</h2>
+
+									<div class="switch">
+									<div class="col-xs-5">
+										<label for="cmn-toggle-1">Display Unique Only</label>
+									</div>
+									<div class="col-xs-5">
+									  <input id="cmn-toggle-1" class="cmn-toggle cmn-toggle-round" type="checkbox">
+									  <label for="cmn-toggle-1"></label>
+									</div>
+									</div>
+								</div>
+							</li>
+							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-time"></span> Date Range</a>
+								<div class="mp-level options-date-range">
+									<h2><span class="glyphicon glyphicon-time"></span> Date Range</h2>
+									<form class="col-xs-12" role="form">
+									  <div class="form-group">
+									    <label class="sr-only" for="date1">Start Date</label>
+									    <input type="date" class="form-control" id="date1" placeholder="Start Date">
+									  </div>
+									  <div class="form-group">
+									    <label class="sr-only" for="date2">End Date</label>
+									    <input type="date" class="form-control" id="date2" placeholder="End Date">
+									  </div>
+									  
+									  <button type="submit" class="btn btn-default">Fetch Data</button>
+									</form>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</li>
+				<li class="icon icon-arrow-left">
+					<a href="#"><span class="glyphicon glyphicon-user"></span> Audience</a>
+					<div class="mp-level filter-audience">
+						<h2><span class="glyphicon glyphicon-user"></span> Audience</h2>
+						<ul>
+							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-user"></span> Students</a>
+								<div class="mp-level filter-students">
+									<h2><span class="glyphicon glyphicon-user"> Students</h2>
+									<ul class="students">
+										{{#each item in model.student_classes}}
+											{{students-filter-button title=item}}
+										{{/each}}
+									</ul>
+								</div>
+							</li>
+							<li class="icon icon-arrow-left">
+								<a href="#"><span class="glyphicon glyphicon-fire"></span> Faculty</a>
+								<div class="mp-level filter-faculty">
+									<h2>Faculty</h2>
+									<ul class="faculty">
+										{{#each item in model.faculty_divisions}}
+											{{faculty-filter-button title=item}}
+										{{/each}}
+									</ul>
+								</div>
+							</li>
+						</ul>
+					</div>
+				</li>
+				<li class="icon icon-arrow-left">
+					<a href="#"><span class="glyphicon glyphicon-list-alt"></span> Degree</a>
+					<div class="mp-level filter-academic-plan">
+						<h2><span class="glyphicon glyphicon-list-alt"></span> Degree</h2>
+						<ul>
+							{{#each item in model.academic_plans}}
+								{{filter-button title=item}}
+							{{/each}}
+						</ul>
+					</div>
+				</li>
+				<li class="icon icon-arrow-left">
+					<a href="#"><span class="glyphicon glyphicon-briefcase"></span> School</a>
+					<div class="mp-level">
+						<h2><span class="glyphicon glyphicon-briefcase"></span> School</h2>
+						<ul>
+							{{#each item in model.academic_career}}
+								{{filter-button title=item}}
+							{{/each}}
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div>
+	</nav>
   </script>
 
   <script type="text/x-handlebars" data-template-name="components/filter-button">
@@ -325,7 +329,7 @@
               <p>There is, one knows not what sweet mystery about this sea, whose gently awful stirrings seem to speak of some hidden soul beneath; like those fabled undulations of the Ephesian sod over the buried Evangelist St. John. And meet it is, that over these sea-pastures, wide-rolling watery prairies and Potters Fields of all four continents, the waves should rise and fall, and ebb and flow unceasingly; for here, millions of mixed shades and shadows, drowned dreams, somnambulisms, reveries; all that we call lives and souls, lie dreaming, dreaming, still; tossing like slumberers in their beds; the ever-rolling waves but made so by their restlessness.</p>
             </div>
             <div class="col-xs-12 col-sm-8">
-              {{!-- {{json-sparkline}} --}}
+              {{json-sparkline}}
             </div>
           </div>
         </div>
