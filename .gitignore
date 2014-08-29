@@ -3,11 +3,6 @@
 libuse-openshift.komodoproject
 static
 venv
-#libraryuse/localsettings.py
-
-libraryuse/api/resources.pyc
-
-libraryuse/api/__init__.pyc
-#libraryuse/localsettings.py
-
 libraryuse/localsettings.py
+libraryuse/api/resources.pyc
+libraryuse/api/__init__.pyc
