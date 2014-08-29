@@ -37,13 +37,13 @@ def chart_data(numbers, distinct, start, end, library):
             visits.append('[%s000,%s]' % (epoch, number['total']))
         elif number.has_key('acpl_n'):
             acpl_n = number['acpl_n']
-            visits.append('["%s",%s]' % (acpl_n, number['total']))
+            visits.append('{"label":"%s","value":%s}' % (acpl_n, number['total']))
         elif number.has_key('dprt_n'):
             dprt_n = number['dprt_n']
-            visits.append('["%s",%s]' % (dprt_n, number['total']))
+            visits.append('{"label":"%s","value":%s}' % (dprt_n, number['total']))
         elif number.has_key('dvsn_n'):
             dvsn_n = number['dvsn_n']
-            visits.append('["%s",%s]' % (dvsn_n, number['total']))
+            visits.append('{"label":"%s","value":%s}' % (dvsn_n, number['total']))
     data.append(', '.join(visits))
 
     data.append('],')
