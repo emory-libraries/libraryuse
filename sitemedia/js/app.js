@@ -54,12 +54,6 @@ App.ApplicationRoute = Ember.Route.extend({
   }
 });
 
-App.NavComponent = Ember.Component.extend({
-  didInsertElement:function(){
-    
-  }
-});
-
 var GLOBAL_LIB='';
 
 App.FilterButtonComponent = Ember.Component.extend({
