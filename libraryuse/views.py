@@ -28,6 +28,7 @@ def chart_data(numbers, distinct, start, end, library):
     visits = []
     data.append('{"data":[')
 
+
     for number in numbers:
         if number.has_key('visit_time'):
             dt = datetime.strptime(str(number['visit_time']), '%Y-%m-%d %H:%M:%S')
