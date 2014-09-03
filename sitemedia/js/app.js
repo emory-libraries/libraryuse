@@ -88,15 +88,43 @@ App.IndexRoute = Ember.Route.extend({
 });
 
 
-
-App.reportStore = Ember.Object.extend({});
-
-
-
 App.ReportsRoute = Ember.Route.extend({
   model: function(params) {
     return Ember.$.getJSON('/top_dprtn/woodruff/2013-8-28/2014-8-28/')
   }
+});
+
+App.ReportsController = Ember.Controller.extend({
+    firstItemInArray: function() {
+      return this.get('model.data').filter( function(item, index) {
+        // return true if you want to include this item
+        // for example, with the code below we include all but the first item
+        if (index == 0) { 
+          return item;     
+        }    
+      });
+    }.property('model.data.@each'),
+
+    theFilter: "",
+    
+    filterPeople: function() {
+      var searchText = this.get('theFilter').toLowerCase();
+        return this.get('model.data').filter( function(_this, index) {
+        // return true if you want to include this item
+        // for example, with the code below we include all but the first item
+        var item = _this.label.toLowerCase();
+        if(item.indexOf(searchText)>-1){
+          return item
+        }
+      });
+
+    }.property("theFilter"),
+
+    actions: {
+      sortBy: function(property) {
+          this.set("sortProperties", [property]);
+      }
+    }
 });
 
 

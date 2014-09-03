@@ -168,7 +168,7 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="loading">
-	<h1>Loading</h1>
+	{{flip-loading}}
   </script>
 
 
@@ -321,28 +321,37 @@
            <div class="row">
 
             <div class="col-xs-12 col-sm-4">
-              <h3>Report one</h3>
-              <p>There is, one knows not what sweet mystery about this sea, whose gently awful stirrings seem to speak of some hidden soul beneath; like those fabled undulations of the Ephesian sod over the buried Evangelist St. John. And meet it is, that over these sea-pastures, wide-rolling watery prairies and Potters Fields of all four continents, the waves should rise and fall, and ebb and flow unceasingly; for here, millions of mixed shades and shadows, drowned dreams, somnambulisms, reveries; all that we call lives and souls, lie dreaming, dreaming, still; tossing like slumberers in their beds; the ever-rolling waves but made so by their restlessness.</p>
+              <h3>Total Visitors by Department</h3>
+              <p>The most visitors for {{model.meta.library}} 
+				{{#each item in firstItemInArray}}
+					came from the {{item.label}} department with {{item.value}} visitors.
+				{{/each}}
+              </p>
             </div>
             <div class="col-xs-12 col-sm-8">
-              {{json-sparkline}}
+              {{input type='text' value=theFilter placeholder='Filter by Department'}}
+				<table id="table-sparkline" class="table">
+				    <thead>
+				        <tr>
+				            <th {{action "sortBy" "id"}}>Department</th>
+				            <th>Total Visits</th>
+				            {{!-- <th>Unique Visits</th> --}}
+				        </tr>
+				    </thead>
+				    <tbody>
+				    	{{#each item in filterPeople}}
+				    		<tr>
+				    			<td>{{item.label}}</td>
+				    			<td>{{item.value}}</td>
+				    		</tr>
+				    	{{/each}}
+				    </tbody>
+				</table>
             </div>
           </div>
         </div>
 	</script>
 
-	<script type="text/x-handlebars" data-template-name="components/json-sparkline">
-		<div id="result"></div>
-		<table id="table-sparkline">
-		    <thead>
-		        <tr>
-		            <th>Classifications</th>
-		            <th>Total Visits</th>
-		            <th>Unique Visits</th>
-		        </tr>
-		    </thead>
-		</table>
-	</script>
 
 	<script type="text/x-handlebars" data-template-name="components/json-chart">
 		<div id="container" style="height: 400px; min-width: 400px">
