@@ -18,6 +18,3 @@ Initial setup
   python manage.py syncdb
   python manage.py dbops --refresh-esd
   python manage.py dbops --refresh-libraryvisit
-
-
-

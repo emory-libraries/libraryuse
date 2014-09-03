@@ -29,7 +29,7 @@ DATABASES = {
         'HOST': 'db.library.emory.edu',   # Set to empty string for localhost. Not used with sqlite3.
         #'HOST': 'kamina.library.emory.ed,
         #'HOST': 'localhost',
-        'PORT': '',        
+        'PORT': '',
     },
    # 'mongodb' : {
    #     'ENGINE' : 'django_mongodb_engine',
@@ -117,7 +117,7 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',
-            'include_html': True,            
+            'include_html': True,
         },
         'console':{
             'level':'DEBUG',
