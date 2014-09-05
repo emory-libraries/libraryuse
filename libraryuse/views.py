@@ -22,10 +22,11 @@ def reports_index(request):
     context = {}
     return redirect('/#/reports')
 
-def chart_data(numbers, distinct, start, end, library):
+def chart_data(numbers, distinct, start, end, library,**keyword_parameters):
 
     data = []
     visits = []
+    title = ""
     data.append('{"data":[')
 
 
@@ -36,22 +37,30 @@ def chart_data(numbers, distinct, start, end, library):
             # We have to add the three zeros to work with HighCharts
             visits.append('[%s000,%s]' % (epoch, number['total']))
         elif number.has_key('acpl_n'):
+            title = "Acedemic Plan"
             acpl_n = number['acpl_n']
-            visits.append('["%s",%s]' % (acpl_n, number['total']))
+            visits.append('{"label":"%s","value":%s}' % (acpl_n, number['total']))
         elif number.has_key('dprt_n'):
+            title = "Department"
             dprt_n = number['dprt_n']
-            visits.append('["%s",%s]' % (dprt_n, number['total']))
+            visits.append('{"label":"%s","value":%s}' % (dprt_n, number['total']))
         elif number.has_key('dvsn_n'):
+            title = "Faculty Division"
             dvsn_n = number['dvsn_n']
-            visits.append('["%s",%s]' % (dvsn_n, number['total']))
+            visits.append('{"label":"%s","value":%s}' % (dvsn_n, number['total']))
     data.append(', '.join(visits))
 
     data.append('],')
-
+    
+    if('sum' in keyword_parameters):
+        data.append('"total_sum":%s,' % keyword_parameters['sum'])
+    
+    
     data.append('"meta":{')
     data.append('"strt_date":["%s"],' % start)
     data.append('"end_date":["%s"],' % end)
-    data.append('"library":["%s"]' % library)
+    data.append('"library":["%s"],' % library)
+    data.append('"title":["%s"]' % title)
     data.append('},')
 
     data.append('"distinct":["%s"],"queried_at":["%s"]}' % (distinct, datetime.now()))
@@ -212,8 +221,10 @@ def top_academic_plan(request, library, start, end):
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
                 .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
-
-    data = chart_data(numbers, distinct, start, end, library)
+    
+    sum = numbers.values('acpl_n').count()
+    
+    data = chart_data(numbers, distinct, start, end, library, sum=sum)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
@@ -228,12 +239,14 @@ def top_dprtn(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
+    
+    sum = numbers.values('dprt_n').count()
 
-    data = chart_data(numbers, distinct, start, end, library)
+    data = chart_data(numbers, distinct, start, end, library, sum=sum)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
-def top_devision(request, library, start, end):
+def top_division(request, library, start, end):
 
     distinct = None
 
@@ -244,8 +257,10 @@ def top_devision(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
+                
+    sum = numbers.values('dvsn_n').count()
 
-    data = chart_data(numbers, distinct, start, end, library)
+    data = chart_data(numbers, distinct, start, end, library, sum=sum)
 
     return StreamingHttpResponse(data, content_type='application/json')
 

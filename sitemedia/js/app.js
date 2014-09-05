@@ -22,8 +22,12 @@ App.Router.map(function() {
 
   this.resource('date', { path: '/library/:lib/:category/:demo/:date'});
 
-
-  this.resource('reports', { path: 'reports' });
+  this.resource('reports', { path: 'reports' },function(){
+    this.resource('report', { path: '/:id' });
+    this.resource('report', { path: '/:id/:lib' });
+    this.resource('today-report', { path: '/:id/:lib/:start' });
+    this.resource('today-report', { path: '/:id/:lib/:start/:end' });
+  });
   this.resource('json');
   // this.route("fourOhFour", { path: "*path"});
 });
@@ -76,11 +80,10 @@ App.IndexRoute = Ember.Route.extend({
     return ['red','green','purple']
   },
   setupController: function(controller,model) {
-    this._super(controller, model);
-    controller.set('title', "My App");
+    // controller.set('title', "My App");
   },
   activate: function() {
-        $(document).attr('title', 'My App');
+        // $(document).attr('title', 'My App');
     },
   beforeModel: function() {
       this.transitionTo('library.all');
@@ -88,15 +91,227 @@ App.IndexRoute = Ember.Route.extend({
 });
 
 
-
-App.reportStore = Ember.Object.extend({});
-
-
-
 App.ReportsRoute = Ember.Route.extend({
-  model: function(params) {
-    return Ember.$.getJSON('/top_dprtn/woodruff/2013-8-28/2014-8-28/')
+  model: function() {
+    $(document).attr('title', "Reports");
   }
+});
+
+App.reportsStore = Ember.Object.extend({
+  id: null,
+  lib: null,
+  start: null,
+  end:null
+});
+
+var reportParams = App.reportsStore.create();
+
+App.ReportRoute = App.TodayReportRoute = App.FullReportRoute = Ember.Route.extend({
+  model: function(params) {
+    if(params.id){
+      reportParams.set('id',params.id);
+    }
+    if(params.lib){
+      reportParams.set('lib',params.lib);
+    }
+    if(params.start!=="undefined"){
+      reportParams.set('start',params.start);
+    }
+    if(params.end!=="undefined"){
+      reportParams.set('end',params.end);
+    }
+    
+    var monthsAgo = 1,
+        today = new Date()
+        default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate());
+        
+    var id = reportParams.get("id") || "top_academic_plan",
+        lib = reportParams.get('lib') || "woodruff",
+        start = reportParams.get('start') || formatDate(default_start),
+        end = reportParams.get('end') || formatDate(today);
+    
+    $(document).attr('title', "Reports|"+" "+lib );
+    
+    return Ember.$.getJSON('/'+id+'/'+lib+'/'+start+'/'+end)
+  },
+  renderTemplate:function(){
+    this.render('report');
+  }
+});
+
+App.CalendarDatePicker = Ember.TextField.extend({
+  _picker: null,
+ 
+  modelChangedValue: function(){
+    var picker = this.get("_picker");
+    if (picker){
+      picker.setDate(this.get("value"));
+    }
+  }.observes("value"),
+ 
+  didInsertElement: function(){
+    $(".row.report-dates >input")
+    .datepicker({
+        beforeShow: function(i,obj) {
+            $widget = obj.dpDiv;
+            window.$uiDatepickerDiv = $widget;
+            $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates");
+            if ($widget.data("top")) {
+                setTimeout(function() {
+                    $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+                },50);
+            }
+        }
+        ,onClose: function(i,obj) {
+            $widget = obj.dpDiv;
+            $widget.data("top", $widget.position().top);
+        }
+    })
+  }
+});
+
+App.ReportController = Ember.Controller.extend({
+    theFilter: "",
+    
+    numberToShow: 14,
+    
+    startDateInput: "",
+    
+    endDateInput: "",
+    
+    placeholder: function(){
+      return ("Filter by "+ this.get("model.meta.title")[0]+"s")  
+    }.property('model.meta.title'),
+    
+    firstItemInArray: function() {
+      return this.get('model.data').filter( function(item, index) {
+        // return true if you want to include this item
+        // for example, with the code below we include all but the first item
+        if (index == 0) { 
+          return item;     
+        }    
+      });
+    }.property('model.data.@each'),
+    
+    filteredSum: function(){
+      var sum = 0;
+      this.get('filterPeople').filter( function(_this, index) {
+        sum+=parseInt(_this.value) 
+      })
+      return sum;
+    }.property('filterPeople'),
+    
+    filterPeople: function() { 
+        var searchText = this.get('theFilter').toLowerCase(),
+            exclude = searchText.indexOf('!')==0,
+            n = this.get('numberToShow');
+            
+            if(exclude){
+              searchText=searchText.substring(1)
+            }
+            console.log(exclude);
+            console.log(searchText);
+        return this.get('model.data').filter( function(_this, index) {
+        // return true if you want to include this item
+        // for example, with the code below we include all but the first item
+        var item = _this.label.toLowerCase();
+        if(item.indexOf(searchText)>-1 && !exclude){
+            return item
+        }
+        else if(item.indexOf(searchText)!==0 && exclude){
+          return item
+        }
+      });
+    }.property("theFilter","model.data.@each"),
+    
+    drawChart: (function(){
+      var total_sum = this.get('filteredSum'),
+          n = this.get('numberToShow'),
+          datapoints = [],
+          drilldown = [],
+          allothers = 0;
+          
+      this.get('filterPeople').filter( function(_this, index) {
+        var label = "'"+_this.label+"'",
+            percent = parseInt((_this.value/total_sum *100).toPrecision(3));
+        if(index<n){
+          var point = [label,percent]
+          datapoints.push(point)
+        }
+        else{
+          drilldown.push(label);
+          allothers+=percent
+        }
+      });
+
+      if( drilldown.length>1){
+        drilldown=['All Others',allothers];
+        datapoints.push(drilldown);
+      }
+      
+      function capitaliseFirstLetter(string)
+      {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+      
+      var byFilter =this.get("theFilter");
+      if(byFilter.length>0){
+        byFilter = " | filtered by: "+ byFilter;
+      }
+      
+      var library_name = this.get("model.meta.library")[0],
+          report_title = this.get("model.meta.title")[0];
+
+      function draw(){
+        $('#report-chart .chart').highcharts({
+            chart: {
+                backgroundColor:'transparent',
+                plotBackgroundColor: null,
+                plotBorderWidth: 1,
+                plotBorderColor: 'transparent',
+                plotShadow: false,
+            },
+            title: {
+                text: capitaliseFirstLetter(library_name) + 
+                ' Vistors per '+report_title+byFilter
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>',
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                type: 'pie',
+                name: '% visitors',
+                data: datapoints
+            }]
+        });
+      }
+      Ember.run.once(this,function(){
+        Ember.run.next(this, function(){ 
+          window.setTimeout(draw,500)
+        })
+      })
+    }).property("filterPeople"),
+    
+    actions: {
+      loadDates: function() {
+        reportParams.set('start',this.get("startDateInput"));
+        console.log(this.get("startDateInput"));
+        console.log(this.get("endDateInput"));
+      }
+    }     
 });
 
 
@@ -259,7 +474,7 @@ App.DemoRoute = Ember.Route.extend({
 App.DateRoute = Ember.Route.extend({
   model:function(params){
     var date = params.date;
-    console.log(date);
+    // console.log(date);
   },
   afterModel: function (model){
     _this = this;
@@ -400,6 +615,11 @@ App.NetChangeComponent = Ember.Component.extend({
 
 var selection = []
 
+function formatDate(date){
+  var formatted_date = (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
+  return formatted_date;
+}
+
 // function that builds both the charts on the Library pages
 function SUPERCHART(url){
     var path = dataURL.get('paths'),
@@ -412,11 +632,6 @@ function SUPERCHART(url){
       if(uri_users.length>1){
         uri_users='/'+uri_users+'/';
       }
-
-    function formatDate(date){
-      var formatted_date = (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
-      return formatted_date;
-    }
 
     var $container = $('#container'),
       seriesOptions = [],
@@ -434,15 +649,15 @@ function SUPERCHART(url){
 
     $.each(names, function(i, name) {
 
-      console.log(path[i])
-      console.log(uri_path+uri_category+path[i]+uri_users+date_range);
+      // console.log(path[i])
+      // console.log(uri_path+uri_category+path[i]+uri_users+date_range);
 
       $.ajax({
           url: uri_path+uri_category+path[i]+uri_users+date_range,
           dataType: 'json',
           success:function(data){jsonResponse(data)},
           error: function(xhr, status, error){
-            console.log(xhr.responseText)
+            // console.log(xhr.responseText)
             var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, it's taking a while to load.</p>");
             $error.append($("<a/>").attr({'href':'#','class':'btn btn-warning btn-refresh'}).append('Refresh'));
             $container.html($error);
@@ -530,7 +745,7 @@ function SUPERCHART(url){
             }
           }
           else{
-            console.log('There are no returns for this category in '+name+'.');
+            // console.log('There are no returns for this category in '+name+'.');
           }
         }
 
@@ -766,6 +981,7 @@ function SUPERCHART(url){
                 $.datepicker.setDefaults({
                     dateFormat: 'yy-mm-dd',
                     onSelect: function(dateText) {
+                      console.log(dateText);
                         this.onchange();
                         this.onblur();
                     }
@@ -849,5 +1065,3 @@ App.FlipLoadingComponent = Ember.Component.extend({
     });
   }
 });
-
-
