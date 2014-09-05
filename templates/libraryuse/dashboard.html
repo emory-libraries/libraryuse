@@ -13,7 +13,6 @@
   <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/component.css' %}">
-  <link rel="stylesheet" href="{% static 'css/datepicker2.css' %}">
   <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
   <link rel="stylesheet" href="{% static 'js/libs/flipclock/flipclock.css' %}">
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -335,7 +334,7 @@
   </script>
   
   <script type="text/x-handlebars" data-template-name="report">
-      <div class="row">
+      <div class="row report-dates">
         {{view App.CalendarDatePicker valueBinding=startDateInput}}
         {{view App.CalendarDatePicker valueBinding=endDateInput}}
         <button {{action "loadDates"}}>Load Dates</button>
@@ -409,7 +408,6 @@
   <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-  <script src="http://dbushell.github.io/Pikaday/pikaday.js"></script>
 
   <script src="{% static 'js/libs/flipclock/flipclock.js' %}"></script>
   <script src="{% static 'js/libs/jquery.easing.js' %}"></script>

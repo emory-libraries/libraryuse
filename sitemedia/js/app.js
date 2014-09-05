@@ -26,7 +26,7 @@ App.Router.map(function() {
     this.resource('report', { path: '/:id' });
     this.resource('report', { path: '/:id/:lib' });
     this.resource('today-report', { path: '/:id/:lib/:start' });
-    this.resource('report', { path: '/:id/:lib/:start/:end' });
+    this.resource('today-report', { path: '/:id/:lib/:start/:end' });
   });
   this.resource('json');
   // this.route("fourOhFour", { path: "*path"});
@@ -126,7 +126,7 @@ App.ReportRoute = App.TodayReportRoute = App.FullReportRoute = Ember.Route.exten
         default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate());
         
     var id = reportParams.get("id") || "top_academic_plan",
-        lib = reportParams.get('lib') || "",
+        lib = reportParams.get('lib') || "woodruff",
         start = reportParams.get('start') || formatDate(default_start),
         end = reportParams.get('end') || formatDate(today);
     
@@ -150,22 +150,23 @@ App.CalendarDatePicker = Ember.TextField.extend({
   }.observes("value"),
  
   didInsertElement: function(){
-    console.log(this._super().model);
-    currentYear = (new Date()).getFullYear();
-    formElement = this.$()[0];
-    picker = new Pikaday({
-      field: formElement,
-      yearRange: [1900,currentYear+2]
-    });
-    this.set("_picker", picker);
-  },
- 
-  willDestroyElement: function(){
-    picker = this.get("_picker");
-    if (picker) {
-      picker.destroy();
-    }
-    this.set("_picker", null);
+    $(".row.report-dates >input")
+    .datepicker({
+        beforeShow: function(i,obj) {
+            $widget = obj.dpDiv;
+            window.$uiDatepickerDiv = $widget;
+            $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates");
+            if ($widget.data("top")) {
+                setTimeout(function() {
+                    $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+                },50);
+            }
+        }
+        ,onClose: function(i,obj) {
+            $widget = obj.dpDiv;
+            $widget.data("top", $widget.position().top);
+        }
+    })
   }
 });
 
@@ -202,12 +203,22 @@ App.ReportController = Ember.Controller.extend({
     
     filterPeople: function() { 
         var searchText = this.get('theFilter').toLowerCase(),
+            exclude = searchText.indexOf('!')==0,
             n = this.get('numberToShow');
+            
+            if(exclude){
+              searchText=searchText.substring(1)
+            }
+            console.log(exclude);
+            console.log(searchText);
         return this.get('model.data').filter( function(_this, index) {
         // return true if you want to include this item
         // for example, with the code below we include all but the first item
         var item = _this.label.toLowerCase();
-        if(item.indexOf(searchText)>-1){
+        if(item.indexOf(searchText)>-1 && !exclude){
+            return item
+        }
+        else if(item.indexOf(searchText)!==0 && exclude){
           return item
         }
       });
@@ -970,6 +981,7 @@ function SUPERCHART(url){
                 $.datepicker.setDefaults({
                     dateFormat: 'yy-mm-dd',
                     onSelect: function(dateText) {
+                      console.log(dateText);
                         this.onchange();
                         this.onblur();
                     }

@@ -422,3 +422,7 @@ thead th {
 #table-report tbody>tr:nth-child(-n+42)>td {
     background-color: #EFF2F8;
 }
+
+.report-dates.ll-skin-melon.ui-datepicker {
+  margin-left: 0em;
+}
