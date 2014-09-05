@@ -37,6 +37,11 @@ class Command(BaseCommand):
             dest='refresh_esd',
             default=False,
             help='Refresh Emory Shared Data copy'),
+        make_option('--refresh-esd-historic',
+            action='store_true',
+            dest='refresh_esd_historic',
+            default=False,
+            help='Refresh Historic Emory Shared Data copy'),
         make_option('--refresh-libraryvisit',
             action='store_true',
             dest='refresh_libraryvisit',
@@ -56,7 +61,7 @@ class Command(BaseCommand):
 
     @transaction.commit_manually
     def handle(self, *args, **options):
-        if not (options['refresh_esd'] or options['refresh_libraryvisit'] or options['update_libraryvisit'] or options['refresh_hash_esd']):
+        if not (options['refresh_esd'] or options['refresh_libraryvisit'] or options['update_libraryvisit'] or options['refresh_hash_esd'] or options['refresh_esd_historic']):
             sys.exit('Nothing to do')
 
         if options['refresh_esd']:
@@ -67,6 +72,8 @@ class Command(BaseCommand):
             self.update_libraryvisit()
         if options['refresh_hash_esd']:
             self.refresh_hash_esd()
+        if options['refresh_esd_historic']:
+            self.refresh_esd_historic()
 
     @transaction.commit_manually
     def refresh_esd(self):
@@ -95,6 +102,38 @@ class Command(BaseCommand):
             cxn_esd.close()
             cxn_db.close()
             raise CommandError("problem refreshing db.esd: %s" % e)
+
+        transaction.commit()
+        cxn_esd.close()
+        cxn_db.close()
+
+    @transaction.commit_manually
+    def refresh_esd_historic(self):
+        cxn_esd = connections['esd']
+        cursor_esd = cxn_esd.cursor()
+        #cursor_esd.execute("select * from V_LUD_PRSN where rownum <= 10")
+        cursor_esd.execute("select * from LUD_ECN_HSTR")
+
+        cxn_db = connections['default']
+        cursor_db = cxn_db.cursor()
+
+        try:
+            cursor_db.execute("truncate esd_historic")
+            for result in self.ResultsIterator(cursor_esd):
+                cursor_db.execute('''insert into esd-historic (PRSN_I_PBLC, PRSN_I_ECN,
+                PRSN_E_TITL_DTRY, PRSN_C_TYPE,
+                PRSN_E_TYPE, EMJO_C_CLSF, DPRT_C, DPRT_N, DVSN_I, DVSN_N,
+                EMPE_C_FCLT_RANK, PRSN_C_TYPE_HC, PRSN_E_TYPE_HC, EMJO8HC_C_CLSF,
+                DPRT8HC_C, DPRT8HC_N, DVSN8HC_I, DVSN8HC_N, ACCA_I, ACPR_N,
+                ACPL_N, STDN_E_CLAS, STDN_F_UNGR, STDN_F_CMPS_ON) values (
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s, %s)''', result)
+
+        except Exception, e:
+            transaction.rollback()
+            cxn_esd.close()
+            cxn_db.close()
+            raise CommandError("problem refreshing db.esd_historic: %s" % e)
 
         transaction.commit()
         cxn_esd.close()
