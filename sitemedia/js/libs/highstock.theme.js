@@ -1,6 +1,10 @@
 Highcharts.theme = {
-  colors: ["#9AC3DB", "#FFDBAE", "#FFB4AE", "#9EE8AB", "#9CC6DF", "#FFDAAD", "#FFB3AD", "#9FEBAC", 
-  "#B5D7EB", "#FFE3C0", "#FFC5C0", "#B7F2C1", "#CDE6F4", "#FFEBD3", "#FFD6D3", "#CDF8D5"],
+  colors: [ "#0292EF","#24A1F2","#5DB7F2","#9AD1F5",
+            "#3BC553","#5AD76F","#81E793","#B2F4BD",
+            "#FF594C","#FF756B","#FF978F","#FFBFBA",
+            "#FFBE4C","#FFC96B","#FFD68F","#FFE6BA",
+            "#6E3FAF","#8A5EC8","#AA84DE","#CEB5F0",
+            "#434D5C"],
   chart: {
     borderWidth: 0,
     plotShadow: false,
