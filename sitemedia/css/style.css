@@ -162,7 +162,8 @@ nav.nav-reports {
     transition: background-color 0.2s,border-color 0.2s;
 }
 
-.nav-tabs.nav-justified>li>a.active {
+.nav-tabs.nav-justified>li>a.active,
+.nav-tabs.nav-justified>li.active>a{
     background-color: transparent;
     color: rgb(67, 73, 80);
     border-color: transparent;
@@ -388,6 +389,10 @@ a.list-group-item .list-group-item-heading {
   Test
 ******/
 
+div#report-chart.affix {
+  top: 10px;
+}
+
 #result {
   text-align: right;
   color: gray;
@@ -419,10 +424,69 @@ thead th {
     padding: 8px;
 }
 
-#table-report tbody>tr:nth-child(-n+42)>td {
+#table-report tbody>tr:nth-child(-n+60)>td {
     background-color: #EFF2F8;
 }
 
 .report-dates.ll-skin-melon.ui-datepicker {
   margin-left: 0em;
+}
+
+.container-reports {
+  padding: 0 40px;
+  margin: auto;
+  max-width: 1800px;
+}
+
+.library-name{
+  text-transform:capitalize;
+}
+
+.nav-pills.report-types {
+    margin: 10px 0;
+    padding-left: 30px;
+    background: #E5E8EE;
+}
+.nav-pills.report-types>li>a {
+    color: rgb(36, 155, 108);
+}
+
+.nav-pills.report-types>li.active>a, 
+.nav-pills.report-types>li.active>a:hover, 
+.nav-pills.report-types>li.active>a:focus{
+    background-color: #F7FAFF;
+    color: rgb(27, 178, 118);
+}
+
+.report-dates>form>input{
+    text-align:center;
+}
+
+.report-dates>form>input.form-control.start {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.report-dates>form>input.form-control.end{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -5px;
+}
+
+.btn.btn-clear,
+.btn.btn-clear.disabled:hover,
+.btn.btn-clear.disabled:focus{
+    background-color:transparent;
+    border-color: #6481DB;
+    color: #6481DB;
+    transition: all 0.2s ease;
+}
+
+.btn.btn-clear.disabled{
+  transition:none;
+}
+
+.btn.btn-clear:hover,.btn.btn-clear:focus{
+    background-color: #6481DB;
+    color:#FFF;
 }

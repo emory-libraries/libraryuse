@@ -12,6 +12,7 @@
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
   <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
   <link rel="stylesheet" href="{% static 'css/component.css' %}">
   <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
   <link rel="stylesheet" href="{% static 'js/libs/flipclock/flipclock.css' %}">
@@ -319,43 +320,73 @@
   </script>
   
   <script type="text/x-handlebars" id="reports">
-    <div class="container">
-            <div class="row">
-              <div class="col-xs-12">
-                <ul class="nav nav-pills">
-                  <li><a href="#/reports/top_division">Divisons</a></li>
-                  <li><a href="#/reports/top_academic_plan">Acad</a></li>
-                  <li><a href="#/reports/top_dprtn">Department</a></li>
-                </ul>
-              </div>
-            </div>
-           {{outlet}}
+    <div class="flex-container">
+        <div class="row">
+          <ul class="nav nav-tabs nav-justified">
+              <li {{bind-attr class="isWoodruff:active"}}>
+                <a href="#" {{action "setLibrary" "woodruff"}}>Woodruff</a>
+              </li>
+              <li {{bind-attr class="isHealth:active"}}>
+                <a href="#" {{action "setLibrary" "health"}}>Health Science</a>
+              </li>
+              <li {{bind-attr class="isLaw:active"}}>
+                <a href="#" {{action "setLibrary" "law"}}>Law</a>
+              </li>
+          </ul>
         </div>
+        
+        <div class="row">
+          <div class="col-xs-12">
+            <ul class="nav nav-pills report-types">
+              <li {{bind-attr class="isDiv:active"}}>
+                <a href="#" {{action "setType" "top_division"}}>Divisons</a>
+              </li>
+              <li {{bind-attr class="isDprt:active"}}>
+                <a href="#" {{action "setType" "top_dprtn"}}>Departments</a>
+              </li>
+              <li {{bind-attr class="isAcad:active"}}>
+                <a href="#" {{action "setType" "top_academic_plan"}}>Academic Plans</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="container-reports">
+          {{outlet}}
+        </div>
+    </div>
   </script>
   
   <script type="text/x-handlebars" data-template-name="report">
       <div class="row report-dates">
-        {{view App.CalendarDatePicker valueBinding=startDateInput}}
-        {{view App.CalendarDatePicker valueBinding=endDateInput}}
-        <button {{action "loadDates"}}>Load Dates</button>
+        <form class="form-inline col-xs-12" role="form">
+          {{view App.CalendarDatePicker valueBinding="startDateInput" class="start form-control"}}
+          {{view App.CalendarDatePicker valueBinding="endDateInput" class="end form-control" value="end"}}
+          <button {{action "loadDates"}} class="btn btn-clear load-date disabled">Load dates 
+          <span class="loading-data"><span class="fa fa-circle-o-notch fa-spin"></span></span>
+          </button>
+        </form>
       </div>
+      {{#if model.data}}
       <div class="row">
-       <div class="col-xs-12 col-sm-6 col-md-8">
-         <h3>Total Visitors by {{model.meta.title}}s</h3>
-         <p>Between {{model.meta.strt_date}} and {{model.meta.end_date}}, 
-         we have had {{model.total_sum}} visitors for {{model.meta.library}}; 
+       <div class="col-xs-12 col-sm-8 col-md-8">
+         <h3>Total Visitors by {{model.meta.title}}s in <span class="library-name">{{model.meta.library}}</span></h3>
+         <p>Between {{formattedDate.start}} and {{formattedDate.end}}, 
+         we have had {{model.total_sum}} visitors for <span class="library-name">{{model.meta.library}}</span>; 
          the most coming from
          {{#each item in firstItemInArray}}
            the {{item.label}} {{model.meta.title}} with {{item.value}} visitors.
          {{/each}}
          </p>
          <div id="report-chart">
+            <div class="loading-data" style="display:none;">
+              <p class="text-center"><span class="fa fa-circle-o-notch fa-spin"></span></p>
+            </div>
            <div class="chart"></div>
            {{drawChart}}
            {{reports-pie-chart}}
          </div>
        </div>
-       <div class="col-xs-12 col-sm-6 col-md-4">
+       <div class="col-xs-12 col-sm-4 col-md-4">
          {{input type='text' value=theFilter placeholder=placeholder}}
          <table id="table-report" class="table">
              <thead>
@@ -376,6 +407,16 @@
          </table>
        </div>
      </div>
+     {{else}}
+     <div class="row">
+       <div class="col-xs-12">
+         <h3>No Total Visitors in this time range</h3>
+         <p>Sorry, there were no results for the selected criteria. 
+         Try choosing a broader time range.</p>
+       </div>
+     </div>
+     {{/if}}
+     
   </script>
   
   <script type="text/x-handlebars" data-template-name="components/reports-pie-chart">
