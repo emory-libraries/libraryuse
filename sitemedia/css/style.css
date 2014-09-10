@@ -12,6 +12,30 @@ body >.ember-view{
     min-height: 100%;
     float: left;
     width: 100%;
+    overflow-x: hidden;
+}
+
+.global-loading {
+  margin: auto;
+  width: 120px;
+  position: relative;
+  top: 7%;
+  color: rgb(179, 179, 179);
+}
+
+.loading-data.page-level {
+  position: absolute;
+  left: 60%;
+  z-index: 999;
+  top: 44%;
+  color: rgb(255, 194, 0);
+  text-shadow: 0px 0px 5px rgba(39, 39, 39, 0.48);
+  line-height: 0;
+}
+
+#report-chart .loading-data{
+  color: rgb(179, 179, 179);
+  margin-top:20%;
 }
 
 section {
@@ -57,6 +81,11 @@ a{
     position:relative;
 }
 
+#header .navbar-nav>li.active>a {
+    background-color: rgb(243, 181, 49);
+    color: rgb(39, 43, 51);
+}
+
 @media (max-width:767px){
     #header .navbar-nav{
         padding-right:15px;
@@ -69,7 +98,8 @@ a{
     #header .navbar-nav>li>a {
         padding-top: 10px;
         padding-bottom: 10px;
-    }
+        color: rgb(235, 198, 48);
+  }
 }
 
 
@@ -169,7 +199,8 @@ nav.nav-reports {
     border-color: transparent;
 }
 
-.nav-tabs.nav-justified>li>a:hover, .nav-tabs.nav-justified>li>a:focus {
+.nav-tabs.nav-justified>li>a:hover, 
+.nav-tabs.nav-justified>li>a:focus {
     background-color: rgb(226, 229, 238);
     border-color: rgb(226, 229, 238);
 }
@@ -384,6 +415,50 @@ a.list-group-item .list-group-item-heading {
 }
 
 
+/******
+  Menu
+******/
+.options-date-range .form-group {
+    float: left;
+    width: 50%;
+    text-align:center;
+    margin-bottom: 0;
+}
+
+.options-date-range .form-group label.label{
+    color: rgb(228, 228, 228);
+    font-weight: normal;
+}
+
+.options-date-range .form-group input {
+    text-align:center;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 0;
+}
+
+.options-date-range .form-group:first-child input {
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.options-date-range .button-group .btn{
+    width:100%;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    background-color: rgb(228, 228, 228);
+    color: rgb(27, 162, 108);
+    transition:background-color 0.2s ease, color 0.2s ease;
+}
+
+.options-date-range .button-group .btn:hover,
+.options-date-range .button-group .btn:focus{
+    background-color: rgb(110, 226, 161);
+    color: rgb(22, 95, 66);
+}
+
 
 /******
   Test
@@ -430,6 +505,7 @@ thead th {
 
 .report-dates.ll-skin-melon.ui-datepicker {
   margin-left: 0em;
+  margin-top: 0px;
 }
 
 .container-reports {
@@ -443,12 +519,18 @@ thead th {
 }
 
 .nav-pills.report-types {
-    margin: 10px 0;
-    padding-left: 30px;
-    background: #E5E8EE;
+    margin: 25px 0 10px;
+    padding: 0 40px 0 30px;
+    float: right;
 }
 .nav-pills.report-types>li>a {
     color: rgb(36, 155, 108);
+    padding: 7px 15px;
+}
+
+.nav-pills.report-types>li>a:hover,
+.nav-pills.report-types>li>a:focus{
+  background-color: rgb(229, 241, 236);
 }
 
 .nav-pills.report-types>li.active>a, 
@@ -460,6 +542,12 @@ thead th {
 
 .report-dates>form>input{
     text-align:center;
+    background: rgba(0, 0, 0, 0.05);
+    transition:background-color 0.5s ease;
+}
+
+.report-dates>form>input:focus{
+  background-color: white;
 }
 
 .report-dates>form>input.form-control.start {
@@ -471,6 +559,30 @@ thead th {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     margin-left: -5px;
+}
+
+.report-dates {
+    margin: 5px 0 15px; padding-left: 30px;
+}
+.row.report-nav {
+    border-bottom: 1px solid rgb(209, 209, 209);
+    margin-bottom: 25px;
+}
+.container-reports h3 {
+    margin-top: 0;
+}
+
+.report-dates label.label {
+  width: 200px;
+  display: inline-block;
+  color: rgb(148, 148, 148);
+  font-weight: normal;
+  margin-bottom: 0;
+}
+
+p.instructions {
+    padding: 30px 20px 0px;
+    color: rgb(137, 146, 162);
 }
 
 .btn.btn-clear,

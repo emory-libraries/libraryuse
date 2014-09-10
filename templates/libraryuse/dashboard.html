@@ -19,7 +19,11 @@
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
   <script src="{% static 'js/libs/modernizr.custom.js' %}"></script>
 </head>
-<body>
+<body data-spy="scroll">
+  <div class="global-loading" id="onLoad">
+    Initializing App <span class="fa fa-circle-o-notch fa-spin"></span>
+  </div>
+  <span class="loading-data page-level" style="display:none;"><span class="fa fa-circle-o-notch fa-spin"></span> Fetching Data</span>
 
 {% verbatim myblock %}
   <script type="text/x-handlebars" data-template-name="application">
@@ -39,33 +43,26 @@
                       <a href="#"><span class="glyphicon glyphicon-adjust"></span> Unique Users</a>
                       <div class="mp-level options-unique-users">
                         <h2><span class="glyphicon glyphicon-adjust"></span> Unique Users</h2>
-
-                        <div class="switch">
-                        <div class="col-xs-5">
-                          <label for="cmn-toggle-1">Display Unique Only</label>
-                        </div>
-                        <div class="col-xs-5">
-                          <input id="cmn-toggle-1" class="cmn-toggle cmn-toggle-round" type="checkbox">
-                          <label for="cmn-toggle-1"></label>
-                        </div>
-                        </div>
+                        {{distinct-users-switch}}
                       </div>
                     </li>
                     <li class="icon icon-arrow-left">
                       <a href="#"><span class="glyphicon glyphicon-time"></span> Date Range</a>
                       <div class="mp-level options-date-range">
                         <h2><span class="glyphicon glyphicon-time"></span> Date Range</h2>
+                        <p class="instructions"><i class="fa fa-info-circle"></i> Load data from select date ranges.</p>
                         <form class="col-xs-12" role="form">
                           <div class="form-group">
-                            <label class="sr-only" for="date1">Start Date</label>
-                            <input type="date" class="form-control" id="date1" placeholder="Start Date">
+                            <label class="label" for="date1">From</label>
+                            {{view App.OptionalCalendarDatePicker valueBinding="chartStartInput" class="start form-control" id="date1" placeholder="Start Date"}}
                           </div>
                           <div class="form-group">
-                            <label class="sr-only" for="date2">End Date</label>
-                            <input type="date" class="form-control" id="date2" placeholder="End Date">
+                            <label class="label" for="date2">To</label>
+                            {{view App.OptionalCalendarDatePicker valueBinding="chartEndInput" class="end form-control" id="date2" placeholder="End Date"}}
                           </div>
-
-                          <button type="submit" class="btn btn-default">Fetch Data</button>
+                          <div class="button-group">
+                            {{reload-chart-data-button}}
+                          </div>
                         </form>
                       </div>
                     </li>
@@ -78,9 +75,9 @@
                   <h2><span class="glyphicon glyphicon-user"></span> Audience</h2>
                   <ul>
                     <li class="icon icon-arrow-left">
-                      <a href="#"><span class="glyphicon glyphicon-user"></span> Students</a>
+                      <a href="#"><span class="fa fa-graduation-cap"></span> Students</a>
                       <div class="mp-level filter-students">
-                        <h2><span class="glyphicon glyphicon-user"> Students</h2>
+                        <h2><span class="fa fa-graduation-cap"> Students</h2>
                         <ul class="students">
                           {{#each item in model.student_classes}}
                             {{students-filter-button title=item}}
@@ -89,9 +86,9 @@
                       </div>
                     </li>
                     <li class="icon icon-arrow-left">
-                      <a href="#"><span class="glyphicon glyphicon-fire"></span> Faculty</a>
+                      <a href="#"><span class="fa fa-coffee"></span> Faculty</a>
                       <div class="mp-level filter-faculty">
-                        <h2>Faculty</h2>
+                        <h2><span class="fa fa-coffee"></span> Faculty</h2>
                         <ul class="faculty">
                           {{#each item in model.faculty_divisions}}
                             {{faculty-filter-button title=item}}
@@ -138,7 +135,7 @@
               <h1 class="site-title">{{#link-to "index" classNames="logo"}}<span class="glyphicon glyphicon-signal"></span> Library Use{{/link-to}}</h1>
               <nav class="pull-right">
                 <ul class="nav navbar-nav">
-                  {{#link-to "library.all" tagName="li"}}
+                  {{#link-to "library" tagName="li"}}
                       <a {{bind-attr href="view.href"}}>Charts</a>
                   {{/link-to}}
                   {{#link-to "reports" tagName="li"}}
@@ -155,7 +152,23 @@
     </div><!-- /pusher -->
 
   </script>
-
+  
+  <script type="text/x-handlebars" data-template-name="components/reload-chart-data-button">
+    <button class="btn btn-default reload">Fetch Data</button>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="components/distinct-users-switch">
+    <div class="switch">
+      <div class="col-xs-5">
+        <label for="cmn-toggle-1">Display Unique Only</label>
+      </div>
+      <div class="col-xs-5">
+        {{input checked=value id="cmn-toggle-1" class="cmn-toggle cmn-toggle-round" type="checkbox"}}
+        <label for="cmn-toggle-1"></label>
+      </div>
+    </div>
+  </script>
+  
   <script type="text/x-handlebars" data-template-name="components/filter-button">
     <li>
       {{#if addon}}
@@ -171,7 +184,7 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="loading">
-  {{flip-loading}}
+    {{flip-loading}}
   </script>
 
 
@@ -228,9 +241,9 @@
 
 
   <script type="text/x-handlebars" data-template-name="components/flip-loading">
-    <div class="loading">
-      <div class="clock"></div>
-    </div>
+      <div class="loading">
+        <div class="clock"></div>
+      </div>
   </script>
 
   <script type="text/x-handlebars" data-template-name="components/filter-tabs">
@@ -334,9 +347,8 @@
               </li>
           </ul>
         </div>
-        
-        <div class="row">
-          <div class="col-xs-12">
+        <div class="row report-nav">
+          <div class="col-xs-12 col-sm-5 pull-right">
             <ul class="nav nav-pills report-types">
               <li {{bind-attr class="isDiv:active"}}>
                 <a href="#" {{action "setType" "top_division"}}>Divisons</a>
@@ -349,23 +361,29 @@
               </li>
             </ul>
           </div>
+          
+          <div class="report-dates inputs col-xs-12 col-sm-7">
+            <form class="form-inline" role="form">
+              <label class="label" for="start"><span>From</span></label>
+              <label class="label" for="end"><span>To</span></label>
+              <div class="clearfix"></div>
+              {{view App.CalendarDatePicker valueBinding="startDateInput" class="start form-control" id="start"}}
+              {{view App.CalendarDatePicker valueBinding="endDateInput" class="end form-control" id="end"}}
+            
+              <button {{action "loadDates"}} class="btn btn-clear load-date disabled">Load dates 
+              <span class="loading-data"><span class="fa fa-circle-o-notch fa-spin"></span></span>
+              </button>
+            </form>
+          </div>
+          
         </div>
         <div class="container-reports">
           {{outlet}}
         </div>
     </div>
   </script>
-  
+
   <script type="text/x-handlebars" data-template-name="report">
-      <div class="row report-dates">
-        <form class="form-inline col-xs-12" role="form">
-          {{view App.CalendarDatePicker valueBinding="startDateInput" class="start form-control"}}
-          {{view App.CalendarDatePicker valueBinding="endDateInput" class="end form-control" value="end"}}
-          <button {{action "loadDates"}} class="btn btn-clear load-date disabled">Load dates 
-          <span class="loading-data"><span class="fa fa-circle-o-notch fa-spin"></span></span>
-          </button>
-        </form>
-      </div>
       {{#if model.data}}
       <div class="row">
        <div class="col-xs-12 col-sm-8 col-md-8">
@@ -379,7 +397,7 @@
          </p>
          <div id="report-chart">
             <div class="loading-data" style="display:none;">
-              <p class="text-center"><span class="fa fa-circle-o-notch fa-spin"></span></p>
+              <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
             </div>
            <div class="chart"></div>
            {{drawChart}}
@@ -387,7 +405,7 @@
          </div>
        </div>
        <div class="col-xs-12 col-sm-4 col-md-4">
-         {{input type='text' value=theFilter placeholder=placeholder}}
+         {{input type='text' value=theFilter placeholder=placeholder class="form-control"}}
          <table id="table-report" class="table">
              <thead>
                  <tr>

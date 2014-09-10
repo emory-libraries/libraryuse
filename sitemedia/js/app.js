@@ -7,22 +7,20 @@ App.Router.map(function() {
   this.resource('index', { path: '/' });
   // this.route('catchall', {path: '/*wildcard'});
   this.resource('library', { path: '/library' },function(){
-    this.route('test');
-    this.route('test1');
-    this.route('test2');
     this.route('all');
     this.route('woodruff');
     this.route('business');
     this.route('health-science');
     this.route('law');
+
+    this.resource('lib', { path: '/:lib' });
+    
+    this.resource('demo', { path: '/:lib/:category/:demo'});
+    
+    this.resource('date', { path: '/:lib/:category/:demo/:date'});
   });
-  this.resource('lib', { path: '/library/:lib' });
-  
-  this.resource('demo', { path: '/library/:lib/:category/:demo'});
-  
-  this.resource('date', { path: '/library/:lib/:category/:demo/:date'});
-  
   this.resource('reports', { path: 'reports' },function(){
+    this.route('reports-index'),
     this.resource('report', { path: '/:id' });
     this.resource('report', { path: '/:id/:lib' });
     this.resource('today-report', { path: '/:id/:lib/:start' });
@@ -36,27 +34,20 @@ App.Router.map(function() {
 
 App.classificationsStore = Ember.Object.extend({});
 
-var test = 'nope';
-
-$.ajax({
-  url: '/classifications',
-  dataType: 'jsonp',
-  jsonpCallback:'jsonResponse',
-  success:function(data){
-    test = data;
-  }
-});
-
 App.ApplicationRoute = Ember.Route.extend({
   model: function() {
     return Ember.$.getJSON('/classifications')
-  },
+  }
+});
+
+App.ApplicationController = Ember.Controller.extend({
   actions:{
     error: function () {
       this.transitionTo('catchall', "application-error");
     }
   }
-});
+})
+
 
 var GLOBAL_LIB='';
 
@@ -77,7 +68,6 @@ App.FacultyFilterButtonComponent = Ember.Component.extend({
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return ['red','green','purple']
   },
   setupController: function(controller,model) {
     // controller.set('title', "My App");
@@ -91,55 +81,94 @@ App.IndexRoute = Ember.Route.extend({
 });
 
 App.reportsStore = Ember.Object.extend({
-  id: null,
-  lib: null,
-  start: null,
-  end:null
+  id: undefined,
+  lib: undefined,
+  start: undefined,
+  end:undefined
 });
 
 var reportParams = App.reportsStore.create();
 
 
-function setGlobalReportVariables(_var, value){
+App.urlStore = Ember.Object.extend({
+  paths: null,
+  names: null,
+  category:null,
+  start:null,
+  end:null,
+  distinct:null
+});
+
+var today = new Date(), 
+    monthsAgo = 1,
+    default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
+    default_end = today;
+
+var dataURL = App.urlStore.create({
+  start:default_start,
+  end:default_end,
+  distinct:false
+});
+
+var libList = App.urlStore.create();
+
+function setGlobalReportVariables(_var, value, _this){
   reportParams.set(_var, value)
-  
-  loadReport();
+  loadReport(_this);
 }
 
-function loadReport(){
+function convertDate(d) {
+  var yyyy = d.getFullYear().toString();                                    
+  var mm = (d.getMonth()+1).toString(); // getMonth() is zero-based         
+  var dd  = d.getDate().toString();             
+                      
+  return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
+}
+
+function loadReport(_this){
   var id = reportParams.get("id"),
   lib = reportParams.get('lib'),
-  start = reportParams.get('start'),
-  end = reportParams.get('end');
+  start = convertDate(dataURL.get('start')),
+  end = convertDate(dataURL.get('end'));
   
   var link = '/'+id+'/'+lib+'/'+start+'/'+end,
   name = "Report: "+id+"|"+lib+"|"+start+"|"+end;
-  
-  console.log(link); 
-  window.location="#/reports"+link;
-  window.history.pushState(name,name, "#/reports"+link);
+  $("#report-chart .loading-data").show();
+  // console.log(link); 
+  _this.transitionToRoute("report",id,lib,start,end)
 }
 
+App.ReportsIndexRoute = Ember.Route.extend({
+  redirect : function(){
+    var defaults = {
+      id: "top_academic_plan",
+      lib: "woodruff",
+      start:  formatDate(dataURL.get("start")),
+      end: formatDate(dataURL.get("end"))
+    }
+    $(".global-loading").hide();
+    this.transitionTo("report", defaults.id,defaults.lib,defaults.start,defaults.end);
+  }
+});
 
 App.ReportsRoute = Ember.Route.extend({
-  model: function() {
+  model: function(params) {
     $(document).attr('title', "Reports");
+    Ember.run.next(this, function(){ 
+      $(".loading-data").hide();
+      $(".load-date").removeClass('disabled');
+    });
   }
 });
 
 App.ReportRoute = App.TodayReportRoute = App.FullReportRoute = Ember.Route.extend({
   model: function(params) {
-    var monthsAgo = 1,
-    today = new Date()
-    default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
     defaults = {
       id: "top_academic_plan",
       lib: "woodruff",
-      start:  formatDate(default_start),
-      end: formatDate(today)
+      start:  dataURL.get("start"),
+      end: dataURL.get("end")
     }
-    console.log(defaults.start)
-    
     if(params.id && params.id!="undefined"){
       reportParams.set('id',params.id);
     }
@@ -174,13 +203,14 @@ App.ReportRoute = App.TodayReportRoute = App.FullReportRoute = Ember.Route.exten
     end = reportParams.get('end');
     
     $(document).attr('title', "Reports|"+" "+lib );
-    console.log('/'+id+'/'+lib+'/'+start+'/'+end);
+    
     return Ember.$.getJSON('/'+id+'/'+lib+'/'+start+'/'+end)
   },
   renderTemplate:function(){
     this.render('report');
   }
 });
+
 
 App.CalendarDatePicker = Ember.TextField.extend({
   _picker: null,
@@ -190,12 +220,18 @@ App.CalendarDatePicker = Ember.TextField.extend({
   }.observes("value"),
   
   didInsertElement: function(){
+    var defaults = {
+      id: "top_academic_plan",
+      lib: "woodruff",
+      start:  formatDate(dataURL.get("start")),
+      end: formatDate(dataURL.get("end"))
+    }
     var urlDate = {
-      start: reportParams.get('start').split('-'),
-      end: reportParams.get('end').split('-')
+      start: dataURL.get("start"),
+      end: dataURL.get("end")
     }
     
-    $(".row.report-dates>form>input")
+    $(".report-dates.inputs>form>input")
     .datepicker({
       beforeShow: function(i,obj) {
         $widget = obj.dpDiv;
@@ -207,17 +243,17 @@ App.CalendarDatePicker = Ember.TextField.extend({
           },50);
         }
       },
+      maxDate: new Date,
       dateFormat: "m/d/yy",
       onClose: function(i,obj) {
         $widget = obj.dpDiv;
         $widget.data("top", $widget.position().top);
       }
     })
-    .datepicker("setDate", new Date(urlDate.start[0], urlDate.start[1]-1, urlDate.start[2]-1 ))
+    .datepicker("setDate", new Date(urlDate.start));
     
-    $(".row.report-dates>form>input.end")
-    .datepicker("setDate", new Date(urlDate.end[0], urlDate.end[1]-1, urlDate.end[2]-1 ))
-    
+    $(".report-dates.inputs>form>input.end")
+    .datepicker("setDate", new Date(urlDate.end))
   }
 });
 
@@ -273,31 +309,68 @@ App.ReportsController = Ember.Controller.extend({
       return true
     }
   }.property("id"),
+  
+  startDateInput: "",
+  
+  endDateInput: "",
+  
   actions:{
     setLibrary: function(libName) {
-      
       this.set('lib', libName)
-      setGlobalReportVariables('lib',libName)
+      $('#report-chart .chart').css('opacity',0)
+      setGlobalReportVariables('lib',libName, this)
     },
+    
     setType: function(idName) {
-      
       this.set('id', idName)
-      setGlobalReportVariables('id',idName)
+      $('#report-chart .chart').css('opacity',0)
+      setGlobalReportVariables('id',idName, this)
+    },
+    
+    loadDates: function() {
+      var newdate ={
+          start: this.get("startDateInput") || dataURL.get('start'),
+          end: this.get("endDateInput") || dataURL.get('end')
+        },
+        olddate = {
+          start: dataURL.get('start'),
+          end: dataURL.get('end')
+        }
+        
+        if(newdate.start.length>0){
+          newdate.start = newdate.start.split('/');
+          newdate.start = new Date(newdate.start[2],newdate.start[0]-1,newdate.start[1])
+        }
+        if(newdate.end.length>0){
+          newdate.end = newdate.end.split('/');
+          newdate.end = new Date(newdate.end[2],newdate.end[0]-1,newdate.end[1])
+        }
+      
+      if(olddate.start!==newdate.start || olddate.end!==newdate.end){
+        //Update the datepicker on the options sidebar manually
+        $(".options-date-range .form-group>input.start").datepicker("setDate",newdate.start)
+        $(".options-date-range .form-group>input.end").datepicker("setDate",newdate.end)
+        
+        //Upadte the global url settings
+        dataURL.set('start',newdate.start);
+        dataURL.set('end',newdate.end);
+        
+        //Hide and Show the loading indicators
+        $(".loading-data").not('.page-level').show();
+        $(".load-date").addClass('disabled');
+        $('#report-chart .chart').css('opacity',0)
+        
+        loadReport(this);
+      }
     }
   }
   
 });
 
-
-
 App.ReportController = Ember.Controller.extend({
   theFilter: "",
   
   numberToShow: 20,
-  
-  startDateInput: "",
-  
-  endDateInput: "",
   
   formattedDate: function(){
     var start = this.get("model.meta.strt_date"),
@@ -454,41 +527,8 @@ App.ReportController = Ember.Controller.extend({
         });
       })
     })
-  }).property("filterPeople"),
+  }).property("filterPeople")
   
-  actions: {
-    loadDates: function() {
-      var newdate ={
-          start: this.get("startDateInput") || reportParams.get('start'),
-          end: this.get("endDateInput") || reportParams.get('end')
-        },
-        olddate = {
-          start: reportParams.get('start'),
-          end: reportParams.get('end')
-        }
-      
-      if(newdate.start!==olddate.start){
-        newdate.start = newdate.start.split('/');
-        newdate.start = newdate.start[2]+"-"+newdate.start[0]+"-"+newdate.start[1];
-        
-      }
-      if(newdate.end!==olddate.end){
-        newdate.end = newdate.end.split('/');
-        newdate.end = newdate.end[2]+"-"+newdate.end[0]+"-"+newdate.end[1];
-      }
-      console.log(olddate.end)
-      console.log(newdate.end)
-      
-      if(olddate.start!==newdate.start || olddate.end!==newdate.end){
-        reportParams.set('start',newdate.start);
-        reportParams.set('end',newdate.end);
-        $(".loading-data").show();
-        $(".load-date").addClass('disabled');
-        $('#report-chart .chart').css('opacity',0)
-        loadReport();
-      }
-    }
-  }
 });
 
 
@@ -498,21 +538,18 @@ App.LibraryRoute = Ember.Route.extend({
     var title = $(document).attr('title');
     $(document).attr('title', title+'-Library');
   },
+  model:function(){
+  },
   setupController: function(controller) {
     controller.set('title', "Library");
   }
 });
 
-
-App.urlStore = Ember.Object.extend({
-  paths: null,
-  names: null,
-  category:null
+App.LibraryIndexRoute = Ember.Route.extend({
+  redirect : function(){
+    this.transitionTo("library.all");
+  }
 });
-var dataURL = App.urlStore.create();
-
-var libList = App.urlStore.create();
-
 
 //ALL LIBS
 App.LibraryAllRoute = Ember.Route.extend({
@@ -656,11 +693,9 @@ App.DateRoute = Ember.Route.extend({
   afterModel: function (model){
     _this = this;
     var library_name = getLibName(_this.get('router.url'));
-    
-    Ember.run.next(function(){
-    });
   }
 });
+
 
 //Woodruff
 App.LibraryWoodruffRoute = Ember.Route.extend({
@@ -790,6 +825,83 @@ App.NetChangeComponent = Ember.Component.extend({
   }
 });
 
+
+//Options Date Range
+App.OptionalCalendarDatePicker = Ember.TextField.extend({
+  _picker: null,
+  
+  modelChangedValue: function(){
+    // console.log('inside OptionalCalendarDatePicker'+this.get("value"))
+  }.observes("value"),
+  
+  didInsertElement: function(){
+    var today = new Date(),
+        yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        
+    var start_date = dataURL.get('start') ||yesterday,
+        end_date = dataURL.get('end') || today;
+      
+    $(".options-date-range .form-group>input")
+    .datepicker({
+      beforeShow: function(i,obj) {
+        $widget = obj.dpDiv;
+        window.$uiDatepickerDiv = $widget;
+        $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates");
+        if ($widget.data("top")) {
+          setTimeout(function() {
+            $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+          },50);
+        }
+      },
+      maxDate: today,
+      yearRange: '1999:c',
+      dateFormat: "m/d/yy",
+      onClose: function(i,obj) {
+        $widget = obj.dpDiv;
+        $widget.data("top", $widget.position().top);
+      }
+    });
+    $(".options-date-range .form-group>input.start")
+      .datepicker("setDate", start_date)
+      
+    $(".options-date-range .form-group>input.end")
+      .datepicker("setDate", end_date)
+  }
+});
+
+App.ReloadChartDataButtonComponent = Ember.Component.extend({
+  didInsertElement:function(){
+    Ember.run.once(this,function(){
+      $(".options-date-range .reload").on("click",function(evt){
+        evt.preventDefault();
+        var start = $(".options-date-range .form-group>input.start").datepicker("getDate");
+            end = $(".options-date-range .form-group>input.end").datepicker("getDate");
+        dataURL.set("start",start)
+        dataURL.set("end",end)
+        
+        if($("#container-lastweek")){
+          $(".loading-data.page-level").show();
+          SUPERCHART();
+        }
+      })
+    });
+  }
+})
+
+App.DistinctUsersSwitchComponent = Ember.Component.extend({
+  modelChangedValue: function(){
+    // console.log('Distinct: '+this.get("value"))
+    dataURL.set('distinct',this.get("value"));
+    if($("#container-lastweek").length>0){
+      SUPERCHART();
+    }
+  }.observes("value"),
+  didInsertElement:function(){
+    this.set("value",dataURL.get('distinct'))
+  }
+})
+
 var selection = []
 
 function formatDate(date){
@@ -798,16 +910,17 @@ function formatDate(date){
 }
 
 // function that builds both the charts on the Library pages
-function SUPERCHART(url){
+function SUPERCHART(){
   var path = dataURL.get('paths'),
   d = '',
   uri_category = dataURL.get('category') || 'total_usage',
   uri_users = dataURL.get('group') || '';
   
   uri_category+='/';
-  
-  if(uri_users.length>1){
-    uri_users='/'+uri_users+'/';
+
+  if(uri_users[0] && uri_users[0].length>0){
+    uri_users=encodeURI(uri_users[0]);
+    uri_users='/'+uri_users;
   }
   
   var $container = $('#container'),
@@ -816,36 +929,45 @@ function SUPERCHART(url){
   seriesCounter = 0,
   enableLegend =false,
   names = dataURL.get('names'),
-  // colors = Highcharts.getOptions().colors;
   colors= ['#FB715E','#7994FF','#5AA689','#FFD340','#796499'],
   uri_path = '/',
   today = new Date(), 
-  monthsAgo = 6,
-  start_date = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate());
-  date_range = '/'+formatDate(start_date)+'/'+formatDate(today)+'/';
+  monthsAgo = 5,
+  start_date = dataURL.get('start') || new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
+  end_date = dataURL.get('end') || today,
+  date_range = '/'+formatDate(start_date)+'/'+formatDate(end_date)+'/',
+  distinct = dataURL.get('distinct') || false,
+  distinct_tag = "";
+  
+  if(distinct){
+    distinct_tag = "?distinct=True";
+  }
   
   $.each(names, function(i, name) {
+    var requestURL = uri_path+uri_category+path[i]+uri_users+date_range+distinct_tag;
+
+    // console.log(requestURL);
     
-    // console.log(path[i])
-    // console.log(uri_path+uri_category+path[i]+uri_users+date_range);
+    var json = $.getJSON(requestURL)
     
-    $.ajax({
-      url: uri_path+uri_category+path[i]+uri_users+date_range,
-      dataType: 'json',
-      success:function(data){jsonResponse(data)},
-      error: function(xhr, status, error){
-        // console.log(xhr.responseText)
-        var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, it's taking a while to load.</p>");
-        $error.append($("<a/>").attr({'href':'#','class':'btn btn-warning btn-refresh'}).append('Refresh'));
-        $container.html($error);
-        $error.fadeOut(0).fadeIn(500)
-        $(document).on('click','.btn-refresh',function(evt){
-          evt.preventDefault();
-          location.reload(true);
-        })
+    json.done(function(data){
+      if(data.data.length>0){
+        jsonResponse(data)
       }
-    });
+      else {
+        data.data.push([(new Date).getTime(),0]);
+        console.log(data.meta.library+" is empty.")
+        jsonResponse(data)
+      }
+      $(".loading-data.page-level").hide();
+    })
     
+    json.fail(function(){
+      console.log('Error: JSON Ajax function failed.')
+      var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
+          $container.html($error);
+          $error.fadeOut(0).fadeIn(500)
+    });
     
     function jsonResponse(data) {
       d = data;
@@ -855,7 +977,7 @@ function SUPERCHART(url){
       else{
         d = data;
       }
-      // console.log(name)
+
       var color = colors[i];
       
       if(name=='Woodruff'){
@@ -868,61 +990,55 @@ function SUPERCHART(url){
         color='#5AA689';
       }
       
-      if(d.length!==0){
-        
-        seriesOptions[i] = {
-          name: name,
-          id: name,
-          data: d,
-          color:color,
-          fillColor : {
-            linearGradient : {
-              x1: 0, 
-              y1: 0, 
-              x2: 0, 
-              y2: 1
-            },
-            stops : [
-            [0, 'rgb(65, 73, 85)'], 
-            [1, 'rgb(65, 73, 85)']
-            ]
+      seriesOptions[i] = {
+        name: name,
+        id: name,
+        data: d,
+        color:color,
+        fillColor : {
+          linearGradient : {
+            x1: 0, 
+            y1: 0, 
+            x2: 0, 
+            y2: 1
           },
-          pointInterval: 36 * 1000
-        };
-        
-        // As we're loading the data asynchronously, we don't know what order it will arrive. So
-        // we keep a counter and create the chart when all the data is loaded.
-        seriesCounter++;
-        
-        if (seriesCounter == names.length) {
-          //  Timeline Events are possible!
-          // seriesOptions.push(
-          // {
-          //     name : "Flaged Events", 
-          //     color: '#999',
-          //     type : 'flags',
-          //     data : [
-          //       {
-          //         x : 1405536180000,      // Point where the flag appears
-          //         title : 'Timeline Event 1', // Title of flag displayed on the chart 
-          //         text : 'Description for timeline event.'   // Text displayed when the flag are highlighted.
-          //       },
-          //       {
-          //         x : 1407272940000,      // Point where the flag appears
-          //         title : 'Timeline Event 2', // Title of flag displayed on the chart 
-          //         text : 'Description for timeline event.'   // Text displayed when the flag are highlighted.
-          //       }
-          //     ],
-          //     onSeries : '',  // Id of which series it should be placed on. If not defined 
-          //                     // the flag series will be put on the X axis
-          //     shape : 'flag'  // Defines the shape of the flags.
-          // });
-          drawChart(seriesOptions);
-          drawChartLastWeek(seriesOptions);
-        }
-      }
-      else{
-        // console.log('There are no returns for this category in '+name+'.');
+          stops : [
+          [0, 'rgb(65, 73, 85)'], 
+          [1, 'rgb(65, 73, 85)']
+          ]
+        },
+        pointInterval: 36 * 1000
+      };
+      
+      // As we're loading the data asynchronously, we don't know what order it will arrive. So
+      // we keep a counter and create the chart when all the data is loaded.
+      seriesCounter++;
+      
+      if (seriesCounter == names.length) {
+        //  Timeline Events are possible!
+        // seriesOptions.push(
+        // {
+        //     name : "Flaged Events", 
+        //     color: '#999',
+        //     type : 'flags',
+        //     data : [
+        //       {
+        //         x : 1405536180000,      // Point where the flag appears
+        //         title : 'Timeline Event 1', // Title of flag displayed on the chart 
+        //         text : 'Description for timeline event.'   // Text displayed when the flag are highlighted.
+        //       },
+        //       {
+        //         x : 1407272940000,      // Point where the flag appears
+        //         title : 'Timeline Event 2', // Title of flag displayed on the chart 
+        //         text : 'Description for timeline event.'   // Text displayed when the flag are highlighted.
+        //       }
+        //     ],
+        //     onSeries : '',  // Id of which series it should be placed on. If not defined 
+        //                     // the flag series will be put on the X axis
+        //     shape : 'flag'  // Defines the shape of the flags.
+        // });
+        drawChart(seriesOptions);
+        drawChartLastWeek(seriesOptions);
       }
     }
     
@@ -931,7 +1047,7 @@ function SUPERCHART(url){
       enableLegend = (data.length > 1 ? true : false);
       Highcharts.setOptions({
         global: {
-          timezoneOffset: 5 * 60
+          useUTC: false
         }
       });
       $container.highcharts('StockChart', {
@@ -1022,23 +1138,26 @@ function SUPERCHART(url){
       }, function(chart) {
         // apply the date pickers
         setTimeout(function(){
-          $($('#'+chart.options.chart.renderTo.id + ' input.highcharts-range-selector'))
-          .datepicker({
-            beforeShow: function(i,obj) {
-              $widget = obj.dpDiv;
-              window.$uiDatepickerDiv = $widget;
-              $uiDatepickerDiv.addClass("ll-skin-melon");
-              if ($widget.data("top")) {
-                setTimeout(function() {
-                  $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
-                },50);
+          if(chart.options.chart){
+            $($('#'+chart.options.chart.renderTo.id + ' input.highcharts-range-selector'))
+            .datepicker({
+              beforeShow: function(i,obj) {
+                $widget = obj.dpDiv;
+                window.$uiDatepickerDiv = $widget;
+                $uiDatepickerDiv.addClass("ll-skin-melon");
+                if ($widget.data("top")) {
+                  setTimeout(function() {
+                    $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+                  },50);
+                }
               }
-            }
-            ,onClose: function(i,obj) {
-              $widget = obj.dpDiv;
-              $widget.data("top", $widget.position().top);
-            }
-          })
+              ,maxDate:new Date
+              ,onClose: function(i,obj) {
+                $widget = obj.dpDiv;
+                $widget.data("top", $widget.position().top);
+              }
+            })
+          }
         },0)
       });//end highcharts
     }//end drawChartLastWeek
@@ -1048,7 +1167,7 @@ function SUPERCHART(url){
       enableLegend = (data.length > 1 ? true : false);
       Highcharts.setOptions({
         global: {
-          timezoneOffset: 5 * 60
+          useUTC: false
         }
       });
       $container.highcharts('StockChart', {
@@ -1083,7 +1202,7 @@ function SUPERCHART(url){
             type: 'all',
             text: 'All'
           }],
-          selected: 1,
+          selected: 6,
           inputDateFormat: '%b %e %Y',
           inputEditDateFormat: '%Y-%m-%d' 
         },
@@ -1141,24 +1260,21 @@ function SUPERCHART(url){
             beforeShow: function(i,obj) {
               $widget = obj.dpDiv;
               window.$uiDatepickerDiv = $widget;
-              $uiDatepickerDiv.addClass("ll-skin-melon");
+              $uiDatepickerDiv.addClass("ll-skin-melon").removeClass("report-dates")
               if ($widget.data("top")) {
                 setTimeout(function() {
                   $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
                 },50);
               }
-            }
-            ,onClose: function(i,obj) {
+            },
+            minDate: new Date(dataURL.get('start')),
+            maxDate: new Date(dataURL.get('end')),
+            onClose: function(i,obj) {
               $widget = obj.dpDiv;
               $widget.data("top", $widget.position().top);
-            }
-          })
-          
-          // Set the datepicker's date format
-          $.datepicker.setDefaults({
+            },
             dateFormat: 'yy-mm-dd',
             onSelect: function(dateText) {
-              console.log(dateText);
               this.onchange();
               this.onblur();
             }
@@ -1203,11 +1319,9 @@ App.JsonChartComponent = Ember.Component.extend({
       setTab(hash);
       
       if($('.mp-pusher').hasClass("mp-pushed")){
-        SUPERCHART(url);
+        SUPERCHART();
       }
     }
-    
-    
     
     var hash = window.location.hash
     SUPERCHART(url);
@@ -1224,6 +1338,7 @@ App.JsonChartComponent = Ember.Component.extend({
 //Loading Component
 App.FlipLoadingComponent = Ember.Component.extend({
   didInsertElement:function(){
+    $(".global-loading#onLoad").hide();
     var clock;
     
     $(document).ready(function() {
