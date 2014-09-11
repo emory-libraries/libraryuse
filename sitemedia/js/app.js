@@ -96,7 +96,8 @@ App.urlStore = Ember.Object.extend({
   category:null,
   start:null,
   end:null,
-  distinct:null
+  distinct:null,
+  campus:null
 });
 
 var today = new Date(), 
@@ -202,12 +203,23 @@ App.ReportRoute = App.TodayReportRoute = App.FullReportRoute = Ember.Route.exten
     start = reportParams.get('start'),
     end = reportParams.get('end');
     
-    $(document).attr('title', "Reports|"+" "+lib );
+    var jsonUrl = "/"+id+"/"+lib;
+    if(id == "on_off_campus" ){
+      jsonUrl += "/"+"Y";
+    }
+    jsonUrl += "/"+start+"/"+end+"/"
     
-    return Ember.$.getJSON('/'+id+'/'+lib+'/'+start+'/'+end)
+    $(document).attr('title', "Reports|"+" "+lib+ ": "+id );
+    
+    return Ember.$.getJSON(jsonUrl)
   },
   renderTemplate:function(){
-    this.render('report');
+    if(reportParams.get("id") == "on_off_campus" ){
+      this.render('report-table');
+    }
+    else{
+      this.render('report');
+    }
   }
 });
 
@@ -291,6 +303,12 @@ App.ReportsController = Ember.Controller.extend({
   id:function(){
     return this.get("default_id")
   }.property(),
+  
+  isCampus:function(){
+    if(this.get("id")=="on_off_campus"){
+      return true
+    }
+  }.property("id"),
   
   isDiv:function(){
     if(this.get("id")=="top_division"){
@@ -422,17 +440,20 @@ App.ReportController = Ember.Controller.extend({
     return this.get('model.data').filter( function(_this, index) {
       // return true if you want to include this item
       // for example, with the code below we include all but the first item
-      var item = _this.label.toLowerCase();
-      if(item.indexOf(searchText)>-1 && !exclude){
-        return item
+      if(_this.label){
+        var item = _this.label.toLowerCase();
+        if(item.indexOf(searchText)>-1 && !exclude){
+          return item
+        }
+        else if(item.indexOf(searchText)!==0 && exclude){
+          return item
+        }
       }
-      else if(item.indexOf(searchText)!==0 && exclude){
-        return item
-      }
+      return
     });
   }.property("theFilter","model.data.@each"),
   
-  drawChart: (function(){
+  drawPieChart: (function(){
     var total_sum = this.get('filteredSum'),
     n = this.get('numberToShow'),
     datapoints = [],
@@ -527,7 +548,190 @@ App.ReportController = Ember.Controller.extend({
         });
       })
     })
-  }).property("filterPeople")
+  }).property("filterPeople"),
+
+  
+  drawCampusChart: (function(){
+    var data = this.get("model.data"),
+        name = this.get("model.meta.title");
+        
+    var id = reportParams.get("id"),
+    lib = reportParams.get('lib'),
+    start = reportParams.get('start'),
+    end = reportParams.get('end');
+    
+    var jsonUrl = "/on_off_campus/"+lib;
+    jsonUrl += "/"+"N";
+    jsonUrl += "/"+start+"/"+end+"/"
+    
+    var oc_data=""
+    
+    function draw(){
+      Highcharts.setOptions({
+        global: {
+          useUTC: false
+        }
+      });
+      $('#report-chart .chart')
+        .highcharts('StockChart', {
+            chart:{
+              backgroundColor:'transparent'
+            },
+            rangeSelector: {
+              buttons: [{
+                type: 'week',
+                count: 1,
+                text: '1w'
+              }, {
+                type: 'month',
+                count: 1,
+                text: '1m'
+              }, {
+                type: 'month',
+                count: 3,
+                text: '3m'
+              }, {
+                type: 'month',
+                count: 6,
+                text: '6m'
+              }, {
+                type: 'ytd',
+                text: 'YTD'
+              }, {
+                type: 'year',
+                count: 1,
+                text: '1y'
+              }, {
+                type: 'all',
+                text: 'All'
+              }],
+              selected: 6,
+              inputDateFormat: '%b %e %Y',
+              inputEditDateFormat: '%Y-%m-%d' 
+            },
+            
+            yAxis: {
+              labels: {
+                formatter: function() {
+                  return (this.value < 0 ? '-' : '') + Highcharts.numberFormat(this.value, 0);
+                }
+              },
+              floor:0
+            },
+            
+            title: {
+              text: '',
+              floating: true
+            },
+            
+            series : [{
+                name : "On Campus",
+                data : data,
+                color:{
+                  color:"rgb(59, 197, 83)",
+                  linearGradient: { x1: 1, x2: 0, y1: 0, y2: 0 },
+                  stops: [
+                      [0, 'rgb(59, 197, 83)'],
+                      [1, 'rgb(129, 231, 147)']
+                  ]
+                },
+                pointInterval: 36 * 1000
+              },
+              {
+                name : "Off Campus",
+                data : oc_data,
+                color:{
+                  color:"rgb(255,130,87)",
+                  linearGradient: { x1: 1, x2: 0, y1: 0, y2: 0 },
+                  stops: [
+                      [0, 'rgb(255,130,87)'],
+                      [1, 'rgb(255,180,154)']
+                  ]
+                },
+                pointInterval: 36 * 1000
+              }
+            ],
+            
+            tooltip: {
+              useHTML: true,
+              borderWidth: 0,
+              borderColor:null,
+              backgroundColor:'#888',
+              shadow: false,
+              style: {
+                  padding: 0,
+                  borderRadius:'5px'
+              },
+              pointFormat: '<span style="color:{series.color.color}">{series.name}</span>: <b>{point.y} patrons</b><br/>',
+              changeDecimals: 2,
+              valueDecimals: 0
+            },
+            plotOptions: {
+              series: {
+                compare: undefined, //value, percent
+                dataGrouping:{
+                  approximation:'sum',
+                  smoothed:false,
+                  forced:true,
+                  groupPixelWidth:300,
+                  units: [ ['minute',[15]],['hour', [1]],['day',[1]] ]
+                }
+              }
+            },
+            xAxis: {
+              tickPixelInterval: 120,
+              type: 'datetime',
+              dateTimeLabelFormats : {
+                hour: '%I %p',
+                minute: '%I:%M %p'
+              },
+            }
+          },
+          function(chart) {
+          // apply the date pickers
+          setTimeout(function(){
+            $(".loading-data").hide();
+            $(".load-date").removeClass('disabled');
+            $('#report-chart .chart input.highcharts-range-selector')
+            .datepicker({
+              beforeShow: function(i,obj) {
+                $widget = obj.dpDiv;
+                window.$uiDatepickerDiv = $widget;
+                $uiDatepickerDiv.addClass("ll-skin-melon").removeClass("report-dates")
+                if ($widget.data("top")) {
+                  setTimeout(function() {
+                    $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+                  },50);
+                }
+              },
+              minDate: new Date(dataURL.get('start')),
+              maxDate: new Date(dataURL.get('end')),
+              onClose: function(i,obj) {
+                $widget = obj.dpDiv;
+                $widget.data("top", $widget.position().top);
+              },
+              dateFormat: 'yy-mm-dd',
+              onSelect: function(dateText) {
+                this.onchange();
+                this.onblur();
+              }
+            });
+          },0)
+        })//end highstocks
+        .css('opacity',1);
+    }
+    
+    $.getJSON(jsonUrl,function(data){
+      oc_data =  data.data;
+      Ember.run.once(this,function(){
+        Ember.run.next(this, function(){ 
+          
+          window.setTimeout(draw,500)
+        });
+      });
+    })
+    
+  }).property("model.data")
   
 });
 
@@ -870,6 +1074,33 @@ App.OptionalCalendarDatePicker = Ember.TextField.extend({
   }
 });
 
+App.ClearFiltersButtonComponent = Ember.Component.extend({
+  didInsertElement:function(){
+    Ember.run.once(this,function(){
+      Ember.run.next(this, function(){ 
+        $("#clear-filters").on("click",function(evt){
+          evt.preventDefault();
+
+          var lib = dataURL.get('names');
+          
+          if(lib.length>1){
+            lib = "all"
+          }
+          else{
+            lib = lib[0].toLowerCase()
+          }
+          
+          dataURL.set('category',null),
+          dataURL.set('group',null)
+          
+          link = "#/library/"+lib+"/";
+          window.location = link;
+        })
+      });
+    });
+  }
+})
+
 App.ReloadChartDataButtonComponent = Ember.Component.extend({
   didInsertElement:function(){
     Ember.run.once(this,function(){
@@ -893,7 +1124,8 @@ App.DistinctUsersSwitchComponent = Ember.Component.extend({
   modelChangedValue: function(){
     // console.log('Distinct: '+this.get("value"))
     dataURL.set('distinct',this.get("value"));
-    if($("#container-lastweek").length>0){
+    if($("#container-lastweek").length>0 && $(".mp-pushed").length>0){
+      $(".loading-data.page-level").show();
       SUPERCHART();
     }
   }.observes("value"),
@@ -901,6 +1133,36 @@ App.DistinctUsersSwitchComponent = Ember.Component.extend({
     this.set("value",dataURL.get('distinct'))
   }
 })
+
+App.OnOffCampusSwitchComponent = Ember.Component.extend({
+  didInsertElement:function(){
+    
+    Ember.run.once(this,function(){
+      Ember.run.next(this, function(){ 
+        $('.options-campus .switch input').on("click",function(evt){
+          var $this = $(this),
+              val = $this.val();
+              
+          var current = dataURL.get("campus");
+          if(current==val){
+            $this.prop("checked", false);
+            dataURL.set("campus",null);
+          }
+          else{
+            dataURL.set("campus",val);
+          }
+          if($("#container-lastweek").length>0 && $(".mp-pushed").length>0){
+            $(".loading-data.page-level").show();
+            SUPERCHART();
+          }
+        });
+      })
+    })
+    
+  }
+})
+
+
 
 var selection = []
 
@@ -936,17 +1198,23 @@ function SUPERCHART(){
   start_date = dataURL.get('start') || new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
   end_date = dataURL.get('end') || today,
   date_range = '/'+formatDate(start_date)+'/'+formatDate(end_date)+'/',
+  campus_tag = dataURL.get('campus') || '',
   distinct = dataURL.get('distinct') || false,
   distinct_tag = "";
+  
+  if(campus_tag!='' && campus_tag[0].length>0 ){
+      campus_tag="/"+campus_tag[0];
+      uri_category="on_off_campus/";
+  }
   
   if(distinct){
     distinct_tag = "?distinct=True";
   }
   
   $.each(names, function(i, name) {
-    var requestURL = uri_path+uri_category+path[i]+uri_users+date_range+distinct_tag;
+    var requestURL = uri_path+uri_category+path[i]+uri_users+campus_tag+date_range+distinct_tag;
 
-    // console.log(requestURL);
+    console.log(requestURL);
     
     var json = $.getJSON(requestURL)
     
@@ -959,7 +1227,6 @@ function SUPERCHART(){
         console.log(data.meta.library+" is empty.")
         jsonResponse(data)
       }
-      $(".loading-data.page-level").hide();
     })
     
     json.fail(function(){
@@ -1039,6 +1306,7 @@ function SUPERCHART(){
         // });
         drawChart(seriesOptions);
         drawChartLastWeek(seriesOptions);
+        $(".loading-data.page-level").hide();
       }
     }
     
@@ -1138,7 +1406,7 @@ function SUPERCHART(){
       }, function(chart) {
         // apply the date pickers
         setTimeout(function(){
-          if(chart.options.chart){
+          if(chart && chart.options.chart){
             $($('#'+chart.options.chart.renderTo.id + ' input.highcharts-range-selector'))
             .datepicker({
               beforeShow: function(i,obj) {

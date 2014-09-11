@@ -166,6 +166,11 @@ div.control-btn .btn.refresh-btn:hover{
     border-bottom: 0;
 }
 
+.nav-tabs.nav-justified>li {
+display: table-cell;
+width: 1%;
+}
+
 .net-lib-change.text-danger span.glyphicon.glyphicon-arrow-up:before {
     content:"\e094";    
 }
@@ -366,11 +371,12 @@ a.list-group-item .list-group-item-heading {
 
 
 @media(max-width:767px){
-    .nav-tabs.nav-justified>li>a {
-        display: table-cell;
-        width:25%;
-        float:left;
-        vertical-align:bottom;
+    .highcharts-button, 
+    .highcharts-input-group{
+        display: none;
+    }
+    .highcharts-scrollbar+text{
+      opacity:0;
     }
 }
 
@@ -459,6 +465,12 @@ a.list-group-item .list-group-item-heading {
     color: rgb(22, 95, 66);
 }
 
+.options-campus .switch .label {
+  margin-top: 10px;
+  font-size: 1em;
+  display: inline-block;
+}
+
 
 /******
   Test
@@ -526,6 +538,7 @@ thead th {
 .nav-pills.report-types>li>a {
     color: rgb(36, 155, 108);
     padding: 7px 15px;
+    font-size: 0.9em;
 }
 
 .nav-pills.report-types>li>a:hover,
@@ -544,6 +557,8 @@ thead th {
     text-align:center;
     background: rgba(0, 0, 0, 0.05);
     transition:background-color 0.5s ease;
+    width: 33%!important;
+    display: inline-block;
 }
 
 .report-dates>form>input:focus{
@@ -573,7 +588,7 @@ thead th {
 }
 
 .report-dates label.label {
-  width: 200px;
+  width: 33%;
   display: inline-block;
   color: rgb(148, 148, 148);
   font-weight: normal;
