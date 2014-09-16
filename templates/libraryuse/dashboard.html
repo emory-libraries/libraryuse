@@ -149,6 +149,9 @@
                   {{#link-to "reports" tagName="li"}}
                       <a {{bind-attr href="view.href"}}>Reports</a>
                   {{/link-to}}
+                  <li id="averages-link">
+                      <a href="#/total_averages">Averages</a>
+                  </li>
                 </ul>
               </nav>
             </header>
@@ -225,7 +228,6 @@
     {{flip-loading}}
   </script>
 
-
   <script type="text/x-handlebars" data-template-name='lib-navigation'>
     <nav class="nav-reports">
     <ul class="nav nav-tabs nav-justified">
@@ -285,11 +287,6 @@
   </script>
 
   <script type="text/x-handlebars" data-template-name="components/filter-tabs">
-    {{!--
-      <div class="toggle-filters">
-        <a href="#"><span class="glyphicon glyphicon-filter"></span></a>
-      </div>
-    --}}
     <div class="row">
       <a id="menu-toggle" class="btn btn-clear" data-effect="st-effect-2">
       		<span class="glyphicon glyphicon-filter"></span>
@@ -388,8 +385,8 @@
         <div class="row report-nav">
           <div class="col-xs-12 col-md-5 pull-right">
             <ul class="nav nav-pills report-types nav-justified">
-              <li {{bind-attr class="isCampus:active"}}>
-                <a href="#" {{action "setType" "on_off_campus"}}>Campus</a>
+              <li {{bind-attr class="isAcad:active"}}>
+                <a href="#" {{action "setType" "top_academic_plan"}}>Academic</a>
               </li>
               <li {{bind-attr class="isDiv:active"}}>
                 <a href="#" {{action "setType" "top_division"}}>Divisons</a>
@@ -397,8 +394,8 @@
               <li {{bind-attr class="isDprt:active"}}>
                 <a href="#" {{action "setType" "top_dprtn"}}>Departments</a>
               </li>
-              <li {{bind-attr class="isAcad:active"}}>
-                <a href="#" {{action "setType" "top_academic_plan"}}>Academic</a>
+              <li {{bind-attr class="isCampus:active"}}>
+                <a href="#" {{action "setType" "on_off_campus"}}>Campus</a>
               </li>
             </ul>
           </div>
@@ -476,13 +473,62 @@
      {{/if}}
   </script>
   
-  <script type="text/x-handlebars" data-template-name="report-table">
+  <script type="text/x-handlebars" data-template-name="report-campus">
     <div id="report-chart">
        <div class="loading-data">
          <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
        </div>
       <div class="chart"></div>
       {{drawCampusChart}}
+    </div>
+  </script>
+  
+  <script type="text/x-handlebars" id="averages">
+    <div class="flex-container">
+        <div class="row">
+          <ul class="nav nav-tabs nav-justified">
+              <li {{bind-attr class="isWoodruff:active"}}>
+                <a href="#" {{action "setLibrary" "woodruff"}}>Woodruff</a>
+              </li>
+              <li {{bind-attr class="isHealth:active"}}>
+                <a href="#" {{action "setLibrary" "health"}}>Health Science</a>
+              </li>
+              <li {{bind-attr class="isLaw:active"}}>
+                <a href="#" {{action "setLibrary" "law"}}>Law</a>
+              </li>
+          </ul>
+        </div>
+        <div class="row report-nav">
+          <div class="report-dates inputs col-xs-12 col-md-7">
+            <form class="form-inline" role="form">
+              <label class="label" for="start"><span>From</span></label>
+              <label class="label" for="end"><span>To</span></label>
+              <div class="clearfix"></div>
+              {{view App.CalendarDatePicker valueBinding="averagesStart" class="start form-control" id="start"}}
+              {{view App.CalendarDatePicker valueBinding="averagesEnd" class="end form-control" id="end"}}
+            
+              <button {{action "loadDatesAverages"}} class="btn btn-clear load-date disabled">Load dates 
+              <span class="loading-data"><span class="fa fa-circle-o-notch fa-spin"></span></span>
+              </button>
+            </form>
+          </div>
+          
+        </div>
+        <div class="container-reports">
+          {{outlet}}
+        </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" id="avg-report">
+    <div id="averages-chart" class="text-center">
+      <h2>Weekly Averages</h2>
+      <p>This chart shows the average number of patrons to the library for the time period listed above.</p>
+      <div class="chart"></div>
+      {{drawAverages}}
+      <div class="loading-data">
+        <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
+      </div>
     </div>
   </script>
 
@@ -500,10 +546,10 @@
 
   {% endverbatim myblock %}
 
-  <script src="{% static 'js/libs/jquery-1.10.2.js'  %}"></script>
+  <script src="{% static 'js/libs/jquery-1.10.2.js' %}"></script>
   <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
-  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
-
+  <script src="{% static 'js/libs/jquery-ui-1.10.4.custom.min.js' %}"></script>
+  
   <script src="{% static 'js/libs/handlebars-1.1.2.js' %}"></script>
   <script src="{% static 'js/libs/ember-1.5.0.js' %}"></script>
 

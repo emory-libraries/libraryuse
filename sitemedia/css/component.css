@@ -112,6 +112,7 @@ html, body, .container, .scroller {
   -webkit-transition: opacity 0.3s;
   -moz-transition: opacity 0.3s;
   transition: opacity 0.3s;
+  z-index: 2;
 }
 
 .mp-level.mp-level-overlay {

@@ -252,6 +252,34 @@
   border-left-width: 1px;
 }
 
+
+/*! jQuery Timepicker Addon - v1.5.0 - 2014-09-01
+* http://trentrichardson.com/examples/timepicker
+* Copyright (c) 2014 Trent Richardson; Licensed MIT */
+
+.ui-timepicker-div .ui-widget-header{margin-bottom:8px}.ui-timepicker-div dl{text-align:left}.ui-timepicker-div dl dt{float:left;clear:left;padding:0 0 0 5px}.ui-timepicker-div dl dd{margin:0 10px 10px 40%}.ui-timepicker-div td{font-size:90%}.ui-tpicker-grid-label{background:0 0;border:0;margin:0;padding:0}.ui-timepicker-rtl{direction:rtl}.ui-timepicker-rtl dl{text-align:right;padding:0 5px 0 0}.ui-timepicker-rtl dl dt{float:right;clear:right}.ui-timepicker-rtl dl dd{margin:0 40% 10px 10px}
+
+
+.report-dates.ll-skin-melon.ui-datepicker.timepicker {
+    background: #6481DB;
+}
+dt.ui_tpicker_hour_label {
+    display: none;
+}
+.ui-timepicker-div dl dd.ui_tpicker_hour {
+    margin: 0;
+    width: 100%;
+    padding: 0;
+}
+.ui-timepicker-div dl dd select.ui-timepicker-select.ui-state-default.ui-corner-all{
+    width: 100%;
+    text-align: center;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding:10px;
+    font-size:1.2em;
+}
+
 /******
   MELON SKIN
 *******/
