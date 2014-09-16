@@ -1089,14 +1089,14 @@ App.AvgReportController = Ember.Controller.extend({
           seriesCounter++;
           
           if (seriesCounter == names.length) {
-            chart(seriesOptions);
+            chartAverages(seriesOptions);
             dataURL.set("drawing",false)
           }
         }
       })
       
       
-      function chart(seriesOptions){
+      function chartAverages(seriesOptions){
         $(".loading-data").hide();
         $(".load-date").removeClass('disabled');
 
