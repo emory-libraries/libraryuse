@@ -375,3 +375,25 @@
 .ll-skin-melon td .ui-state-hover {
   background: #2e3641;
 }
+
+.ll-skin-melon.ui-datepicker td.ui-datepicker-unselectable.ui-state-disabled.ui-datepicker-other-month,
+.ll-skin-melon.ui-datepicker td.ui-datepicker-unselectable.ui-state-disabled.ui-datepicker-other-month:hover {
+  background: #6481DB;
+  cursor:default!important;
+}
+
+.ll-skin-melon.ui-datepicker td.ui-datepicker-unselectable.ui-state-disabled{
+  background-color: #617BC7;
+}
+
+.ll-skin-melon.ui-datepicker td.ui-datepicker-unselectable.ui-state-disabled{
+  cursor:not-allowed!important;
+}
+.ll-skin-melon.ui-datepicker td.ui-datepicker-unselectable.ui-state-disabled:hover{
+  background: #4A5D94;
+}
+
+
+.ll-skin-melon.ui-datepicker td.ui-datepicker-unselectable.ui-state-disabled .ui-state-default{
+    color: rgb(88, 105, 162);
+}

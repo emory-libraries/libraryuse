@@ -37,7 +37,7 @@ def chart_data(numbers, distinct, start, end, library,**keyword_parameters):
             # We have to add the three zeros to work with HighCharts
             visits.append('[%s000,%s]' % (epoch, number['total']))
         elif number.has_key('acpl_n'):
-            title = "Acedemic Plan"
+            title = "Academic Plan"
             acpl_n = number['acpl_n']
             visits.append('{"label":"%s","value":%s}' % (acpl_n, number['total']))
         elif number.has_key('dprt_n'):
