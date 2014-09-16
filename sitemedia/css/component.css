@@ -113,6 +113,9 @@ html, body, .container, .scroller {
   -moz-transition: opacity 0.3s;
   transition: opacity 0.3s;
 }
+.mp-pusher.mp-pushed::after{
+  z-index: 2;
+}
 
 .mp-level.mp-level-overlay {
   cursor: pointer;

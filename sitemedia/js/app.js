@@ -12,7 +12,7 @@ App.Router.map(function() {
     this.route('business');
     this.route('health-science');
     this.route('law');
-
+    
     this.resource('lib', { path: '/:lib' });
     
     this.resource('demo', { path: '/:lib/:category/:demo'});
@@ -20,12 +20,20 @@ App.Router.map(function() {
     this.resource('date', { path: '/:lib/:category/:demo/:date'});
   });
   this.resource('reports', { path: 'reports' },function(){
-    this.route('reports-index'),
+    this.route('reports-index');
     this.resource('report', { path: '/:id' });
     this.resource('report', { path: '/:id/:lib' });
+    
     this.resource('today-report', { path: '/:id/:lib/:start' });
     this.resource('report', { path: '/:id/:lib/:start/:end' });
   });
+  
+  this.resource('averages', { path: 'total_averages' },function(){
+    this.route('averages-index');
+    this.resource('avg-report', { path: '/:lib/:start/:end/:time1/:time2/:dow' });  
+  });
+  
+  
   this.resource('json');
   // this.route("fourOhFour", { path: "*path"});
 });
@@ -101,43 +109,112 @@ App.urlStore = Ember.Object.extend({
 });
 
 var today = new Date(), 
-    monthsAgo = 1,
-    default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
-    default_end = today;
+monthsAgo = 1,
+default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
+default_end = today;
 
 var dataURL = App.urlStore.create({
   start:default_start,
   end:default_end,
-  distinct:false
+  distinct:false,
+  time1:0,
+  time2:23,
+  dow:1
 });
 
 var libList = App.urlStore.create();
 
-function setGlobalReportVariables(_var, value, _this){
+function setGlobalReportVariables(_var, value, _this,route){
   reportParams.set(_var, value)
-  loadReport(_this);
+  loadReport(_this,route);
 }
 
 function convertDate(d) {
+  if (typeof d == "string" || d ==undefined){
+    return d;
+  }
   var yyyy = d.getFullYear().toString();                                    
   var mm = (d.getMonth()+1).toString(); // getMonth() is zero-based         
   var dd  = d.getDate().toString();             
-                      
+  
   return yyyy + '-' + (mm[1]?mm:"0"+mm[0]) + '-' + (dd[1]?dd:"0"+dd[0]);
 }
 
-function loadReport(_this){
+function loadReport(_this, route){
+  console.log(_this);
   var id = reportParams.get("id"),
   lib = reportParams.get('lib'),
   start = convertDate(dataURL.get('start')),
-  end = convertDate(dataURL.get('end'));
+  end = convertDate(dataURL.get('end')),
+  time1 = reportParams.get('time1'),
+  time2 = reportParams.get('time2'),
+  dow = reportParams.get('dow'),
+  route = (route==undefined) ? "report" : "averages";
   
   var link = '/'+id+'/'+lib+'/'+start+'/'+end,
   name = "Report: "+id+"|"+lib+"|"+start+"|"+end;
   $("#report-chart .loading-data").show();
-  // console.log(link); 
-  _this.transitionToRoute("report",id,lib,start,end)
+
+
+  if(route=="averages"){
+    _this.transitionToRoute("avg-report",lib,start,end,time1,time2,dow)
+  }
+  else{  
+    _this.transitionToRoute(route,id,lib,start,end)
+  }
 }
+
+App.CalendarDatePicker = Ember.TextField.extend({
+  _picker: null,
+  
+  modelChangedValue: function(){
+    // console.log('inside CalendarDatePicker'+this.get("value"))
+  }.observes("value"),
+  
+  didInsertElement: function(){
+    var formatted_start = convertDate(reportParams.get("start"))
+    var formatted_end = convertDate(reportParams.get("end"))
+    
+    
+    var defaults = {
+      id: "top_academic_plan",
+      lib: "woodruff",
+    }
+    
+    var urlDate = {
+      start:  formatted_start,
+      end: formatted_end
+    }
+    
+    $(".report-dates.inputs>form>input")
+    .datepicker({
+      beforeShow: function(i,obj) {
+        $widget = obj.dpDiv;
+        window.$uiDatepickerDiv = $widget;
+        $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates");
+        if ($widget.data("top")) {
+          setTimeout(function() {
+            $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+          },50);
+        }
+      },
+      maxDate: new Date,
+      dateFormat: "m/d/yy",
+      onClose: function(i,obj) {
+        $widget = obj.dpDiv;
+        $widget.data("top", $widget.position().top);
+      }
+    });
+    
+    $(".report-dates.inputs>form>input.start")
+    .datepicker("setDate", new Date(urlDate.start));
+    
+    $(".report-dates.inputs>form>input.end")
+    .datepicker("setDate", new Date(urlDate.end))
+  }
+});
+
+
 
 App.ReportsIndexRoute = Ember.Route.extend({
   redirect : function(){
@@ -152,8 +229,26 @@ App.ReportsIndexRoute = Ember.Route.extend({
   }
 });
 
-App.ReportsRoute = Ember.Route.extend({
+App.AveragesIndexRoute = Ember.Route.extend({
+  redirect : function(){
+    var defaults = {
+      id: "total_averages",
+      lib: "woodruff",
+      start:  formatDate(dataURL.get("start")),
+      end: formatDate(dataURL.get("end")),
+      time1: dataURL.get("time1"),
+      time2: dataURL.get("time2"),
+      dow: dataURL.get("dow")
+    }
+    
+    $(".global-loading").hide();
+    this.transitionTo("avg-report", defaults.lib,defaults.start,defaults.end,defaults.time1,defaults.time2,defaults.dow);
+  }
+});
+
+App.ReportsRoute = App.AveragesRoute = Ember.Route.extend({
   model: function(params) {
+    $("#averages-link").removeClass("active");
     $(document).attr('title', "Reports");
     Ember.run.next(this, function(){ 
       $(".loading-data").hide();
@@ -162,14 +257,10 @@ App.ReportsRoute = Ember.Route.extend({
   }
 });
 
-App.ReportRoute = App.TodayReportRoute = App.FullReportRoute = Ember.Route.extend({
+App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
   model: function(params) {
-    defaults = {
-      id: "top_academic_plan",
-      lib: "woodruff",
-      start:  dataURL.get("start"),
-      end: dataURL.get("end")
-    }
+    var defaults = this.get("defaults");
+    
     if(params.id && params.id!="undefined"){
       reportParams.set('id',params.id);
     }
@@ -198,76 +289,101 @@ App.ReportRoute = App.TodayReportRoute = App.FullReportRoute = Ember.Route.exten
       reportParams.set('end',defaults.end);
     }
     
+    if(params.time1 && params.time1!="undefined"){
+      reportParams.set('time1',params.time1);
+    }
+    else{
+      reportParams.set('time1',defaults.time1);
+    }
+    
+    if(params.time2 && params.time2!="undefined"){
+      reportParams.set('time2',params.time2);
+    }
+    else{
+      reportParams.set('time2',defaults.time2);
+    }
+    
+    if(params.dow && params.dow!="undefined"){
+      reportParams.set('dow',params.dow);
+    }
+    else{
+      reportParams.set('dow',defaults.dow);
+    }
+    
     var id = reportParams.get("id"),
     lib = reportParams.get('lib'),
-    start = reportParams.get('start'),
-    end = reportParams.get('end');
+    start = convertDate(reportParams.get('start')),
+    end = convertDate(reportParams.get('end')),
+    time1 = reportParams.get('time1'),
+    time2 = reportParams.get('time2'),
+    dow = reportParams.get('dow');
     
     var jsonUrl = "/"+id+"/"+lib;
+    
     if(id == "on_off_campus" ){
       jsonUrl += "/"+"Y";
     }
-    jsonUrl += "/"+start+"/"+end+"/"
+    
+    jsonUrl += "/"+start+"/"+end+"/";
+
+    if(this.routeName=="avg-report"){
+      jsonUrl += time1+"/"+time2+"/";
+    }
     
     $(document).attr('title', "Reports|"+" "+lib+ ": "+id );
-    
-    return Ember.$.getJSON(jsonUrl)
+    if(this.routeName=="avg-report"){
+      $("#averages-link").addClass("active");
+      return jsonUrl
+    }
+    else{
+      return Ember.$.getJSON(jsonUrl)
+    }
+  }
+});
+
+App.ReportRoute = App.ReportRoute.extend({
+  defaults:{
+    id: "top_academic_plan",
+    lib: "woodruff",
+    start:  dataURL.get("start"),
+    end: dataURL.get("end"),
+    time1: 12,
+    time2: 13,
+    dow: 1
   },
   renderTemplate:function(){
-    if(reportParams.get("id") == "on_off_campus" ){
-      this.render('report-table');
+    if(reportParams.get("id")=="on_off_campus"){
+      this.render('report-campus')
     }
     else{
       this.render('report');
     }
   }
-});
+})
 
 
-App.CalendarDatePicker = Ember.TextField.extend({
-  _picker: null,
-  
-  modelChangedValue: function(){
-    // console.log('inside CalendarDatePicker'+this.get("value"))
-  }.observes("value"),
-  
-  didInsertElement: function(){
-    var defaults = {
-      id: "top_academic_plan",
-      lib: "woodruff",
-      start:  formatDate(dataURL.get("start")),
-      end: formatDate(dataURL.get("end"))
-    }
-    var urlDate = {
-      start: dataURL.get("start"),
-      end: dataURL.get("end")
-    }
-    
-    $(".report-dates.inputs>form>input")
-    .datepicker({
-      beforeShow: function(i,obj) {
-        $widget = obj.dpDiv;
-        window.$uiDatepickerDiv = $widget;
-        $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates");
-        if ($widget.data("top")) {
-          setTimeout(function() {
-            $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
-          },50);
-        }
-      },
-      maxDate: new Date,
-      dateFormat: "m/d/yy",
-      onClose: function(i,obj) {
-        $widget = obj.dpDiv;
-        $widget.data("top", $widget.position().top);
-      }
-    })
-    .datepicker("setDate", new Date(urlDate.start));
-    
-    $(".report-dates.inputs>form>input.end")
-    .datepicker("setDate", new Date(urlDate.end))
+App.AveragesRoute = App.AveragesRoute.extend({
+  renderTemplate:function(){
+    this.render('averages');
   }
 });
+
+App.AvgReportRoute = App.AvgReportRoute.extend({
+  defaults:{
+    id: "total_averages",
+    lib: "woodruff",
+    start:  dataURL.get("start"),
+    end: dataURL.get("end"),
+    time1: 12,
+    time2: 13,
+    dow: 1
+  },
+  renderTemplate:function(){
+    this.render('avg-report');
+  }
+})
+
+
 
 App.ReportsController = Ember.Controller.extend({
   default_lib: function(){
@@ -347,22 +463,22 @@ App.ReportsController = Ember.Controller.extend({
     
     loadDates: function() {
       var newdate ={
-          start: this.get("startDateInput") || dataURL.get('start'),
-          end: this.get("endDateInput") || dataURL.get('end')
-        },
-        olddate = {
-          start: dataURL.get('start'),
-          end: dataURL.get('end')
-        }
-        
-        if(newdate.start.length>0){
-          newdate.start = newdate.start.split('/');
-          newdate.start = new Date(newdate.start[2],newdate.start[0]-1,newdate.start[1])
-        }
-        if(newdate.end.length>0){
-          newdate.end = newdate.end.split('/');
-          newdate.end = new Date(newdate.end[2],newdate.end[0]-1,newdate.end[1])
-        }
+        start: this.get("startDateInput") || dataURL.get('start'),
+        end: this.get("endDateInput") || dataURL.get('end')
+      },
+      olddate = {
+        start: dataURL.get('start'),
+        end: dataURL.get('end')
+      }
+      
+      if(newdate.start.length>0){
+        newdate.start = newdate.start.split('/');
+        newdate.start = new Date(newdate.start[2],newdate.start[0]-1,newdate.start[1])
+      }
+      if(newdate.end.length>0){
+        newdate.end = newdate.end.split('/');
+        newdate.end = new Date(newdate.end[2],newdate.end[0]-1,newdate.end[1])
+      }
       
       if(olddate.start!==newdate.start || olddate.end!==newdate.end){
         //Update the datepicker on the options sidebar manually
@@ -382,7 +498,6 @@ App.ReportsController = Ember.Controller.extend({
       }
     }
   }
-  
 });
 
 App.ReportController = Ember.Controller.extend({
@@ -436,7 +551,9 @@ App.ReportController = Ember.Controller.extend({
     if(exclude){
       searchText=searchText.substring(1)
     }
-    
+    if(this.get('model.average')){
+      return this.get('model.average')
+    }
     return this.get('model.data').filter( function(_this, index) {
       // return true if you want to include this item
       // for example, with the code below we include all but the first item
@@ -549,16 +666,15 @@ App.ReportController = Ember.Controller.extend({
       })
     })
   }).property("filterPeople"),
-
-  
+    
   drawCampusChart: (function(){
     var data = this.get("model.data"),
-        name = this.get("model.meta.title");
-        
+    name = this.get("model.meta.title");
+    
     var id = reportParams.get("id"),
     lib = reportParams.get('lib'),
-    start = reportParams.get('start'),
-    end = reportParams.get('end');
+    start = convertDate(reportParams.get('start')),
+    end = convertDate(reportParams.get('end'));
     
     var jsonUrl = "/on_off_campus/"+lib;
     jsonUrl += "/"+"N";
@@ -573,159 +689,158 @@ App.ReportController = Ember.Controller.extend({
         }
       });
       $('#report-chart .chart')
-        .highcharts('StockChart', {
-            chart:{
-              backgroundColor:'transparent'
-            },
-            rangeSelector: {
-              buttons: [{
-                type: 'week',
-                count: 1,
-                text: '1w'
-              }, {
-                type: 'month',
-                count: 1,
-                text: '1m'
-              }, {
-                type: 'month',
-                count: 3,
-                text: '3m'
-              }, {
-                type: 'month',
-                count: 6,
-                text: '6m'
-              }, {
-                type: 'ytd',
-                text: 'YTD'
-              }, {
-                type: 'year',
-                count: 1,
-                text: '1y'
-              }, {
-                type: 'all',
-                text: 'All'
-              }],
-              selected: 6,
-              inputDateFormat: '%b %e %Y',
-              inputEditDateFormat: '%Y-%m-%d' 
-            },
-            
-            yAxis: {
-              labels: {
-                formatter: function() {
-                  return (this.value < 0 ? '-' : '') + Highcharts.numberFormat(this.value, 0);
-                }
-              },
-              floor:0
-            },
-            
-            title: {
-              text: '',
-              floating: true
-            },
-            
-            series : [{
-                name : "On Campus",
-                data : data,
-                color:{
-                  color:"rgb(59, 197, 83)",
-                  linearGradient: { x1: 1, x2: 0, y1: 0, y2: 0 },
-                  stops: [
-                      [0, 'rgb(59, 197, 83)'],
-                      [1, 'rgb(129, 231, 147)']
-                  ]
-                },
-                pointInterval: 36 * 1000
-              },
-              {
-                name : "Off Campus",
-                data : oc_data,
-                color:{
-                  color:"rgb(255,130,87)",
-                  linearGradient: { x1: 1, x2: 0, y1: 0, y2: 0 },
-                  stops: [
-                      [0, 'rgb(255,130,87)'],
-                      [1, 'rgb(255,180,154)']
-                  ]
-                },
-                pointInterval: 36 * 1000
-              }
-            ],
-            
-            tooltip: {
-              useHTML: true,
-              borderWidth: 0,
-              borderColor:null,
-              backgroundColor:'#888',
-              shadow: false,
-              style: {
-                  padding: 0,
-                  borderRadius:'5px'
-              },
-              pointFormat: '<span style="color:{series.color.color}">{series.name}</span>: <b>{point.y} patrons</b><br/>',
-              changeDecimals: 2,
-              valueDecimals: 0
-            },
-            plotOptions: {
-              series: {
-                compare: undefined, //value, percent
-                dataGrouping:{
-                  approximation:'sum',
-                  smoothed:false,
-                  forced:true,
-                  groupPixelWidth:300,
-                  units: [ ['minute',[15]],['hour', [1]],['day',[1]] ]
-                }
-              }
-            },
-            xAxis: {
-              tickPixelInterval: 120,
-              type: 'datetime',
-              dateTimeLabelFormats : {
-                hour: '%I %p',
-                minute: '%I:%M %p'
-              },
+      .highcharts('StockChart', {
+        chart:{
+          backgroundColor:'transparent'
+        },
+        rangeSelector: {
+          buttons: [{
+            type: 'week',
+            count: 1,
+            text: '1w'
+          }, {
+            type: 'month',
+            count: 1,
+            text: '1m'
+          }, {
+            type: 'month',
+            count: 3,
+            text: '3m'
+          }, {
+            type: 'month',
+            count: 6,
+            text: '6m'
+          }, {
+            type: 'ytd',
+            text: 'YTD'
+          }, {
+            type: 'year',
+            count: 1,
+            text: '1y'
+          }, {
+            type: 'all',
+            text: 'All'
+          }],
+          selected: 6,
+          inputDateFormat: '%b %e %Y',
+          inputEditDateFormat: '%Y-%m-%d' 
+        },
+        
+        yAxis: {
+          labels: {
+            formatter: function() {
+              return (this.value < 0 ? '-' : '') + Highcharts.numberFormat(this.value, 0);
             }
           },
-          function(chart) {
-          // apply the date pickers
-          setTimeout(function(){
-            $(".loading-data").hide();
-            $(".load-date").removeClass('disabled');
-            $('#report-chart .chart input.highcharts-range-selector')
-            .datepicker({
-              beforeShow: function(i,obj) {
-                $widget = obj.dpDiv;
-                window.$uiDatepickerDiv = $widget;
-                $uiDatepickerDiv.addClass("ll-skin-melon").removeClass("report-dates")
-                if ($widget.data("top")) {
-                  setTimeout(function() {
-                    $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
-                  },50);
-                }
-              },
-              minDate: new Date(dataURL.get('start')),
-              maxDate: new Date(dataURL.get('end')),
-              onClose: function(i,obj) {
-                $widget = obj.dpDiv;
-                $widget.data("top", $widget.position().top);
-              },
-              dateFormat: 'yy-mm-dd',
-              onSelect: function(dateText) {
-                this.onchange();
-                this.onblur();
+          floor:0
+        },
+        
+        title: {
+          text: '',
+          floating: true
+        },
+        
+        series : [{
+          name : "On Campus",
+          data : data,
+          color:{
+            color:"rgb(59, 197, 83)",
+            linearGradient: { x1: 1, x2: 0, y1: 0, y2: 0 },
+            stops: [
+            [0, 'rgb(59, 197, 83)'],
+            [1, 'rgb(129, 231, 147)']
+            ]
+          },
+          pointInterval: 36 * 1000
+        },
+        {
+          name : "Off Campus",
+          data : oc_data,
+          color:{
+            color:"rgb(255,130,87)",
+            linearGradient: { x1: 1, x2: 0, y1: 0, y2: 0 },
+            stops: [
+            [0, 'rgb(255,130,87)'],
+            [1, 'rgb(255,180,154)']
+            ]
+          },
+          pointInterval: 36 * 1000
+        }
+        ],
+        
+        tooltip: {
+          useHTML: true,
+          borderWidth: 0,
+          borderColor:null,
+          backgroundColor:'#888',
+          shadow: false,
+          style: {
+            padding: 0,
+            borderRadius:'5px'
+          },
+          pointFormat: '<span style="color:{series.color.color}">{series.name}</span>: <b>{point.y} patrons</b><br/>',
+          changeDecimals: 2,
+          valueDecimals: 0
+        },
+        plotOptions: {
+          series: {
+            compare: undefined, //value, percent
+            dataGrouping:{
+              approximation:'sum',
+              smoothed:false,
+              forced:true,
+              groupPixelWidth:300,
+              units: [ ['minute',[15]],['hour', [1]],['day',[1]] ]
+            }
+          }
+        },
+        xAxis: {
+          tickPixelInterval: 120,
+          type: 'datetime',
+          dateTimeLabelFormats : {
+            hour: '%I %p',
+            minute: '%I:%M %p'
+          },
+        }
+      },
+      function(chart) {
+        // apply the date pickers
+        setTimeout(function(){
+          $(".loading-data").hide();
+          $(".load-date").removeClass('disabled');
+          $('#report-chart .chart input.highcharts-range-selector')
+          .datepicker({
+            beforeShow: function(i,obj) {
+              $widget = obj.dpDiv;
+              window.$uiDatepickerDiv = $widget;
+              $uiDatepickerDiv.addClass("ll-skin-melon").removeClass("report-dates")
+              if ($widget.data("top")) {
+                setTimeout(function() {
+                  $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+                },50);
               }
-            });
-          },0)
-        })//end highstocks
-        .css('opacity',1);
+            },
+            minDate: new Date(dataURL.get('start')),
+            maxDate: new Date(dataURL.get('end')),
+            onClose: function(i,obj) {
+              $widget = obj.dpDiv;
+              $widget.data("top", $widget.position().top);
+            },
+            dateFormat: 'yy-mm-dd',
+            onSelect: function(dateText) {
+              this.onchange();
+              this.onblur();
+            }
+          });
+        },0)
+      })//end highstocks
+      .css('opacity',1);
     }
     
     $.getJSON(jsonUrl,function(data){
       oc_data =  data.data;
       Ember.run.once(this,function(){
         Ember.run.next(this, function(){ 
-          
           window.setTimeout(draw,500)
         });
       });
@@ -735,6 +850,335 @@ App.ReportController = Ember.Controller.extend({
   
 });
 
+App.AveragesController = Ember.Controller.extend({
+  default_lib: function(){
+    return reportParams.get('lib')
+  }.property(),
+  
+  lib: function(){
+    return this.get("default_lib")
+  }.property(),
+  
+  isWoodruff:function(){
+    if(this.get("lib")=="woodruff"){
+      return true
+    }
+  }.property("lib"),
+  
+  isHealth:function(){
+    if(this.get("lib")=="health"){
+      return true
+    }
+  }.property("lib"),
+  
+  isLaw:function(){
+    if(this.get("lib")=="law"){
+      return true
+    }
+  }.property("lib"),
+  
+  actions:{
+    setLibrary: function(libName) {
+      this.set('lib', libName)
+      // $('#averages-chart').css('opacity',0)
+      
+      setGlobalReportVariables('lib',libName, this,"averages")
+    },
+    
+    setType: function(idName) {
+      this.set('id', idName)
+      // $('#averages-chart').css('opacity',0)
+      setGlobalReportVariables('id',idName, this,"averages")
+    },
+    
+    loadDatesAverages: function() {
+
+      var newdate ={
+        start: this.get("averagesStart") || dataURL.get('start'),
+        end: this.get("averagesEnd") || dataURL.get('end')
+      },
+      olddate = {
+        start: dataURL.get('start'),
+        end: dataURL.get('end')
+      }
+      
+      if(newdate.start.length>0){
+        newdate.start = newdate.start.split('/');
+        newdate.start = new Date(newdate.start[2],newdate.start[0]-1,newdate.start[1])
+      }
+      if(newdate.end.length>0){
+        newdate.end = newdate.end.split('/');
+        newdate.end = new Date(newdate.end[2],newdate.end[0]-1,newdate.end[1])
+      }
+      
+      if(olddate.start!==newdate.start || olddate.end!==newdate.end){
+        //Update the datepicker on the options sidebar manually
+        $(".report-dates>input.start").datepicker("setDate",newdate.start)
+        $(".report-dates>input.end").datepicker("setDate",newdate.end)
+        
+        //Upadte the global url settings
+        dataURL.set('start',newdate.start);
+        dataURL.set('end',newdate.end);
+        
+        var link = "#/total_averages/"+reportParams.get("lib")+"/"+convertDate(dataURL.get("start"))+"/"+convertDate(dataURL.get("end"))+"/"+reportParams.get("time1")+"/"+reportParams.get("time2")+"/"+reportParams.get("dow");
+        
+        window.history.pushState("Total Averages", "Total Averages", link);
+        
+        //Hide and Show the loading indicators
+        $(".loading-data").not('.page-level').show();
+        $(".load-date").addClass('disabled');
+        $('#report-chart .chart').css('opacity',0)
+        
+        loadReport(this, "avg-report");
+      }
+    }
+  }
+});
+
+
+App.HourPicker = Ember.TextField.extend({
+  hours: ["12AM","1AM","2AM","3AM","4AM","5AM","6AM","7AM","8AM","9AM","10AM","11AM",
+          "12PM","1PM","2PM","3PM","4PM","5PM","6PM","7PM","8PM","9PM","10PM","11PM"],
+          
+  modelChangedValue: function(){
+    
+    function convert12to24(str){
+      var hour = parseInt(str),
+          isAM =  str.indexOf("AM")>-1
+      
+      if(!isAM && hour!==12){
+        hour+=12;
+      }
+      else if(isAM && hour==12){
+        hour = 0;
+      }
+      
+      return hour
+    }
+    
+    var t1 = convert12to24($(".timepicker.start").val())
+    var t2 = convert12to24($(".timepicker.end").val())
+    reportParams.set("time1",t1)
+    reportParams.set("time2",t2)
+
+    loadReport(this._parentView.controller, "avg-report");
+  }.observes("value"),
+  
+  didInsertElement: function(){
+    $("#averages-chart input.timepicker").timepicker({
+      beforeShow: function(i,obj) {
+        $widget = obj.dpDiv;
+        window.$uiDatepickerDiv = $widget;
+        $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates").addClass("timepicker");
+        if ($widget.data("top")) {
+          setTimeout(function() {
+            $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+          },50);
+        }
+      },
+      showMinute:false,
+      showTime:false, 
+      timeFormat:"h TT",
+      onClose: function(i,obj) {
+        $widget = obj.dpDiv;
+        $widget.data("top", $widget.position().top);
+      }
+    })
+  }
+});
+
+App.AvgReportController = Ember.Controller.extend({
+  formattedTime: function(){
+    function formatTime(h){
+      h = parseInt(h);
+      var dd = "AM";
+      
+      if (h >= 12) {
+        h = h-12;
+        dd = "PM";
+      }
+      if (h == 0) {
+          h = 12;
+      }
+      return h+" "+dd;
+    }
+    
+    var start = formatTime(this.get("model.start_hour"))
+    var end = formatTime(this.get("model.end_hour"))
+    
+    return {"start":start,"end":end}
+    
+  }.property("model.start_hour","model.end_hour"),
+  
+  drawAverages: function(){
+    $(".global-loading").hide();
+    $('#averages-chart .loading-data').show()
+    $('#averages-chart .chart').css("opacity",0.2);
+    var total_averages = this.get("model.data.average")
+    
+    var jsonUrl = this.get("model");
+
+    function draw(){
+      $("#averages-link").addClass("active");
+      var $container = $('#averages-chart .chart');
+      
+      var d=1,
+          seriesOptions =[],
+          seriesCounter=0,
+          names = ["Sunday","Monday","Tuesday","Wednesday","Thrusday","Friday","Saturday"];
+          
+      $.each(names, function(i, name) {
+        var requestURL = jsonUrl+(i+1)+"/";
+        
+        // console.log(requestURL);
+        
+        var json = $.getJSON(requestURL)
+        
+        json.done(function(data){
+          if(data.data.average.length>0){
+            jsonResponse(data)
+          }
+          else {
+            data.data.average.push(0);
+            console.log("This is empty.")
+            jsonResponse(data)
+          }
+        })
+        
+        json.fail(function(){
+          console.log('Error: JSON Ajax function failed.')
+          var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
+          $container.html($error);
+          $error.fadeOut(0).fadeIn(500);
+          dataURL.set("drawing","")
+        });
+        
+        function jsonResponse(data) {
+          d = data;
+          if(data.data !== undefined){
+            d = data.data;
+          }
+          else{
+            d = data;
+          }
+          
+          seriesOptions[i] = {
+            name: name,
+            data: [parseInt(d.average)],
+            fillColor : {
+              linearGradient : {
+                x1: 0, 
+                y1: 0, 
+                x2: 0, 
+                y2: 1
+              },
+              stops : [
+              [0, 'rgb(65, 73, 85)'], 
+              [1, 'rgb(65, 73, 85)']
+              ]
+            },
+            events: {
+              legendItemClick:function(){
+                // this.chart.redraw();
+              }
+            }
+          };
+          
+          // As we're loading the data asynchronously, we don't know what order it will arrive. So
+          // we keep a counter and create the chart when all the data is loaded.
+          seriesCounter++;
+          
+          if (seriesCounter == names.length) {
+            chart(seriesOptions);
+            dataURL.set("drawing",false)
+          }
+        }
+      })
+      
+      
+      function chart(seriesOptions){
+        $(".loading-data").hide();
+        $(".load-date").removeClass('disabled');
+
+        $('#averages-chart .counter').animateNumber({ number: total_averages });
+        var $container = $('#averages-chart .chart'),
+        enableLegend = true;
+        Highcharts.setOptions({
+          global: {
+            useUTC: false
+          }
+        });
+        $container.highcharts({
+          chart:{
+            backgroundColor:'transparent',
+            type:'column'
+          },
+          xAxis: {
+            categories: ['Average'],
+            labels: {enabled:false}
+          },
+          yAxis: {
+            title:{text:"Number of patrons"},
+            labels: {
+              formatter: function() {
+                return (this.value < 0 ? '-' : '') + Highcharts.numberFormat(this.value, 0);;
+              }
+            },
+            floor:0
+          },
+          navigator : {
+            enabled : false
+          },
+          scrollbar : {
+            enabled : false
+          },
+          legend: {
+            enabled: enableLegend,
+          },
+          tooltip: {
+            useHTML: true,
+            borderWidth: 0,
+            borderColor:null,
+            backgroundColor:'#888',
+            shadow: false,
+            style: {
+              padding: 0,
+              borderRadius:'5px'
+            },
+            pointFormat: '<span>{series.name}</span>: <b>{point.y} patrons</b><br/>',
+            changeDecimals: 2,
+            valueDecimals: 0
+          },
+          
+          title: {
+            text: '',
+            floating: true
+          },
+          
+          plotOptions: {
+            series: {
+              animation: false,
+              borderWidth: 0,
+              pointWidth: 20
+            }
+            
+          },
+          
+          series: seriesOptions
+        });//end highcharts
+        $('#averages-chart .chart').css("opacity",1)
+      }
+    }
+
+      Ember.run.next(this, function(){ 
+        window.setTimeout(draw,500)
+      });
+    
+  }.property("model.data")
+})
+
+
+
 
 //LIBRARY ROOT
 App.LibraryRoute = Ember.Route.extend({
@@ -743,6 +1187,7 @@ App.LibraryRoute = Ember.Route.extend({
     $(document).attr('title', title+'-Library');
   },
   model:function(){
+    $("#averages-link").removeClass("active");
   },
   setupController: function(controller) {
     controller.set('title', "Library");
@@ -782,8 +1227,9 @@ App.LibraryAllRoute = Ember.Route.extend({
 //LIB ROOT
 App.LibRoute = Ember.Route.extend({
   model:function(params){
-    var libs = params.libs;
-    if(libs.indexOf('woodruff')>-1){
+    var libs = params.libs || dataURL.names;
+    console.log(params.lib)
+    if(libs=="woodruff"){
       var data = {
         title: 'Woodruff',
         student_info:[1,2,3]
@@ -791,7 +1237,7 @@ App.LibRoute = Ember.Route.extend({
       dataURL.set('names', [data.title]);
       dataURL.set('paths', ["woodruff"]);
     }
-    else if(libs.indexOf('health-science')>-1){
+    else if(libs=='health-science'){
       var data = {
         title: 'Health Science',
         student_info:[1,2,3]
@@ -799,7 +1245,7 @@ App.LibRoute = Ember.Route.extend({
       dataURL.set('names', [data.title]);
       dataURL.set('paths', ["health-science"]);
     }
-    else if(libs.indexOf('law')>-1){
+    else if(libs=='law'){
       var data = {
         title: 'Law',
         student_info:[1,2,3]
@@ -1040,12 +1486,12 @@ App.OptionalCalendarDatePicker = Ember.TextField.extend({
   
   didInsertElement: function(){
     var today = new Date(),
-        yesterday = new Date(today);
-        yesterday.setDate(today.getDate() - 1);
-        
+    yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    
     var start_date = dataURL.get('start') ||yesterday,
-        end_date = dataURL.get('end') || today;
-      
+    end_date = dataURL.get('end') || today;
+    
     $(".options-date-range .form-group>input")
     .datepicker({
       beforeShow: function(i,obj) {
@@ -1067,10 +1513,10 @@ App.OptionalCalendarDatePicker = Ember.TextField.extend({
       }
     });
     $(".options-date-range .form-group>input.start")
-      .datepicker("setDate", start_date)
-      
+    .datepicker("setDate", start_date)
+    
     $(".options-date-range .form-group>input.end")
-      .datepicker("setDate", end_date)
+    .datepicker("setDate", end_date)
   }
 });
 
@@ -1080,20 +1526,20 @@ App.ClearFiltersButtonComponent = Ember.Component.extend({
       Ember.run.next(this, function(){ 
         $("#clear-filters").on("click",function(evt){
           evt.preventDefault();
-
+          
           var lib = dataURL.get('names');
           
           if(lib.length>1){
             lib = "all"
           }
           else{
-            lib = lib[0].toLowerCase()
+            lib = lib[0].toLowerCase().replace(" ","-");
           }
           
           dataURL.set('category',null),
           dataURL.set('group',null)
           
-          link = "#/library/"+lib+"/";
+          link = "#/library/"+lib;
           window.location = link;
         })
       });
@@ -1107,11 +1553,11 @@ App.ReloadChartDataButtonComponent = Ember.Component.extend({
       $(".options-date-range .reload").on("click",function(evt){
         evt.preventDefault();
         var start = $(".options-date-range .form-group>input.start").datepicker("getDate");
-            end = $(".options-date-range .form-group>input.end").datepicker("getDate");
+        end = $(".options-date-range .form-group>input.end").datepicker("getDate");
         dataURL.set("start",start)
         dataURL.set("end",end)
         
-        if($("#container-lastweek")){
+        if($("#container-lastweek").length>0 && $(".mp-pushed").length>0){
           $(".loading-data.page-level").show();
           SUPERCHART();
         }
@@ -1141,8 +1587,8 @@ App.OnOffCampusSwitchComponent = Ember.Component.extend({
       Ember.run.next(this, function(){ 
         $('.options-campus .switch input').on("click",function(evt){
           var $this = $(this),
-              val = $this.val();
-              
+          val = $this.val();
+          
           var current = dataURL.get("campus");
           if(current==val){
             $this.prop("checked", false);
@@ -1173,13 +1619,18 @@ function formatDate(date){
 
 // function that builds both the charts on the Library pages
 function SUPERCHART(){
+  if(dataURL.get("drawing")){
+    return
+  }
+  dataURL.set("drawing",true)
+  
   var path = dataURL.get('paths'),
   d = '',
   uri_category = dataURL.get('category') || 'total_usage',
   uri_users = dataURL.get('group') || '';
   
   uri_category+='/';
-
+  
   if(uri_users[0] && uri_users[0].length>0){
     uri_users=encodeURI(uri_users[0]);
     uri_users='/'+uri_users;
@@ -1203,8 +1654,8 @@ function SUPERCHART(){
   distinct_tag = "";
   
   if(campus_tag!='' && campus_tag[0].length>0 ){
-      campus_tag="/"+campus_tag[0];
-      uri_category="on_off_campus/";
+    campus_tag="/"+campus_tag[0];
+    uri_category="on_off_campus/";
   }
   
   if(distinct){
@@ -1213,8 +1664,8 @@ function SUPERCHART(){
   
   $.each(names, function(i, name) {
     var requestURL = uri_path+uri_category+path[i]+uri_users+campus_tag+date_range+distinct_tag;
-
-    console.log(requestURL);
+    
+    // console.log(requestURL);
     
     var json = $.getJSON(requestURL)
     
@@ -1232,8 +1683,9 @@ function SUPERCHART(){
     json.fail(function(){
       console.log('Error: JSON Ajax function failed.')
       var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
-          $container.html($error);
-          $error.fadeOut(0).fadeIn(500)
+      $container.html($error);
+      $error.fadeOut(0).fadeIn(500);
+      dataURL.set("drawing","")
     });
     
     function jsonResponse(data) {
@@ -1244,7 +1696,7 @@ function SUPERCHART(){
       else{
         d = data;
       }
-
+      
       var color = colors[i];
       
       if(name=='Woodruff'){
@@ -1282,6 +1734,7 @@ function SUPERCHART(){
       seriesCounter++;
       
       if (seriesCounter == names.length) {
+        // console.log(seriesCounter)
         //  Timeline Events are possible!
         // seriesOptions.push(
         // {
@@ -1307,6 +1760,7 @@ function SUPERCHART(){
         drawChart(seriesOptions);
         drawChartLastWeek(seriesOptions);
         $(".loading-data.page-level").hide();
+        dataURL.set("drawing",false)
       }
     }
     

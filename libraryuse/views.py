@@ -339,14 +339,14 @@ def total_averages(request, library, start, end, start_hour, end_hour, dow):
 
     average = totals / count
 
-    jsonp = 'jsonResponse({'
+    jsonp = '{'
     jsonp += '"start_date":"%s",' % start
     jsonp += '"end_date":"%s",' % end
     jsonp += '"start_hour":"%s",' % start_hour
     jsonp += '"end_hour":"%s",' % end_hour
     jsonp += '"dow":"%s",' % dow
-    jsonp += '"average":"%s"' % average
-    jsonp += '})'
+    jsonp += '"data":{"average":"%s"}' % average
+    jsonp += '}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 

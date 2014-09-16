@@ -471,7 +471,6 @@ a.list-group-item .list-group-item-heading {
   display: inline-block;
 }
 
-
 /******
   Test
 ******/
@@ -594,6 +593,18 @@ thead th {
   font-weight: normal;
   margin-bottom: 0;
 }
+
+
+
+#averages-chart .loading-data {
+    position: absolute;
+    top: 50%;
+    left:0;
+    width:100%;
+    text-align:center;
+    color: rgb(243, 181, 49);
+}
+
 
 p.instructions {
     padding: 30px 20px 0px;
