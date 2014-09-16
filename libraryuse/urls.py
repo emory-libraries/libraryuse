@@ -34,6 +34,7 @@ urlpatterns = patterns(
     url(r'^top_division/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_division, name='top_division'),
     url(r'^averages/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/(?P<start_hour>.+)/(?P<end_hour>.+)/(?P<dow>.+)/(?P<filter_on>.+)/$', views.averages, name='averages'),
     url(r'^total_averages/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/(?P<start_hour>.+)/(?P<end_hour>.+)/(?P<dow>.+)/$', views.total_averages, name='total_averages'),
+    url(r'^faculty_dprt_count/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_dprt_count, name='faculty_dprt_count'),
 
     url(r'^api/', include(v1_api.urls)),
 )
