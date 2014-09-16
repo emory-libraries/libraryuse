@@ -541,7 +541,7 @@ def faculty_dprt_count(request, library, start, end):
             jsonp += '}'
 
         jsonp += '}'
-        jsonp += '}'
+        jsonp += '}}}'
         
     jsonp += ',"meta":{'
     
@@ -557,7 +557,7 @@ def faculty_dprt_count(request, library, start, end):
     
     jsonp += ',"queried_at": "%s"' % datetime.now()
     
-    jsonp += '}}}'
+    jsonp += '}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 
