@@ -51,11 +51,11 @@ def chart_data(numbers, distinct, start, end, library,**keyword_parameters):
     data.append(', '.join(visits))
 
     data.append('],')
-    
+
     if('sum' in keyword_parameters):
         data.append('"total_sum":%s,' % keyword_parameters['sum'])
-    
-    
+
+
     data.append('"meta":{')
     data.append('"strt_date":["%s"],' % start)
     data.append('"end_date":["%s"],' % end)
@@ -114,6 +114,14 @@ def get_classifications(filter_by):
             .exclude(dvsn_n__isnull=True) \
             .filter(Q(prsn_c_type = 'F')) \
             .order_by('dvsn_n')
+
+    else:
+        return LibraryVisit.objects \
+            .values_list('dprt_n', flat=True) \
+            .distinct() \
+            .exclude(dprt_n__isnull=True) \
+            .order_by('dprt_n') \
+            .filter(dvsn_n = filter_by)
 
 #@login_required
 
@@ -221,9 +229,9 @@ def top_academic_plan(request, library, start, end):
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
                 .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
-    
+
     sum = numbers.values('acpl_n').count()
-    
+
     data = chart_data(numbers, distinct, start, end, library, sum=sum)
 
     return StreamingHttpResponse(data, content_type='application/json')
@@ -239,7 +247,7 @@ def top_dprtn(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
-    
+
     sum = numbers.values('dprt_n').count()
 
     data = chart_data(numbers, distinct, start, end, library, sum=sum)
@@ -257,7 +265,7 @@ def top_division(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
-                
+
     sum = numbers.values('dvsn_n').count()
 
     data = chart_data(numbers, distinct, start, end, library, sum=sum)
@@ -387,6 +395,149 @@ def averages(request, library, start, end, start_hour, end_hour, dow, filter_on)
     jsonp += '"dow":["%s"],' % alph_day(dow)
     jsonp += '"queried_at":["%s"]' % datetime.now()
     jsonp += '}}'
+
+    return StreamingHttpResponse(jsonp, content_type='application/json')
+
+def faculty_dprt_count(request, library, start, end):
+
+    '''
+    {
+        "data": {
+            "divs": {
+                "division-name-slug": {
+                    "label": "Division Name",
+                    "value": 10009,
+                    "depts": {
+                        "department-name-slug": {
+                            "label": "Department Name",
+                            "value": 9990
+                        }
+                    }
+                }
+            }
+        }
+    }
+    '''
+
+    def division_count(division, location, start, end):
+        count = LibraryVisit.objects.values('dvsn_n') \
+                .annotate(total=Count('dvsn_n')) \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(dvsn_n = division)
+
+        if count:
+            return count[0]['total']
+        else:
+            return 0
+
+    def department_count(department, location, start, end):
+        count = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(dprt_n = department)
+
+        if count:
+            return count[0]['total']
+        else:
+            return 0
+
+    location = location_name(library)
+
+    faculty_divisions = get_classifications('dvsn_n')
+
+    jsonp = '{"data":{"divs":{'
+    jsonp += '"'
+
+    faculty_divisions_list = (sorted(faculty_divisions.reverse()[1:]))
+
+
+    for faculty_division in faculty_divisions_list:
+
+        visit_count = division_count(faculty_division, location, start, end)
+        departments = get_classifications(faculty_division)
+        departments_list = (sorted(departments.reverse()[1:]))
+        last_departments = departments.reverse()[:1]
+
+        jsonp += '%s": {' % slugify(faculty_division)
+
+        jsonp += '"label": "%s",' % faculty_division
+
+        jsonp += '"value": "%s",' % visit_count
+
+        jsonp += '"depts":{'
+
+        for department in departments_list:
+
+            department_visit_count = department_count(department, location, start, end)
+
+            jsonp += '"%s":{' % slugify(department)
+
+            jsonp += '"label": "%s",' % department
+
+            jsonp += '"value": "%s"' % department_visit_count
+
+            jsonp += '},'
+
+        for last_department in last_departments:
+
+            last_department_visit_count = department_count(last_department, location, start, end)
+
+            jsonp += '"%s":{' % slugify(last_department)
+
+            jsonp += '"lable": "%s",' % last_department
+
+            jsonp += '"value": "%s"' % last_department_visit_count
+
+            jsonp += '}'
+
+        jsonp += '}'
+
+        jsonp += '},"'
+
+    last_faculty_divisions = faculty_divisions.reverse()[:1]
+
+    for last_faculty_division in last_faculty_divisions:
+
+        last_division_count = division_count(last_faculty_division, location, start, end)
+        last_departments = get_classifications(last_faculty_division)
+        last_departments_list = sorted(last_departments.reverse()[1:])
+        final_departments = last_departments.reverse()[:1]
+
+        jsonp += '%s":{' % slugify(last_faculty_division)
+        jsonp += '"label": "%s",' % last_faculty_division
+        jsonp += '"value": "%s",' % last_division_count
+        jsonp += '"depts":{'
+
+        for final_department in last_departments_list:
+
+            final_department_visit_count = department_count(final_department, location, start, end)
+
+            jsonp += '"%s": {' % slugify(final_department)
+
+            jsonp += '"label": "%s",' % final_department
+
+            jsonp += '"value": "%s"' % final_department_visit_count
+
+            jsonp += '},'
+
+        for last_final_department in final_departments:
+
+            last_final_department_visit_count = department_count(last_final_department, location, start, end)
+
+            jsonp += '"%s": {' % slugify(last_final_department)
+
+            jsonp += '"label": "%s",' % last_final_department
+
+            jsonp += '"value": "%s"' % last_final_department_visit_count
+
+            jsonp += '}'
+
+        jsonp += '}'
+        jsonp += '}'
+
+    jsonp += '}}}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 
