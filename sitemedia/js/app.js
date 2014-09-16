@@ -1012,7 +1012,8 @@ App.AvgReportController = Ember.Controller.extend({
   
   drawAverages: function(){
     $(".global-loading").hide();
-    
+    $('#averages-chart .loading-data').show()
+    $('#averages-chart .chart').css("opacity",0.2);
     var total_averages = this.get("model.data.average")
     
     var jsonUrl = this.get("model");
@@ -1165,6 +1166,7 @@ App.AvgReportController = Ember.Controller.extend({
           
           series: seriesOptions
         });//end highcharts
+        $('#averages-chart .chart').css("opacity",1)
       }
     }
 
