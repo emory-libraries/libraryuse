@@ -605,6 +605,10 @@ thead th {
     color: rgb(243, 181, 49);
 }
 
+#averages-chart .chart{
+  min-height:400px;
+}
+
 
 p.instructions {
     padding: 30px 20px 0px;

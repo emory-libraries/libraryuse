@@ -389,11 +389,13 @@
                 <a href="#" {{action "setType" "top_academic_plan"}}>Academic</a>
               </li>
               <li {{bind-attr class="isDiv:active"}}>
-                <a href="#" {{action "setType" "top_division"}}>Divisons</a>
+                <a href="#" {{action "setType" "faculty_divs_dprt"}}>Divisons</a>
               </li>
+              {{!--
               <li {{bind-attr class="isDprt:active"}}>
                 <a href="#" {{action "setType" "top_dprtn"}}>Departments</a>
               </li>
+              --}}
               <li {{bind-attr class="isCampus:active"}}>
                 <a href="#" {{action "setType" "on_off_campus"}}>Campus</a>
               </li>
@@ -556,6 +558,7 @@
   <script src="http://code.highcharts.com/stock/highstock.js"></script>
   <script src="{% static 'js/libs/highstock.theme.js' %}"></script>
   <script src="http://code.highcharts.com/modules/exporting.js"></script>
+  <script src="http://code.highcharts.com/modules/drilldown.js"></script>
 
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 

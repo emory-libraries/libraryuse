@@ -335,6 +335,7 @@ App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
       return jsonUrl
     }
     else{
+      // jsonUrl = "/static/js/data/test-divs.json";
       return Ember.$.getJSON(jsonUrl)
     }
   }
@@ -426,7 +427,7 @@ App.ReportsController = Ember.Controller.extend({
   }.property("id"),
   
   isDiv:function(){
-    if(this.get("id")=="top_division"){
+    if(this.get("id")=="faculty_divs_dprt"){
       return true
     }
   }.property("id"),
@@ -438,7 +439,7 @@ App.ReportsController = Ember.Controller.extend({
   }.property("id"),
   
   isDprt:function(){
-    if(this.get("id")=="top_dprtn"){
+    if(this.get("id")=="faculty_divs_dprt"){
       return true
     }
   }.property("id"),
@@ -525,7 +526,15 @@ App.ReportController = Ember.Controller.extend({
   }.property('model.meta.title'),
   
   firstItemInArray: function() {
-    return this.get('model.data').filter( function(item, index) {
+    var data = this.get('model.data');
+    var report_type = reportParams.get('id');
+
+    if(report_type=='faculty_divs_dprt'){
+      data = this.get('model.data.divs');
+    }
+      // console.log(data)
+    
+    return data.filter( function(item, index) {
       // return true if you want to include this item
       // for example, with the code below we include all but the first item
       if (index == 0) { 
@@ -553,9 +562,21 @@ App.ReportController = Ember.Controller.extend({
     if(this.get('model.average')){
       return this.get('model.average')
     }
-    return this.get('model.data').filter( function(_this, index) {
+    
+    var data;
+    var report_type = reportParams.get('id');
+    
+    if(report_type=='faculty_divs_dprt'){
+      data = this.get('model.data.divs')
+    }
+    else{
+      data = this.get('model.data')
+    }
+    
+    return data.filter( function(_this, index) {
       // return true if you want to include this item
       // for example, with the code below we include all but the first item
+      
       if(_this.label){
         var item = _this.label.toLowerCase();
         if(item.indexOf(searchText)>-1 && !exclude){
@@ -565,8 +586,10 @@ App.ReportController = Ember.Controller.extend({
           return item
         }
       }
-      return
     });
+    
+    return
+    
   }.property("theFilter","model.data.@each"),
   
   drawPieChart: (function(){
@@ -574,13 +597,32 @@ App.ReportController = Ember.Controller.extend({
     n = this.get('numberToShow'),
     datapoints = [],
     drilldown = [],
+    drilldownSeries = [],
     allothers = 0;
     
     this.get('filterPeople').filter( function(_this, index) {
       var label = "'"+_this.label+"'",
       percent = parseInt((_this.value/total_sum *100).toPrecision(3));
       if(index<n){
-        var point = [label,percent]
+        var point = {
+                      name: label,
+                      y: percent,
+                      drilldown: label
+                    }
+        if(_this.depts && _this.depts.length>0){
+          var data =[]
+          for (var i=0; i<_this.depts.length; i++){
+            var dept = _this.depts[i];
+            data.push([dept.label,parseInt(dept.value)])
+          }
+          drilldownSeries.push({ 
+            id: label,
+            name: label,
+            data: data
+          })
+          
+        }
+                    
         datapoints.push(point)
       }
       else{
@@ -621,6 +663,7 @@ App.ReportController = Ember.Controller.extend({
           plotBorderWidth: 1,
           plotBorderColor: 'transparent',
           plotShadow: false,
+          type: "pie"
         },
         title: {
           text: capitaliseFirstLetter(library_name) + 
@@ -646,7 +689,10 @@ App.ReportController = Ember.Controller.extend({
           type: 'pie',
           name: '% visitors',
           data: datapoints
-        }]
+        }],
+        drilldown: {
+          series: drilldownSeries,
+        }
       }).css('opacity',1);
       $(".loading-data").hide();
       $(".load-date").removeClass('disabled');
@@ -1019,6 +1065,7 @@ App.AvgReportController = Ember.Controller.extend({
 
     function draw(){
       $("#averages-link").addClass("active");
+      $('#averages-chart .loading-data').show()
       var $container = $('#averages-chart .chart');
       
       var d=1,

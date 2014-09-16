@@ -8,3 +8,5 @@ libraryuse/api/resources.pyc
 libraryuse/api/__init__.pyc
 
 localsettings.py
+
+sitemedia/js/data/test-divs.json

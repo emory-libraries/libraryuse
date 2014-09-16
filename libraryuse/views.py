@@ -492,7 +492,7 @@ def faculty_dprt_count(request, library, start, end):
 
             jsonp += '"%s":{' % slugify(last_department)
 
-            jsonp += '"lable": "%s",' % last_department
+            jsonp += '"label": "%s",' % last_department
 
             jsonp += '"value": "%s"' % last_department_visit_count
 
@@ -545,13 +545,13 @@ def faculty_dprt_count(request, library, start, end):
         
     jsonp += ',"meta":{'
     
-    jsonp += '"library":"%s",' % library
+    jsonp += '"library":["%s"],' % library
     
-    jsonp += '"start_date":"%s",' % start
+    jsonp += '"strt_date":["%s"],' % start
     
-    jsonp += '"end_date":"%s",' % end
+    jsonp += '"end_date":["%s"],' % end
     
-    jsonp += '"title":"%s"' % "Faculty Departments"
+    jsonp += '"title":["%s"]' % "Faculty Department"
 
     jsonp += '}'
     
@@ -560,6 +560,167 @@ def faculty_dprt_count(request, library, start, end):
     jsonp += '}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
+
+def faculty_divs_dprt(request, library, start, end):
+
+    '''
+    {
+        "data": {
+            "divs": [
+                {
+                  "label": "Division Name",
+                  "value": 10009,
+                  "depts": [
+                      [
+                        "label": "Department Name",
+                        "value": 9990
+                      ]
+                  ]
+                }
+            ]
+        },
+        "meta":{
+            "start_date": "YYYY-MM-DD",
+            "end_date":  "YYYY-MM-DD",
+            "library": "library name",
+            "title": "Faculty Department"
+        }
+    }
+    '''
+
+    def division_count(division, location, start, end):
+        count = LibraryVisit.objects.values('dvsn_n') \
+                .annotate(total=Count('dvsn_n')) \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(dvsn_n = division) 
+
+        if count:
+            return count[0]['total']
+        else:
+            return 0
+
+    def department_count(department, location, start, end):
+        count = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(dprt_n = department) 
+
+        if count:
+            return count[0]['total']
+        else:
+            return 0
+
+    location = location_name(library)
+
+    faculty_divisions = get_classifications('dvsn_n')
+
+    jsonp = '{"data":{"divs":['
+
+    faculty_divisions_list = (sorted(faculty_divisions.reverse()[1:]))
+
+    for faculty_division in faculty_divisions_list:
+
+        visit_count = division_count(faculty_division, location, start, end)
+        departments = get_classifications(faculty_division)
+        departments_list = (sorted(departments.reverse()[1:]))
+        last_departments = departments.reverse()[:1]
+
+        jsonp += '{'
+
+        jsonp += '"label": "%s",' % faculty_division
+
+        jsonp += '"value": "%s",' % visit_count
+
+        jsonp += '"depts":['
+
+        for department in departments_list:
+
+            department_visit_count = department_count(department, location, start, end)
+
+            jsonp += '{'
+
+            jsonp += '"label": "%s",' % department
+
+            jsonp += '"value": "%s"' % department_visit_count
+
+            jsonp += '},'
+
+        for last_department in last_departments:
+
+            last_department_visit_count = department_count(last_department, location, start, end)
+
+            jsonp += '{'
+
+            jsonp += '"label": "%s",' % last_department
+
+            jsonp += '"value": "%s"' % last_department_visit_count
+            
+            jsonp += '}'
+
+        jsonp += ']},'
+
+    last_faculty_divisions = faculty_divisions.reverse()[:1]
+
+    for last_faculty_division in last_faculty_divisions:
+
+        last_division_count = division_count(last_faculty_division, location, start, end)
+        last_departments = get_classifications(last_faculty_division)
+        last_departments_list = sorted(last_departments.reverse()[1:])
+        final_departments = last_departments.reverse()[:1]
+
+        jsonp += '{'
+        jsonp += '"label": "%s",' % last_faculty_division
+        jsonp += '"value": "%s",' % last_division_count
+        jsonp += '"depts":['
+
+        for final_department in last_departments_list:
+
+            final_department_visit_count = department_count(final_department, location, start, end)
+            
+            jsonp += '{'
+            
+            jsonp += '"label": "%s",' % final_department
+
+            jsonp += '"value": "%s"' % final_department_visit_count
+
+            jsonp += '},'
+
+        for last_final_department in final_departments:
+
+            last_final_department_visit_count = department_count(last_final_department, location, start, end)
+            
+            jsonp += '{'
+
+            jsonp += '"label": "%s",' % last_final_department
+
+            jsonp += '"value": "%s"' % last_final_department_visit_count
+
+            jsonp += '}'
+
+        jsonp += ']'
+        jsonp += '}]}'
+        
+    jsonp += ',"meta":{'
+    
+    jsonp += '"library":["%s"],' % library
+    
+    jsonp += '"strt_date":["%s"],' % start
+    
+    jsonp += '"end_date":["%s"],' % end
+    
+    jsonp += '"title":["%s"]' % "Faculty Department"
+
+    jsonp += '}'
+    
+    jsonp += ',"queried_at": "%s"' % datetime.now()
+    
+    jsonp += '}'
+
+    return StreamingHttpResponse(jsonp, content_type='application/json')
+
+
 
 def percent_date(whole, part, label):
     return '[%s: %s]' % (label, (100 * float(part)/float(whole)))
