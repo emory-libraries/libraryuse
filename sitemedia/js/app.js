@@ -141,7 +141,6 @@ function convertDate(d) {
 }
 
 function loadReport(_this, route){
-  console.log(_this);
   var id = reportParams.get("id"),
   lib = reportParams.get('lib'),
   start = convertDate(dataURL.get('start')),
