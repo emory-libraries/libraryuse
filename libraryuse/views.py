@@ -415,6 +415,12 @@ def faculty_dprt_count(request, library, start, end):
                     }
                 }
             }
+        },
+        "meta":{
+            "start_date": "YYYY-MM-DD",
+            "end_date":  "YYYY-MM-DD",
+            "library": "library name",
+            "title": "Faculty Department"
         }
     }
     '''
@@ -536,7 +542,21 @@ def faculty_dprt_count(request, library, start, end):
 
         jsonp += '}'
         jsonp += '}'
+        
+    jsonp += ',"meta":{'
+    
+    jsonp += '"library":"%s",' % library
+    
+    jsonp += '"start_date":"%s",' % start
+    
+    jsonp += '"end_date":"%s",' % end
+    
+    jsonp += '"title":"%s"' % "Faculty Departments"
 
+    jsonp += '}'
+    
+    jsonp += ',"queried_at": "%s"' % datetime.now()
+    
     jsonp += '}}}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
