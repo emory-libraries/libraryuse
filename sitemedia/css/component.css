@@ -112,6 +112,8 @@ html, body, .container, .scroller {
   -webkit-transition: opacity 0.3s;
   -moz-transition: opacity 0.3s;
   transition: opacity 0.3s;
+}
+.mp-pusher.mp-pushed::after{
   z-index: 2;
 }
 
