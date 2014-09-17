@@ -433,7 +433,7 @@
        <div class="col-xs-12 col-sm-6 col-md-8">
          <h3>Total Visitors by {{model.meta.title}}s in <span class="library-name">{{model.meta.library}}</span></h3>
          <p>Between {{formattedDate.start}} and {{formattedDate.end}}, 
-         we have had {{model.total_sum}} visitors for <span class="library-name">{{model.meta.library}}</span>; 
+         we have had {{model.total}} visitors for <span class="library-name">{{model.meta.library}}</span>; 
          the most coming from
          {{#each item in firstItemInArray}}
            the {{item.label}} {{model.meta.title}} with {{item.value}} visitors.
