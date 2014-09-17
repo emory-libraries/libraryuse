@@ -102,7 +102,7 @@ def get_classifications(filter_by):
         return LibraryVisit.objects \
             .values_list('acca_i', flat=True) \
             .distinct().exclude(acca_i__isnull=True) \
-            .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
+            .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S')) \
             .order_by('acca_i')
 
     elif filter_by == 'dvsn_n':
@@ -153,7 +153,7 @@ def on_off_campus(request, library, resident, start, end):
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
                 .filter(stdn_f_cmps_on = resident) \
-                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
 
     distinct = numbers.values("prsn_i_ecn").distinct().count()
 
@@ -175,7 +175,7 @@ def student_class(request, library, classification, start, end):
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
                 .filter(stdn_e_clas = classification) \
-                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
 
     distinct = numbers.values("prsn_i_ecn").distinct().count()
 
@@ -214,10 +214,10 @@ def top_academic_plan(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
-                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
 
     distinct = numbers.values('acpl_n').distinct().count()
-    
+
     total = numbers.values('acpl_n').count()
 
     data = chart_data(numbers, distinct, total, start, end, library)
@@ -235,7 +235,7 @@ def top_dprtn(request, library, start, end):
                 .filter(location = location)
 
     distinct = numbers.values('dprt_n').distinct().count()
-    
+
     total = numbers.values('dprt_n').count()
 
     data = chart_data(numbers, distinct, total, start, end, library)
@@ -251,7 +251,7 @@ def top_division(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
-                
+
     distinct = numbers.values('dvsn_n').distinct().count()
 
     total = numbers.values('dvsn_n').count()
