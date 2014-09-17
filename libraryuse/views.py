@@ -22,7 +22,7 @@ def reports_index(request):
     context = {}
     return redirect('/#/reports')
 
-def chart_data(numbers, distinct, start, end, library,**keyword_parameters):
+def chart_data(numbers, distinct, total, start, end, library,**keyword_parameters):
 
     data = []
     visits = []
@@ -63,7 +63,9 @@ def chart_data(numbers, distinct, start, end, library,**keyword_parameters):
     data.append('"title":["%s"]' % title)
     data.append('},')
 
-    data.append('"distinct":["%s"],"queried_at":["%s"]}' % (distinct, datetime.now()))
+    data.append('"distinct":["%s"],' % distinct)
+    data.append('"total":["%s"],' % total)
+    data.append('"queried_at":["%s"]}' % datetime.now())
 
     return(data)
 
@@ -142,7 +144,12 @@ def total_usage(request, library, start, end):
                 .filter(location = location) \
                 .values("prsn_i_ecn").distinct().count()
 
-    data = chart_data(numbers, distinct, start, end, library)
+    total = LibraryVisit.objects \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .values("prsn_i_ecn").count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
@@ -165,7 +172,14 @@ def on_off_campus(request, library, resident, start, end):
                 .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
                 .values("prsn_i_ecn").distinct().count()
 
-    data = chart_data(numbers, distinct, start, end, library)
+    total = LibraryVisit.objects \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(stdn_f_cmps_on = resident) \
+                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
+                .values("prsn_i_ecn").count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
@@ -176,21 +190,28 @@ def student_class(request, library, classification, start, end):
     location = location_name(library)
 
     numbers = LibraryVisit.objects.values('visit_time') \
-                    .annotate(total=Count('visit_time')) \
-                    .order_by('visit_time') \
-                    .filter(visit_time__range=[start, end]) \
-                    .filter(location = location) \
-                    .filter(stdn_e_clas = classification) \
-                    .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
+                .annotate(total=Count('visit_time')) \
+                .order_by('visit_time') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(stdn_e_clas = classification) \
+                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
 
     distinct = LibraryVisit.objects \
-                    .filter(visit_time__range=[start, end]) \
-                    .filter(location = location) \
-                    .filter(stdn_e_clas = classification) \
-                    .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
-                    .values("prsn_i_ecn").distinct().count()
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(stdn_e_clas = classification) \
+                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
+                .values("prsn_i_ecn").distinct().count()
 
-    data = chart_data(numbers, distinct, start, end, library)
+    total = LibraryVisit.objects \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(stdn_e_clas = classification) \
+                .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E')) \
+                .values("prsn_i_ecn").count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
@@ -213,7 +234,14 @@ def faculty_staff_class(request, library, classification, start, end):
                 .filter(dvsn_n = classification) \
                 .values("prsn_i_ecn").distinct().count()
 
-    data = chart_data(numbers, distinct, start, end, library)
+    total = LibraryVisit.objects \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'F')) \
+                .filter(dvsn_n = classification) \
+                .values("prsn_i_ecn").count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
@@ -542,21 +570,21 @@ def faculty_dprt_count(request, library, start, end):
 
         jsonp += '}'
         jsonp += '}}}'
-        
+
     jsonp += ',"meta":{'
-    
+
     jsonp += '"library":["%s"],' % library
-    
+
     jsonp += '"strt_date":["%s"],' % start
-    
+
     jsonp += '"end_date":["%s"],' % end
-    
+
     jsonp += '"title":["%s"]' % "Faculty Department"
 
     jsonp += '}'
-    
+
     jsonp += ',"queried_at": "%s"' % datetime.now()
-    
+
     jsonp += '}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
@@ -593,7 +621,7 @@ def faculty_divs_dprt(request, library, start, end):
                 .annotate(total=Count('dvsn_n')) \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
-                .filter(dvsn_n = division) 
+                .filter(dvsn_n = division)
 
         if count:
             return count[0]['total']
@@ -605,7 +633,7 @@ def faculty_divs_dprt(request, library, start, end):
                 .annotate(total=Count('dprt_n')) \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
-                .filter(dprt_n = department) 
+                .filter(dprt_n = department)
 
         if count:
             return count[0]['total']
@@ -656,7 +684,7 @@ def faculty_divs_dprt(request, library, start, end):
             jsonp += '"label": "%s",' % last_department
 
             jsonp += '"value": "%s"' % last_department_visit_count
-            
+
             jsonp += '}'
 
         jsonp += ']},'
@@ -678,9 +706,9 @@ def faculty_divs_dprt(request, library, start, end):
         for final_department in last_departments_list:
 
             final_department_visit_count = department_count(final_department, location, start, end)
-            
+
             jsonp += '{'
-            
+
             jsonp += '"label": "%s",' % final_department
 
             jsonp += '"value": "%s"' % final_department_visit_count
@@ -690,7 +718,7 @@ def faculty_divs_dprt(request, library, start, end):
         for last_final_department in final_departments:
 
             last_final_department_visit_count = department_count(last_final_department, location, start, end)
-            
+
             jsonp += '{'
 
             jsonp += '"label": "%s",' % last_final_department
@@ -701,21 +729,21 @@ def faculty_divs_dprt(request, library, start, end):
 
         jsonp += ']'
         jsonp += '}]}'
-        
+
     jsonp += ',"meta":{'
-    
+
     jsonp += '"library":["%s"],' % library
-    
+
     jsonp += '"strt_date":["%s"],' % start
-    
+
     jsonp += '"end_date":["%s"],' % end
-    
+
     jsonp += '"title":["%s"]' % "Faculty Department"
 
     jsonp += '}'
-    
+
     jsonp += ',"queried_at": "%s"' % datetime.now()
-    
+
     jsonp += '}'
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
