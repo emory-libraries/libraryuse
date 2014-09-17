@@ -532,17 +532,15 @@
               </button>
             </form>
           </div>
-              {{!-- 
-          <div class="report-dates inputs col-xs-12 col-md-5">
+          <div class="averages-dates inputs col-xs-12 col-md-5">
             <form class="form-inline" role="form">
               <label class="label" for="start"><span>From</span></label>
               <label class="label" for="end"><span>To</span></label>
               <div class="clearfix"></div>
-              {{view App.HourPicker class="start form-control" id="time1"}}
-              {{view App.HourPicker class="end form-control" id="time2"}}
+              {{view App.HourPicker valueBinding="t1" class="timepicker start form-control" id="time1"}}
+              {{view App.HourPicker valueBinding="t2" class="timepicker end form-control" id="time2"}}
             </form>
           </div>
-            --}}
         </div>
         <div class="container-reports">
           {{outlet}}

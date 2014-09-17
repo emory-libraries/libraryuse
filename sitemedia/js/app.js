@@ -100,6 +100,7 @@ var reportParams = App.reportsStore.create();
 
 App.urlStore = Ember.Object.extend({
   paths: null,
+  persons:null,
   names: null,
   category:null,
   start:null,
@@ -109,11 +110,13 @@ App.urlStore = Ember.Object.extend({
 });
 //This sets the default globals
 var today = new Date(), 
-monthsAgo = 2,
-default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
-default_end = today;
+    monthsAgo = 2,
+    default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
+    default_end = today,
+    default_persons = "all";
 
 var dataURL = App.urlStore.create({
+  persons:default_persons,
   start:default_start,
   end:default_end,
   distinct:false,
@@ -310,12 +313,12 @@ App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
     }
     
     var id = reportParams.get("id"),
-    lib = reportParams.get('lib'),
-    start = convertDate(reportParams.get('start')),
-    end = convertDate(reportParams.get('end')),
-    time1 = reportParams.get('time1'),
-    time2 = reportParams.get('time2'),
-    dow = reportParams.get('dow');
+        lib = reportParams.get('lib'),
+        start = convertDate(reportParams.get('start')),
+        end = convertDate(reportParams.get('end')),
+        time1 = reportParams.get('time1'),
+        time2 = reportParams.get('time2'),
+        dow = reportParams.get('dow');
     
     var jsonUrl = "/"+id+"/"+lib;
     
@@ -984,6 +987,9 @@ App.AveragesController = Ember.Controller.extend({
     }
   }.property("lib"),
   
+  t1: '12 AM',
+  t2: '11PM',
+  
   actions:{
     setLibrary: function(libName) {
       this.set('lib', libName)
@@ -1060,19 +1066,22 @@ App.HourPicker = Ember.TextField.extend({
         hour = 0;
       }
       
+      console.log(hour)
+      
       return hour
     }
     
     var t1 = convert12to24($(".timepicker.start").val())
     var t2 = convert12to24($(".timepicker.end").val())
+    
     reportParams.set("time1",t1)
     reportParams.set("time2",t2)
-
+    
     loadReport(this._parentView.controller, "avg-report");
   }.observes("value"),
   
   didInsertElement: function(){
-    $("#averages-chart input.timepicker").timepicker({
+    $(".averages-dates.inputs input.timepicker").timepicker({
       beforeShow: function(i,obj) {
         $widget = obj.dpDiv;
         window.$uiDatepickerDiv = $widget;
@@ -1140,11 +1149,11 @@ App.AvgReportController = Ember.Controller.extend({
           names = ["Sunday","Monday","Tuesday","Wednesday","Thrusday","Friday","Saturday"];
           
       $.each(names, function(i, name) {
-        var requestURL = jsonUrl+(i+1)+"/";
+        var jsonURL = jsonUrl+(i+1)+"/";
         
-        // console.log(requestURL);
+        // console.log(jsonURL);
         
-        var json = $.getJSON(requestURL)
+        var json = $.getJSON(jsonURL)
         
         json.done(function(data){
           if(data.data.average.length>0){
@@ -1756,10 +1765,12 @@ function SUPERCHART(){
   dataURL.set("drawing",true)
   
   var path = dataURL.get('paths'),
-  d = '',
-  uri_category = dataURL.get('category') || 'total_usage',
-  uri_users = dataURL.get('group') || '';
-  
+      d = '',
+      uri_persons = dataURL.get('persons'),
+      uri_category = dataURL.get('category') || 'total_usage',
+      uri_users = dataURL.get('group') || '';
+      
+  uri_persons='/'+uri_persons;
   uri_category+='/';
   
   if(uri_users[0] && uri_users[0].length>0){
@@ -1768,19 +1779,19 @@ function SUPERCHART(){
   }
   
   var $container = $('#container'),
-  seriesOptions = [],
-  yAxisOptions = [],
-  seriesCounter = 0,
-  enableLegend =false,
-  names = dataURL.get('names'),
-  colors= ['#FB715E','#7994FF','#5AA689','#FFD340','#796499'],
-  uri_path = '/',
-  start_date = dataURL.get('start'),
-  end_date = dataURL.get('end'),
-  date_range = '/'+formatDate(start_date)+'/'+formatDate(end_date)+'/',
-  campus_tag = dataURL.get('campus') || '',
-  distinct = dataURL.get('distinct') || false,
-  distinct_tag = "";
+      seriesOptions = [],
+      yAxisOptions = [],
+      seriesCounter = 0,
+      enableLegend =false,
+      names = dataURL.get('names'),
+      colors= ['#FB715E','#7994FF','#5AA689','#FFD340','#796499'],
+      uri_root = '/',
+      start_date = dataURL.get('start'),
+      end_date = dataURL.get('end'),
+      date_range = '/'+formatDate(start_date)+'/'+formatDate(end_date)+'/',
+      campus_tag = dataURL.get('campus') || '',
+      distinct = dataURL.get('distinct') || false,
+      distinct_tag = "";
   
   if(campus_tag!='' && campus_tag[0].length>0 ){
     campus_tag="/"+campus_tag[0];
@@ -1795,11 +1806,11 @@ function SUPERCHART(){
       distinct_sum = 0;
   
   $.each(names, function(i, name) {
-    var requestURL = uri_path+uri_category+path[i]+uri_users+campus_tag+date_range+distinct_tag;
+    var jsonURL = uri_root+uri_category+path[i]+uri_users+uri_persons+campus_tag+date_range+distinct_tag;
     
-    // console.log(requestURL);
+    console.log(jsonURL);
     
-    var json = $.getJSON(requestURL)
+    var json = $.getJSON(jsonURL)
     
     json.done(function(data){
       total_sum += parseInt(data.total);
@@ -1892,8 +1903,6 @@ function SUPERCHART(){
         //                     // the flag series will be put on the X axis
         //     shape : 'flag'  // Defines the shape of the flags.
         // });
-        
-        console.log(total_sum, ':', distinct_sum)
        
        function duration(number){
          var upper_limit = 2500;
@@ -1905,7 +1914,6 @@ function SUPERCHART(){
          else if(number < lower_limit){
            number = lower_limit;
          }
-         console.log(number)
          return number;
        }
        
