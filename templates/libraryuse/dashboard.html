@@ -267,6 +267,19 @@
 
     <section>
     <div class="card">
+      <div class="visitor-count">
+        <dl class="total">
+          <dt>Total Patrons</dt>
+          <dd class="number"><span>0</span></dd>
+        </dl>
+        <dl class="distinct">
+          <dt>Distinct Patrons</dt>
+          <dd><span class="number">0</span></dd>
+        </dl>
+        
+      </div>
+    </div>
+    <div class="card">
       {{json-chart}}
     </div>
     <div class="card">
@@ -519,7 +532,17 @@
               </button>
             </form>
           </div>
-          
+              {{!-- 
+          <div class="report-dates inputs col-xs-12 col-md-5">
+            <form class="form-inline" role="form">
+              <label class="label" for="start"><span>From</span></label>
+              <label class="label" for="end"><span>To</span></label>
+              <div class="clearfix"></div>
+              {{view App.HourPicker class="start form-control" id="time1"}}
+              {{view App.HourPicker class="end form-control" id="time2"}}
+            </form>
+          </div>
+            --}}
         </div>
         <div class="container-reports">
           {{outlet}}

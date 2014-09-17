@@ -1791,6 +1791,9 @@ function SUPERCHART(){
     distinct_tag = "?distinct=True";
   }
   
+  var total_sum = 0,
+      distinct_sum = 0;
+  
   $.each(names, function(i, name) {
     var requestURL = uri_path+uri_category+path[i]+uri_users+campus_tag+date_range+distinct_tag;
     
@@ -1799,6 +1802,9 @@ function SUPERCHART(){
     var json = $.getJSON(requestURL)
     
     json.done(function(data){
+      total_sum += parseInt(data.total);
+      distinct_sum += parseInt(data.distinct);
+      
       if(data.data.length>0){
         jsonResponse(data)
       }
@@ -1886,8 +1892,29 @@ function SUPERCHART(){
         //                     // the flag series will be put on the X axis
         //     shape : 'flag'  // Defines the shape of the flags.
         // });
+        
+        console.log(total_sum, ':', distinct_sum)
+       
+       function duration(number){
+         var upper_limit = 2500;
+         var lower_limit = 550;
+         number = (number/10);
+         if(number > upper_limit){
+           number = upper_limit
+         }
+         else if(number < lower_limit){
+           number = lower_limit;
+         }
+         console.log(number)
+         return number;
+       }
+       
+        $(".card .visitor-count .total .number").animateNumber({ number: total_sum,easing: 'easeInQuad' },duration(total_sum));
+        $(".card .visitor-count .distinct .number").animateNumber({ number: distinct_sum, easing: 'easeInQuad' },duration(distinct_sum));
+        
         drawChart(seriesOptions);
         drawChartLastWeek(seriesOptions);
+        
         $(".loading-data.page-level").hide();
         dataURL.set("drawing",false)
       }
@@ -2177,6 +2204,7 @@ function SUPERCHART(){
     
   })//end $.each
 }//end SUPERCHART
+
 
 
 App.JsonChartComponent = Ember.Component.extend({
