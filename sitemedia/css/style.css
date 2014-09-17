@@ -182,7 +182,7 @@ width: 1%;
 
 div.card {
     /*background-color: #FFF;*/
-    margin-bottom: 1em;
+    margin-bottom: 5em;
 }
 
 .card .table{
@@ -637,4 +637,37 @@ p.instructions {
 .btn.btn-clear:hover,.btn.btn-clear:focus{
     background-color: #6481DB;
     color:#FFF;
+}
+
+
+.visitor-count {
+    width: 100%;
+    margin: -1em auto;
+    position: relative;
+}
+
+.visitor-count > dl {
+    width: 50%;
+    float: left;
+    text-align: center;
+}
+
+@media(min-width:767px){
+    .visitor-count {
+        width: 60%;
+    }
+    .visitor-count > dl {
+        margin-bottom: 30px;
+    }
+}
+
+.visitor-count>dl>dt {
+    font-size: 1.5em;
+    font-weight: 300;
+    color: rgb(169, 172, 182);
+}
+
+.visitor-count .number {
+    font-size: 2em;
+    color: rgb(99, 105, 139);
 }
