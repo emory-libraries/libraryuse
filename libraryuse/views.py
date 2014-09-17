@@ -22,7 +22,7 @@ def reports_index(request):
     context = {}
     return redirect('/#/reports')
 
-def chart_data(numbers, distinct, total, start, end, library,**keyword_parameters):
+def chart_data(numbers, distinct, total, start, end, library):
 
     data = []
     visits = []
@@ -51,10 +51,6 @@ def chart_data(numbers, distinct, total, start, end, library,**keyword_parameter
     data.append(', '.join(visits))
 
     data.append('],')
-
-    if('sum' in keyword_parameters):
-        data.append('"total_sum":%s,' % keyword_parameters['sum'])
-
 
     data.append('"meta":{')
     data.append('"strt_date":["%s"],' % start)
@@ -211,9 +207,6 @@ def faculty_staff_class(request, library, classification, start, end):
 
 def top_academic_plan(request, library, start, end):
 
-    distinct = None
-    total = None
-
     location = location_name(library)
 
     numbers = LibraryVisit.objects.values('acpl_n') \
@@ -223,16 +216,15 @@ def top_academic_plan(request, library, start, end):
                 .filter(location = location) \
                 .filter(Q(prsn_c_type = 'C') | Q(prsn_c_type = 'B') | Q(prsn_c_type = 'E'))
 
-    sum = numbers.values('acpl_n').count()
+    distinct = numbers.values('acpl_n').distinct().count()
+    
+    total = numbers.values('acpl_n').count()
 
-    data = chart_data(numbers, distinct, total, start, end, library, sum=sum)
+    data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
 def top_dprtn(request, library, start, end):
-
-    distinct = None
-    total = None
 
     location = location_name(library)
 
@@ -242,16 +234,15 @@ def top_dprtn(request, library, start, end):
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
 
-    sum = numbers.values('dprt_n').count()
+    distinct = numbers.values('dprt_n').distinct().count()
+    
+    total = numbers.values('dprt_n').count()
 
-    data = chart_data(numbers, distinct, total, start, end, library, sum=sum)
+    data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
 def top_division(request, library, start, end):
-
-    distinct = None
-    total = None
 
     location = location_name(library)
 
@@ -260,10 +251,12 @@ def top_division(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
+                
+    distinct = numbers.values('dvsn_n').distinct().count()
 
-    sum = numbers.values('dvsn_n').count()
+    total = numbers.values('dvsn_n').count()
 
-    data = chart_data(numbers, distinct, total, start, end, library, sum=sum)
+    data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
 
