@@ -35,7 +35,7 @@ body >.ember-view{
 
 #report-chart .loading-data{
   color: rgb(179, 179, 179);
-  margin-top:20%;
+  margin-top: 15%;
 }
 
 section {
@@ -46,6 +46,11 @@ section {
 
 a{
   cursor: pointer;
+}
+
+.text-muted{
+    opacity: 0.8;
+    color: inherit;
 }
 
 #header {
@@ -383,6 +388,7 @@ a.list-group-item .list-group-item-heading {
 
 .loading{
     position: relative;
+    z-index: 1;
 }
 .loading span{
     left:0px;

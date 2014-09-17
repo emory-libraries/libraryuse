@@ -107,9 +107,9 @@ App.urlStore = Ember.Object.extend({
   distinct:null,
   campus:null
 });
-
+//This sets the default globals
 var today = new Date(), 
-monthsAgo = 1,
+monthsAgo = 2,
 default_start = new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
 default_end = today;
 
@@ -223,6 +223,7 @@ App.ReportsIndexRoute = Ember.Route.extend({
       start:  formatDate(dataURL.get("start")),
       end: formatDate(dataURL.get("end"))
     }
+  
     $(".global-loading").hide();
     this.transitionTo("report", defaults.id,defaults.lib,defaults.start,defaults.end);
   }
@@ -247,7 +248,6 @@ App.AveragesIndexRoute = Ember.Route.extend({
 
 App.ReportsRoute = App.AveragesRoute = Ember.Route.extend({
   model: function(params) {
-    $("#averages-link").removeClass("active");
     $(document).attr('title', "Reports");
     Ember.run.next(this, function(){ 
       $(".loading-data").hide();
@@ -259,7 +259,7 @@ App.ReportsRoute = App.AveragesRoute = Ember.Route.extend({
 App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
   model: function(params) {
     var defaults = this.get("defaults");
-    
+
     if(params.id && params.id!="undefined"){
       reportParams.set('id',params.id);
     }
@@ -323,6 +323,12 @@ App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
       jsonUrl += "/"+"Y";
     }
     
+    if(id =="faculty_divs_dprt"){
+      Ember.run.next(function(){
+        $(".extended-load").show();
+      })
+    }
+    
     jsonUrl += "/"+start+"/"+end+"/";
 
     if(this.routeName=="avg-report"){
@@ -331,8 +337,7 @@ App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
     
     $(document).attr('title', "Reports|"+" "+lib+ ": "+id );
     if(this.routeName=="avg-report"){
-      $("#averages-link").addClass("active");
-      return jsonUrl
+      return jsonUrl+"?querytime="+Math.round(new Date().getTime() / 1000)
     }
     else{
       // jsonUrl = "/static/js/data/test-divs.json";
@@ -428,6 +433,7 @@ App.ReportsController = Ember.Controller.extend({
   
   isDiv:function(){
     if(this.get("id")=="faculty_divs_dprt"){
+      $(".extended-load ").show();
       return true
     }
   }.property("id"),
@@ -609,6 +615,7 @@ App.ReportController = Ember.Controller.extend({
                       y: percent,
                       drilldown: label
                     }
+                    
         if(_this.depts && _this.depts.length>0){
           var data =[]
           for (var i=0; i<_this.depts.length; i++){
@@ -656,6 +663,11 @@ App.ReportController = Ember.Controller.extend({
     total = this.get("filteredSum");
     
     function draw(){
+      Highcharts.setOptions({
+        lang: {
+          drillUpText: '<< Back to all divisions'
+        }
+      });
       $('#report-chart .chart').highcharts({
         chart: {
           backgroundColor:'transparent',
@@ -671,6 +683,27 @@ App.ReportController = Ember.Controller.extend({
         },
         tooltip: {
           pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>',
+        },
+        navigation: {
+            buttonOptions: {
+                theme: {
+                    'stroke-width': 0,
+                    stroke: "#DCDEE5",
+                    r: 3,
+                    style:{
+                      'cursor':"pointer"
+                    },
+                    states: {
+                        hover: {
+                            fill: '#DCDEE5'
+                        },
+                        select: {
+                            stroke: '#DCDEE5',
+                            fill: '#DCDEE5'
+                        }
+                    }
+                }
+            }
         },
         plotOptions: {
           pie: {
@@ -691,10 +724,39 @@ App.ReportController = Ember.Controller.extend({
           data: datapoints
         }],
         drilldown: {
+          activeDataLabelStyle: {
+              textDecoration: 'none'
+          },
+          drillUpButton: {
+            theme: {
+              fill: 'transparent',
+              'stroke-width': 1,
+              stroke: '#6481DB',
+              style: {
+                  color:"#6481DB",
+                  cursor:"pointer"
+              },
+              r: 2,
+              states: {
+                  hover: {
+                      fill: '#6481DB',
+                      style: {
+                         color:"#FFF",
+                    }
+                  },
+                  select: {
+                      fill: '#6481DB',
+                      style: {
+                         color:"#FFF",
+                       }
+                  }
+              }
+            }
+          },
           series: drilldownSeries,
         }
       }).css('opacity',1);
-      $(".loading-data").hide();
+      $(".loading-data, .extended-load").hide();
       $(".load-date").removeClass('disabled');
     }
     Ember.run.once(this,function(){
@@ -1061,10 +1123,14 @@ App.AvgReportController = Ember.Controller.extend({
     $('#averages-chart .chart').css("opacity",0.2);
     var total_averages = this.get("model.data.average")
     
-    var jsonUrl = this.get("model");
+    var jsonUrl = this.get("model"),
+        queryStr = jsonUrl.indexOf("?");
+    
+    if(queryStr>-1){
+      jsonUrl = jsonUrl.substring(0,queryStr);
+    }
 
     function draw(){
-      $("#averages-link").addClass("active");
       $('#averages-chart .loading-data').show()
       var $container = $('#averages-chart .chart');
       
@@ -1159,6 +1225,27 @@ App.AvgReportController = Ember.Controller.extend({
             backgroundColor:'transparent',
             type:'column'
           },
+          navigation: {
+              buttonOptions: {
+                  theme: {
+                      'stroke-width': 0,
+                      stroke: "#DCDEE5",
+                      r: 3,
+                      style:{
+                        'cursor':"pointer"
+                      },
+                      states: {
+                          hover: {
+                              fill: '#DCDEE5'
+                          },
+                          select: {
+                              stroke: '#DCDEE5',
+                              fill: '#DCDEE5'
+                          }
+                      }
+                  }
+              }
+          },
           xAxis: {
             categories: ['Average'],
             labels: {enabled:false}
@@ -1215,12 +1302,11 @@ App.AvgReportController = Ember.Controller.extend({
         $('#averages-chart .chart').css("opacity",1)
       }
     }
-
       Ember.run.next(this, function(){ 
         window.setTimeout(draw,500)
       });
     
-  }.property("model.data")
+  }.property("model","params")
 })
 
 
@@ -1233,7 +1319,6 @@ App.LibraryRoute = Ember.Route.extend({
     $(document).attr('title', title+'-Library');
   },
   model:function(){
-    $("#averages-link").removeClass("active");
   },
   setupController: function(controller) {
     controller.set('title', "Library");
@@ -1690,10 +1775,8 @@ function SUPERCHART(){
   names = dataURL.get('names'),
   colors= ['#FB715E','#7994FF','#5AA689','#FFD340','#796499'],
   uri_path = '/',
-  today = new Date(), 
-  monthsAgo = 5,
-  start_date = dataURL.get('start') || new Date(today.getFullYear(), today.getMonth()-monthsAgo, today.getDate()),
-  end_date = dataURL.get('end') || today,
+  start_date = dataURL.get('start'),
+  end_date = dataURL.get('end'),
   date_range = '/'+formatDate(start_date)+'/'+formatDate(end_date)+'/',
   campus_tag = dataURL.get('campus') || '',
   distinct = dataURL.get('distinct') || false,
@@ -1865,6 +1948,27 @@ function SUPERCHART(){
             }
           }
         },
+        navigation: {
+            buttonOptions: {
+                theme: {
+                    'stroke-width': 0,
+                    stroke: "#DCDEE5",
+                    r: 3,
+                    style:{
+                      'cursor':"pointer"
+                    },
+                    states: {
+                        hover: {
+                            fill: '#DCDEE5'
+                        },
+                        select: {
+                            stroke: '#DCDEE5',
+                            fill: '#DCDEE5'
+                        }
+                    }
+                }
+            }
+        },
         legend: {
           enabled: enableLegend,
         },
@@ -1999,7 +2103,27 @@ function SUPERCHART(){
             
           }
         },
-        
+        navigation: {
+            buttonOptions: {
+                theme: {
+                    'stroke-width': 0,
+                    stroke: "#DCDEE5",
+                    r: 3,
+                    style:{
+                      'cursor':"pointer"
+                    },
+                    states: {
+                        hover: {
+                            fill: '#DCDEE5'
+                        },
+                        select: {
+                            stroke: '#DCDEE5',
+                            fill: '#DCDEE5'
+                        }
+                    }
+                }
+            }
+        },
         tooltip: {
           pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} patrons</b><br/>',
           changeDecimals: 2,

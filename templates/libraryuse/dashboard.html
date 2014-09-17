@@ -39,6 +39,7 @@
                 <div class="mp-level filter-settings">
                   <h2><span class="glyphicon glyphicon-cog"></span> Options</h2>
                   <ul>
+                  {{!-- 
                     <li class="icon icon-arrow-left">
                       <a href="#"><span class="glyphicon glyphicon-adjust"></span> Unique Users</a>
                       <div class="mp-level options-unique-users">
@@ -46,11 +47,14 @@
                         {{distinct-users-switch}}
                       </div>
                     </li>
+                    --}}
                     <li class="icon icon-arrow-left">
                       <a href="#"><span class="glyphicon glyphicon-time"></span> Date Range</a>
                       <div class="mp-level options-date-range">
                         <h2><span class="glyphicon glyphicon-time"></span> Date Range</h2>
-                        <p class="instructions"><i class="fa fa-info-circle"></i> Load data from select date ranges.</p>
+                        <p class="instructions"><i class="fa fa-info-circle"></i> Load data from select date ranges.<br/>
+                          <span class="text-muted">Note: Wider time ranges will take longer to load.</span>
+                        </p>
                         <form class="col-xs-12" role="form">
                           <div class="form-group">
                             <label class="label" for="date1">From</label>
@@ -149,9 +153,9 @@
                   {{#link-to "reports" tagName="li"}}
                       <a {{bind-attr href="view.href"}}>Reports</a>
                   {{/link-to}}
-                  <li id="averages-link">
-                      <a href="#/total_averages">Averages</a>
-                  </li>
+                  {{#link-to "averages" tagName="li"}}
+                      <a {{bind-attr href="view.href"}}>Averages</a>
+                  {{/link-to}}
                 </ul>
               </nav>
             </header>
@@ -438,6 +442,7 @@
          <div id="report-chart">
             <div class="loading-data" style="display:none;">
               <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
+              <p class="extended-load text-center text-muted" style="display:none;">This might take a minute to load.</p>
             </div>
            <div class="chart"></div>
            {{drawPieChart}}
@@ -557,8 +562,7 @@
 
   <script src="http://code.highcharts.com/stock/highstock.js"></script>
   <script src="{% static 'js/libs/highstock.theme.js' %}"></script>
-  <script src="http://code.highcharts.com/modules/exporting.js"></script>
-  <script src="http://code.highcharts.com/modules/drilldown.js"></script>
+  <script src="{% static 'js/libs/highcharts.modules.js' %}"></script>
 
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
