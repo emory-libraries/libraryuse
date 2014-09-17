@@ -25,7 +25,7 @@ urlpatterns = patterns(
     url(r'^student_classifications', views.student_classifications, name='student_classifications'),
     url(r'^classifications', views.classifications, name='classifications'),
 
-    url(r'^total_usage/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.total_usage, name='total_usage'),
+    url(r'^total_usage/(?P<library>.+)/(?P<person_type>.+)/(?P<start>.+)/(?P<end>.+)/$', views.total_usage, name='total_usage'),
     url(r'^on_off_campus/(?P<library>.+)/(?P<resident>.+)/(?P<start>.+)/(?P<end>.+)/$', views.on_off_campus, name='on_off_campus'),
     url(r'^student_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.student_class, name='student_class'),
     url(r'^faculty_staff_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_staff_class, name='faculty_staff_class'),
