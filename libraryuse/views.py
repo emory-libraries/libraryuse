@@ -123,17 +123,29 @@ def get_classifications(filter_by):
 
 #@login_required
 
-def total_usage(request, library, start, end):
+def total_usage(request, library, person_type, start, end):
 
     #distinct_flag = request.GET.get('distinct', False)
 
     location = location_name(library)
 
-    numbers = LibraryVisit.objects.values('visit_time') \
+    total_count = LibraryVisit.objects.values('visit_time') \
                 .annotate(total=Count('visit_time')) \
                 .order_by('visit_time') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
+
+    if person_type == 'all':
+        numbers = total_count
+
+    elif person_type == 'student':
+        numbers = total_count.filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
+
+    elif person_type == 'faculty':
+        numbers = total_count.filter(prsn_c_type = 'F')
+
+    elif person_type == 'staff':
+        numbers = total_count.filter(prsn_c_type = 'E')
 
     distinct = numbers.values("prsn_i_ecn").distinct().count()
 
