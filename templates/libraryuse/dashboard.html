@@ -534,8 +534,8 @@
           </div>
           <div class="averages-dates inputs col-xs-12 col-md-5">
             <form class="form-inline" role="form">
-              <label class="label" for="start"><span>From</span></label>
-              <label class="label" for="end"><span>To</span></label>
+              <label class="label" for="time1"><span>Between</span></label>
+              <label class="label" for="time2"><span>and</span></label>
               <div class="clearfix"></div>
               {{view App.HourPicker valueBinding="t1" class="timepicker start form-control" id="time1"}}
               {{view App.HourPicker valueBinding="t2" class="timepicker end form-control" id="time2"}}
@@ -551,7 +551,7 @@
   <script type="text/x-handlebars" id="avg-report">
     <div id="averages-chart" class="text-center">
       <h2>Weekly Averages</h2>
-      <p>This chart shows the average number of patrons to the library for the time period listed above.</p>
+      <p>This chart shows the average number of patrons to the library for the selected times.</p>
       <div class="chart"></div>
       {{drawAverages}}
       <div class="loading-data" style="display:none;">

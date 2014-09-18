@@ -960,6 +960,20 @@ App.ReportController = Ember.Controller.extend({
   
 });
 
+function convert24to12(str){
+  var hours = parseInt(str);
+   if (hours >= 12) {
+        hours = hours - 12 + " PM";
+    } 
+    else if(hours == 0){
+      hours = "12 AM";
+    }
+    else {
+        hours=hours + " AM";
+      }
+    return hours;
+}
+
 App.AveragesController = Ember.Controller.extend({
   default_lib: function(){
     return reportParams.get('lib')
@@ -987,8 +1001,12 @@ App.AveragesController = Ember.Controller.extend({
     }
   }.property("lib"),
   
-  t1: '12 AM',
-  t2: '11PM',
+  t1: function(){
+    return convert24to12(reportParams.get("time1"))
+  }.property(),
+  t2: function(){
+    return convert24to12(reportParams.get("time2"))
+  }.property(),
   
   actions:{
     setLibrary: function(libName) {
@@ -1066,18 +1084,25 @@ App.HourPicker = Ember.TextField.extend({
         hour = 0;
       }
       
-      console.log(hour)
-      
       return hour
     }
     
     var t1 = convert12to24($(".timepicker.start").val())
     var t2 = convert12to24($(".timepicker.end").val())
     
-    reportParams.set("time1",t1)
-    reportParams.set("time2",t2)
+    if(t1<t2){
+      reportParams.set("time1",t1)
+      reportParams.set("time2",t2)
+      
+      $(".timepicker.start").timepicker({"hourMin":t2})
+      $(".timepicker.end").timepicker({"hourMin":t1})
+      
+      $(".timepicker.start, .timepicker.end").timepicker("hide")
+      
+      loadReport(this._parentView.controller, "avg-report");
+      
+    }
     
-    loadReport(this._parentView.controller, "avg-report");
   }.observes("value"),
   
   didInsertElement: function(){
@@ -1092,6 +1117,7 @@ App.HourPicker = Ember.TextField.extend({
           },50);
         }
       },
+      showButtonPanel:false,
       showMinute:false,
       showTime:false, 
       timeFormat:"h TT",

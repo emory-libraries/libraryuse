@@ -558,7 +558,8 @@ thead th {
     color: rgb(27, 178, 118);
 }
 
-.report-dates>form>input{
+.report-dates>form>input,
+.averages-dates>form>input{
     text-align:center;
     background: rgba(0, 0, 0, 0.05);
     transition:background-color 0.5s ease;
@@ -566,24 +567,59 @@ thead th {
     display: inline-block;
 }
 
-.report-dates>form>input:focus{
+.report-dates>form>input:focus,
+.averages-dates>form>input:focus{
   background-color: white;
 }
 
-.report-dates>form>input.form-control.start {
+.report-dates>form>input.form-control.start,
+.averages-dates>form>input.form-control.start{
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.report-dates>form>input.form-control.end{
+.report-dates>form>input.form-control.end,
+.averages-dates>form>input.form-control.end{
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     margin-left: -5px;
 }
 
 .report-dates {
-    margin: 5px 0 15px; padding-left: 30px;
+    margin: 5px 0 15px; 
+    padding-left: 16%;
 }
+
+.averages-dates form{
+  width:100%;
+  float:left;
+  margin: 5px 15% 15px;
+}
+
+.averages-dates label.label {
+    width: 33%;
+    display: inline-block;
+    color: rgb(148, 148, 148);
+    font-weight: normal;
+    margin-bottom: 0;
+}
+
+.averages-dates .form-inline .form-control{
+    width:33%;
+}
+
+@media (min-width:993px){
+  .report-dates {
+      margin: 5px 0; 
+      padding-left: 45px;
+  }
+  .averages-dates form{
+    float:right;
+    margin: 5px;
+  }
+}
+
+
 .row.report-nav {
     border-bottom: 1px solid rgb(209, 209, 209);
     margin-bottom: 25px;
