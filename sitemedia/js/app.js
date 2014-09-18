@@ -1832,7 +1832,7 @@ function SUPERCHART(){
       distinct_sum = 0;
   
   $.each(names, function(i, name) {
-    var jsonURL = uri_root+uri_category+path[i]+uri_users+uri_persons+campus_tag+date_range+distinct_tag;
+    var jsonURL = uri_root+uri_category+path[i]+uri_persons+uri_users+campus_tag+date_range+distinct_tag;
     
     console.log(jsonURL);
     
