@@ -29,7 +29,6 @@ def chart_data(numbers, distinct, total, start, end, library):
     title = ""
     data.append('{"data":[')
 
-
     for number in numbers:
         if number.has_key('visit_time'):
             dt = datetime.strptime(str(number['visit_time']), '%Y-%m-%d %H:%M:%S')
@@ -40,6 +39,10 @@ def chart_data(numbers, distinct, total, start, end, library):
             title = "Academic Plan"
             acpl_n = number['acpl_n']
             visits.append('{"label":"%s","value":%s}' % (acpl_n, number['total']))
+        elif number.has_key('acca_i'):
+            title = "Academic Career"
+            acca_i = number['acca_i']
+            visits.append('{"label":"%s","value":%s}' % (acca_i, number['total']))
         elif number.has_key('dprt_n'):
             title = "Department"
             dprt_n = number['dprt_n']
@@ -103,7 +106,7 @@ def get_classifications(filter_by):
             .values_list('acca_i', flat=True) \
             .distinct().exclude(acca_i__isnull=True) \
             .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S')) \
-            .order_by('acca_i')
+            .order_by('acca_i') 
 
     elif filter_by == 'dvsn_n':
         return LibraryVisit.objects \
@@ -235,6 +238,26 @@ def top_academic_plan(request, library, start, end):
     data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
+
+# def top_academic_career(request, library, start, end):
+# 
+#     location = location_name(library)
+# 
+#     numbers = LibraryVisit.objects.values('acca_i') \
+#                 .annotate(total=Count('acca_i')) \
+#                 .order_by('-total') \
+#                 .filter(visit_time__range=[start, end]) \
+#                 .filter(location = location) \
+#                 .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
+# 
+#     distinct = numbers.values('acca_i').distinct().count()
+# 
+#     total = numbers.values('acca_i').count()
+# 
+#     data = chart_data(numbers, distinct, total, start, end, library)
+# 
+#     return StreamingHttpResponse(data, content_type='application/json')
+
 
 def top_dprtn(request, library, start, end):
 
@@ -587,7 +610,18 @@ def faculty_divs_dprt(request, library, start, end):
         }
     }
     '''
+    def division_totals(location, start, end):
+        count = LibraryVisit.objects.values('dvsn_n') \
+                .annotate(total=Count('dvsn_n')) \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .order_by('-total')
 
+        if count:
+            return count
+        else:
+            return 0
+            
     def division_count(division, location, start, end):
         count = LibraryVisit.objects.values('dvsn_n') \
                 .annotate(total=Count('dvsn_n')) \
@@ -600,6 +634,19 @@ def faculty_divs_dprt(request, library, start, end):
         else:
             return 0
 
+
+    def department_totals(location, start, end):
+        count = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .order_by('-total')
+
+        if count:
+            return count
+        else:
+            return 0
+            
     def department_count(department, location, start, end):
         count = LibraryVisit.objects.values('dprt_n') \
                 .annotate(total=Count('dprt_n')) \
@@ -617,90 +664,57 @@ def faculty_divs_dprt(request, library, start, end):
     faculty_divisions = get_classifications('dvsn_n')
 
     jsonp = '{"data":{"divs":['
-
-    faculty_divisions_list = (sorted(faculty_divisions.reverse()[1:]))
+    
+    faculty_divisions_list = division_totals(location, start, end)
 
     for faculty_division in faculty_divisions_list:
+        
+        faculty_division_name = faculty_division["dvsn_n"]
 
-        visit_count = division_count(faculty_division, location, start, end)
-        departments = get_classifications(faculty_division)
-        departments_list = (sorted(departments.reverse()[1:]))
+        visit_count = faculty_division["total"]
+
+        departments = get_classifications(faculty_division_name)
+        departments_list = department_totals(location, start, end)
         last_departments = departments.reverse()[:1]
 
         jsonp += '{'
 
-        jsonp += '"label": "%s",' % faculty_division
+        jsonp += '"label": "%s",' % faculty_division_name
 
         jsonp += '"value": "%s",' % visit_count
 
         jsonp += '"depts":['
 
         for department in departments_list:
+            
+            department_name = department["dprt_n"]
 
-            department_visit_count = department_count(department, location, start, end)
-
+            department_visit_count = department["total"]
+            
             jsonp += '{'
 
-            jsonp += '"label": "%s",' % department
+            jsonp += '"label": "%s",' % department_name
 
             jsonp += '"value": "%s"' % department_visit_count
 
             jsonp += '},'
 
         for last_department in last_departments:
-
-            last_department_visit_count = department_count(last_department, location, start, end)
-
-            jsonp += '{'
-
-            jsonp += '"label": "%s",' % last_department
-
-            jsonp += '"value": "%s"' % last_department_visit_count
-
-            jsonp += '}'
+            #remove last comma
+            if(jsonp[-1:] != '['):
+              jsonp = jsonp[:-1]
 
         jsonp += ']},'
 
     last_faculty_divisions = faculty_divisions.reverse()[:1]
 
     for last_faculty_division in last_faculty_divisions:
-
-        last_division_count = division_count(last_faculty_division, location, start, end)
-        last_departments = get_classifications(last_faculty_division)
-        last_departments_list = sorted(last_departments.reverse()[1:])
-        final_departments = last_departments.reverse()[:1]
-
-        jsonp += '{'
-        jsonp += '"label": "%s",' % last_faculty_division
-        jsonp += '"value": "%s",' % last_division_count
-        jsonp += '"depts":['
-
-        for final_department in last_departments_list:
-
-            final_department_visit_count = department_count(final_department, location, start, end)
-
-            jsonp += '{'
-
-            jsonp += '"label": "%s",' % final_department
-
-            jsonp += '"value": "%s"' % final_department_visit_count
-
-            jsonp += '},'
-
-        for last_final_department in final_departments:
-
-            last_final_department_visit_count = department_count(last_final_department, location, start, end)
-
-            jsonp += '{'
-
-            jsonp += '"label": "%s",' % last_final_department
-
-            jsonp += '"value": "%s"' % last_final_department_visit_count
-
-            jsonp += '}'
+        #remove last comma
+        if(jsonp[-1:] != '['):
+          jsonp = jsonp[:-1]
 
         jsonp += ']'
-        jsonp += '}]}'
+        jsonp += '}'
 
     jsonp += ',"meta":{'
 
@@ -711,6 +725,109 @@ def faculty_divs_dprt(request, library, start, end):
     jsonp += '"end_date":["%s"],' % end
 
     jsonp += '"title":["%s"]' % "Faculty Department"
+
+    jsonp += '}'
+
+    jsonp += ',"queried_at": "%s"' % datetime.now()
+
+    jsonp += '}'
+
+    return StreamingHttpResponse(jsonp, content_type='application/json')
+
+
+def top_academic_career(request, library, start, end):
+
+    '''
+    {
+      "data": [
+                {
+                  "label": "School Name",
+                  "value": 10009,
+                  "data": [
+                      [
+                        epoch_timestamp,
+                        value
+                      ]
+                  ]
+                }
+        ],
+        "meta":{
+            "start_date": "YYYY-MM-DD",
+            "end_date":  "YYYY-MM-DD",
+            "library": "library name",
+            "title": "Academic Career"
+        }
+    }
+    '''
+    
+    
+    def career_list(location, start, end):
+        record = LibraryVisit.objects \
+            .values('acca_i') \
+            .filter(visit_time__range=[start, end]) \
+            .filter(location = location) \
+            .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S')) \
+            .annotate(total=Count('acca_i')) \
+            .order_by('-total')
+
+        return record
+
+    location = location_name(library)
+
+    academic_careers = career_list(location, start, end)
+
+    jsonp = '{"data":['
+
+    academic_careers_list = academic_careers
+
+    for academic_career in academic_careers_list:
+      
+      academic_career_name = academic_career["acca_i"]
+      
+      visits =[]
+      
+      visit_count = academic_career["total"]
+    
+      numbers = LibraryVisit.objects.values('visit_time') \
+                  .annotate(total=Count('visit_time')) \
+                  .order_by('visit_time') \
+                  .filter(visit_time__range=[start, end]) \
+                  .filter(location = location) \
+                  .filter(acca_i = academic_career_name)
+                  
+      for number in numbers:
+          if number.has_key('visit_time'):
+              dt = datetime.strptime(str(number['visit_time']), '%Y-%m-%d %H:%M:%S')
+              epoch = int(time.mktime(dt.timetuple()))
+              # We have to add the three zeros to work with HighCharts
+              visits.append('[%s000,%s]' % (epoch, number['total']))
+    
+      visits = ', '.join(visits)
+    
+      jsonp += '{'
+    
+      jsonp += '"label": "%s",' % academic_career_name
+    
+      jsonp += '"value": "%s",' % visit_count
+      
+      jsonp += '"data": [%s]' % visits
+      
+      jsonp += '},'
+    
+    if(jsonp[-1:] != '['):
+      jsonp = jsonp[:-1]
+    
+    jsonp += ']'
+        
+    jsonp += ',"meta":{'
+
+    jsonp += '"library":["%s"],' % library
+
+    jsonp += '"strt_date":["%s"],' % start
+
+    jsonp += '"end_date":["%s"],' % end
+
+    jsonp += '"title":["%s"]' % "Academic Career"
 
     jsonp += '}'
 

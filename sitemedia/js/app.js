@@ -156,6 +156,8 @@ function loadReport(_this, route){
   var link = '/'+id+'/'+lib+'/'+start+'/'+end,
   name = "Report: "+id+"|"+lib+"|"+start+"|"+end;
   $("#report-chart .loading-data").show();
+  $(".load-date, #table-report").addClass('disabled');
+  $(".visitor-count").css({"opacity":0})
 
 
   if(route=="averages"){
@@ -164,6 +166,11 @@ function loadReport(_this, route){
   else{  
     _this.transitionToRoute(route,id,lib,start,end)
   }
+}
+
+function capitaliseFirstLetter(string)
+{
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 App.CalendarDatePicker = Ember.TextField.extend({
@@ -179,7 +186,7 @@ App.CalendarDatePicker = Ember.TextField.extend({
     
     
     var defaults = {
-      id: "top_academic_plan",
+      id: "totals",
       lib: "woodruff",
     }
     
@@ -191,12 +198,15 @@ App.CalendarDatePicker = Ember.TextField.extend({
     $(".report-dates.inputs>form>input")
     .datepicker({
       beforeShow: function(i,obj) {
+        var offset = $(this).offset(),
+            h = $(this).height();
         $widget = obj.dpDiv;
         window.$uiDatepickerDiv = $widget;
         $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates");
-        if ($widget.data("top")) {
+        if (offset!==undefined) {
           setTimeout(function() {
-            $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+            var top = offset.top +h;
+            $uiDatepickerDiv.css( "top", top);
           },50);
         }
       },
@@ -221,7 +231,7 @@ App.CalendarDatePicker = Ember.TextField.extend({
 App.ReportsIndexRoute = Ember.Route.extend({
   redirect : function(){
     var defaults = {
-      id: "top_academic_plan",
+      id: "totals",
       lib: "woodruff",
       start:  formatDate(dataURL.get("start")),
       end: formatDate(dataURL.get("end"))
@@ -253,8 +263,8 @@ App.ReportsRoute = App.AveragesRoute = Ember.Route.extend({
   model: function(params) {
     $(document).attr('title', "Reports");
     Ember.run.next(this, function(){ 
-      $(".loading-data").hide();
-      $(".load-date").removeClass('disabled');
+      $(".visitor-count").css({"opacity":0})
+      $(".load-date, #table-report").removeClass('disabled');
     });
   }
 });
@@ -320,7 +330,12 @@ App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
         time2 = reportParams.get('time2'),
         dow = reportParams.get('dow');
     
+    
     var jsonUrl = "/"+id+"/"+lib;
+    
+    if(id == "totals"){
+      jsonUrl = "/total_usage/"+lib+"/all";
+    }
     
     if(id == "on_off_campus" ){
       jsonUrl += "/"+"Y";
@@ -343,7 +358,6 @@ App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
       return jsonUrl+"?querytime="+Math.round(new Date().getTime() / 1000)
     }
     else{
-      // jsonUrl = "/static/js/data/test-divs.json";
       return Ember.$.getJSON(jsonUrl)
     }
   }
@@ -351,7 +365,7 @@ App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
 
 App.ReportRoute = App.ReportRoute.extend({
   defaults:{
-    id: "top_academic_plan",
+    id: "totals",
     lib: "woodruff",
     start:  dataURL.get("start"),
     end: dataURL.get("end"),
@@ -362,6 +376,9 @@ App.ReportRoute = App.ReportRoute.extend({
   renderTemplate:function(){
     if(reportParams.get("id")=="on_off_campus"){
       this.render('report-campus')
+    }
+    else if(reportParams.get("id")=="totals"){
+      this.render('report-totals')
     }
     else{
       this.render('report');
@@ -447,8 +464,14 @@ App.ReportsController = Ember.Controller.extend({
     }
   }.property("id"),
   
-  isDprt:function(){
-    if(this.get("id")=="faculty_divs_dprt"){
+  isCareer:function(){
+    if(this.get("id")=="top_academic_career"){
+      return true
+    }
+  }.property("id"),
+  
+  isTotals:function(){
+    if(this.get("id")=="totals"){
       return true
     }
   }.property("id"),
@@ -500,7 +523,7 @@ App.ReportsController = Ember.Controller.extend({
         
         //Hide and Show the loading indicators
         $(".loading-data").not('.page-level').show();
-        $(".load-date").addClass('disabled');
+        $(".load-date, #table-report").addClass('disabled');
         $('#report-chart .chart').css('opacity',0)
         
         loadReport(this);
@@ -604,19 +627,21 @@ App.ReportController = Ember.Controller.extend({
   drawPieChart: (function(){
     var total_sum = this.get('filteredSum'),
     n = this.get('numberToShow'),
+    model = this.get("model")
     datapoints = [],
-    drilldown = [],
+    consolidatedPoints = [],
+    consolidatedSeries = [],
     drilldownSeries = [],
     allothers = 0;
     
     this.get('filterPeople').filter( function(_this, index) {
-      var label = "'"+_this.label+"'",
-      percent = parseInt((_this.value/total_sum *100).toPrecision(3));
+      var label = "'"+_this.label+"'";
+      
       if(index<n){
         var point = {
                       name: label,
-                      y: percent,
-                      drilldown: label
+                      y: parseInt(_this.value),
+                      drilldown: (_this.depts && _this.depts.length>0) ? label : null 
                     }
                     
         if(_this.depts && _this.depts.length>0){
@@ -636,19 +661,26 @@ App.ReportController = Ember.Controller.extend({
         datapoints.push(point)
       }
       else{
-        drilldown.push(label);
-        allothers+=percent
+        consolidatedPoints.push(label);
+        allothers+=parseInt(_this.value);
+        consolidatedSeries.push([label,parseInt(_this.value)])
       }
     });
     
-    if( drilldown.length>1){
-      drilldown=['All Others',allothers];
-      datapoints.push(drilldown);
-    }
-    
-    function capitaliseFirstLetter(string)
-    {
-      return string.charAt(0).toUpperCase() + string.slice(1);
+    if( consolidatedSeries.length>1){
+      consolidatedPoints = {
+            name:'All Others', 
+            y:allothers, 
+            color: '#434D5C',
+            drilldown:'All Others'
+        };
+        
+      drilldownSeries.push({ 
+        id: 'All Others',
+        name: 'visitors',
+        data: consolidatedSeries
+      })
+      datapoints.push(consolidatedPoints);
     }
     
     var byFilter =this.get("theFilter");
@@ -668,10 +700,10 @@ App.ReportController = Ember.Controller.extend({
     function draw(){
       Highcharts.setOptions({
         lang: {
-          drillUpText: '<< Back to all divisions'
+          drillUpText: '< Back to all'
         }
       });
-      $('#report-chart .chart').highcharts({
+      $('#report-chart .chart.pie').highcharts({
         chart: {
           backgroundColor:'transparent',
           plotBackgroundColor: null,
@@ -682,10 +714,19 @@ App.ReportController = Ember.Controller.extend({
         },
         title: {
           text: capitaliseFirstLetter(library_name) + 
-          ' Vistors per '+report_title+" (Total: "+total+") "+byFilter
+          ' Visitors per '+report_title+" (Total: "+total+") "+byFilter
         },
         tooltip: {
-          pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>',
+          useHTML: true,
+          borderWidth: 0,
+          borderColor:null,
+          backgroundColor:'#888',
+          shadow: false,
+          style: {
+            padding: 0,
+            borderRadius:'5px'
+          },
+          pointFormat: '{series.name}: <b>{point.y}</b> <br/> ({point.percentage:.2f}%)',
         },
         navigation: {
             buttonOptions: {
@@ -723,7 +764,7 @@ App.ReportController = Ember.Controller.extend({
         },
         series: [{
           type: 'pie',
-          name: '% visitors',
+          name: 'visitors',
           data: datapoints
         }],
         drilldown: {
@@ -759,20 +800,171 @@ App.ReportController = Ember.Controller.extend({
           series: drilldownSeries,
         }
       }).css('opacity',1);
+
+      if($('#report-chart .chart.line').length>0 && model.meta.title=="Academic Career"){
+        var seriesOptions = []
+        
+        $.each(datapoints,function(i){
+          
+          var d = model.data[i];
+          if(d){
+            seriesOptions[i] = {
+              name: d.label,
+              data: d.data,
+              fillColor : {
+                linearGradient : {
+                  x1: 0, 
+                  y1: 0, 
+                  x2: 0, 
+                  y2: 1
+                },
+                stops : [
+                [0, 'rgb(65, 73, 85)'], 
+                [1, 'rgb(65, 73, 85)']
+                ]
+              },
+              pointInterval: 36 * 1000
+            };
+          }
+          if(seriesOptions.length>0 && i==datapoints.length-1){
+            drawLineChart(seriesOptions)
+          }
+        });
+        
+        function drawLineChart(data){
+          var $container= $('#report-chart .chart.line'),
+          enableLegend = (data.length > 1 ? true : false);
+          Highcharts.setOptions({
+            global: {
+              useUTC: false
+            }
+          });
+          
+          $container.highcharts('StockChart', {
+            chart:{
+              backgroundColor:'transparent'
+            },
+            rangeSelector: {
+              buttons: [{
+                type: 'week',
+                count: 1,
+                text: '1w'
+              }, {
+                type: 'month',
+                count: 1,
+                text: '1m'
+              }, {
+                type: 'month',
+                count: 3,
+                text: '3m'
+              }, {
+                type: 'month',
+                count: 6,
+                text: '6m'
+              }, {
+                type: 'ytd',
+                text: 'YTD'
+              }, {
+                type: 'year',
+                count: 1,
+                text: '1y'
+              }, {
+                type: 'all',
+                text: 'All'
+              }],
+              selected: 6,
+              inputDateFormat: '%b %e %Y',
+              inputEditDateFormat: '%Y-%m-%d' 
+            },
+            
+            yAxis: {
+              labels: {
+                formatter: function() {
+                  return (this.value < 0 ? '-' : '') + Highcharts.numberFormat(this.value, 0);;
+                }
+              },
+              floor:0
+            },
+            legend: {
+              enabled: enableLegend,
+            },
+            plotOptions: {
+              series: {
+                compare: undefined, //value, percent
+                dataGrouping:{
+                  approximation:'sum',
+                  smoothed:false,
+                  forced:false,
+                  groupPixelWidth:300,
+                  units: [ ['minute',[15]],['hour', [1]],['day',[1]] ]
+                },
+                
+              }
+            },
+            navigation: {
+                buttonOptions: {
+                    theme: {
+                        'stroke-width': 0,
+                        stroke: "#DCDEE5",
+                        r: 3,
+                        style:{
+                          'cursor':"pointer"
+                        },
+                        states: {
+                            hover: {
+                                fill: '#DCDEE5'
+                            },
+                            select: {
+                                stroke: '#DCDEE5',
+                                fill: '#DCDEE5'
+                            }
+                        }
+                    }
+                }
+            },
+            tooltip: {
+              pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} visitors</b><br/>',
+              changeDecimals: 2,
+              valueDecimals: 0
+            },
+            
+            title: {
+              text: '',
+              floating: true
+            },
+            
+            xAxis: {
+              tickPixelInterval: 120,
+              type: 'datetime',
+              dateTimeLabelFormats : {
+                hour: '%I %p',
+                minute: '%I:%M %p'
+              },
+            },
+            series: data
+          }, function(chart) {
+            // apply the date pickers
+            setTimeout(function(){
+              setDatepickerPosition(chart)
+            },0)
+          }).css('opacity',1);//end highcharts
+        }
+      }
+      
       $(".loading-data, .extended-load").hide();
-      $(".load-date").removeClass('disabled');
+      $(".load-date, #table-report").removeClass('disabled');
+      $('#report-chart').affix({
+        offset: {
+          top: $('#report-chart').offset().top
+          , bottom: function () {
+            return (this.bottom = $('.footer').outerHeight(true))
+          }
+        }
+      });
     }
     Ember.run.once(this,function(){
       Ember.run.next(this, function(){ 
         window.setTimeout(draw,500)
-        $('#report-chart').affix({
-          offset: {
-            top: $('#report-chart').offset().top
-            , bottom: function () {
-              return (this.bottom = $('.footer').outerHeight(true))
-            }
-          }
-        });
       })
     })
   }).property("filterPeople"),
@@ -790,15 +982,171 @@ App.ReportController = Ember.Controller.extend({
     jsonUrl += "/"+"N";
     jsonUrl += "/"+start+"/"+end+"/"
     
-    var oc_data=""
+    var on_numbers = {
+      total: this.get("model.total"),
+      distinct: this.get("model.distinct")
+    }
+    
+    var oc_data="",
+        off_numbers = {
+          total: 0,
+          distinct: 0
+        }
     
     function draw(){
+      $('.visitor-count .on-campus .number.total').animateNumber({ number: parseInt(on_numbers.total) });
+      $('.visitor-count .on-campus .number.distinct').animateNumber({ number: parseInt(on_numbers.distinct) });
+      
+      $('.visitor-count .off-campus .number.total').animateNumber({ number: parseInt(off_numbers.total) });
+      $('.visitor-count .off-campus .number.distinct').animateNumber({ number: parseInt(off_numbers.distinct) });
+      
+      Highcharts.setOptions({
+        lang: {
+          drillUpText: '< Back'
+        }
+      });
+      
+      $('#onoffcampus-chart .pie.chart').highcharts({
+        chart:{
+          backgroundColor:'transparent',
+          type:'pie'
+        },
+        colors: ["rgb(146, 224, 160)","rgb(247, 144, 109)"],
+        title: {
+          text: '',
+          floating: true
+        },
+        navigation: {
+            buttonOptions: {
+                theme: {
+                    'stroke-width': 0,
+                    stroke: "#DCDEE5",
+                    r: 3,
+                    style:{
+                      'cursor':"pointer",
+                      'display':"none"
+                    },
+                    states: {
+                        hover: {
+                            fill: '#DCDEE5'
+                        },
+                        select: {
+                            stroke: '#DCDEE5',
+                            fill: '#DCDEE5'
+                        }
+                    }
+                }
+            }
+        },
+        tooltip: {
+          useHTML: true,
+          borderWidth: 0,
+          borderColor:null,
+          backgroundColor:'#888',
+          shadow: false,
+          style: {
+            padding: 0,
+            borderRadius:'5px'
+          },
+          pointFormat: '<b>{point.y}</b><br/>({point.percentage:.2f}%)',
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+            }
+        },
+        series: [{
+            type: 'pie',
+            name: 'On-Campus v Off-Campus Usage',
+            data: [
+              {
+                name:"On Campus",
+                y: parseInt(on_numbers.total),
+                drilldown: "On Campus"
+              },
+              {
+                name:"Off Campus",
+                y: parseInt(off_numbers.total),
+                drilldown: "Off Campus"
+              }
+            ]
+          }],
+          drilldown: {
+            activeDataLabelStyle: {
+                textDecoration: 'none'
+            },
+            drillUpButton: {
+              theme: {
+                fill: 'transparent',
+                'stroke-width': 1,
+                stroke: '#6481DB',
+                style: {
+                    color:"#6481DB",
+                    cursor:"pointer"
+                },
+                r: 2,
+                states: {
+                    hover: {
+                        fill: '#6481DB',
+                        style: {
+                           color:"#FFF",
+                      }
+                    },
+                    select: {
+                        fill: '#6481DB',
+                        style: {
+                           color:"#FFF",
+                         }
+                    }
+                }
+              }
+            },
+
+            series: [
+              {
+                id: "Off Campus",
+                  name: "Off Campus",
+                  data: [
+                    {
+                      name:"Returning",
+                      y:(parseInt(off_numbers.total)-parseInt(off_numbers.distinct)),
+                      color:[Highcharts.getOptions().colors[11]] 
+                    },
+                    {
+                      name:"Distinct",
+                      y:(parseInt(off_numbers.distinct)),
+                      color:[Highcharts.getOptions().colors[10]] 
+                    }
+                  ]
+              },
+              {
+                id: "On Campus",
+                  name: "On Campus",
+                  data: [
+                    {
+                      name:"Returning",
+                      y:(parseInt(on_numbers.total)-parseInt(on_numbers.distinct)),
+                      color:[Highcharts.getOptions().colors[7]] 
+                    },
+                    {
+                      name:"Distinct",
+                      y:(parseInt(on_numbers.distinct)),
+                      color:[Highcharts.getOptions().colors[6]] 
+                    }
+                  ]
+              }
+            ]
+        }
+      });
+      
+      
       Highcharts.setOptions({
         global: {
           useUTC: false
         }
       });
-      $('#report-chart .chart')
+      $('#report-chart .chart.line')
       .highcharts('StockChart', {
         chart:{
           backgroundColor:'transparent'
@@ -849,7 +1197,27 @@ App.ReportController = Ember.Controller.extend({
           text: '',
           floating: true
         },
-        
+        navigation: {
+            buttonOptions: {
+                theme: {
+                    'stroke-width': 0,
+                    stroke: "#DCDEE5",
+                    r: 3,
+                    style:{
+                      'cursor':"pointer"
+                    },
+                    states: {
+                        hover: {
+                            fill: '#DCDEE5'
+                        },
+                        select: {
+                            stroke: '#DCDEE5',
+                            fill: '#DCDEE5'
+                        }
+                    }
+                }
+            }
+        },
         series : [{
           name : "On Campus",
           data : data,
@@ -888,7 +1256,7 @@ App.ReportController = Ember.Controller.extend({
             padding: 0,
             borderRadius:'5px'
           },
-          pointFormat: '<span style="color:{series.color.color}">{series.name}</span>: <b>{point.y} patrons</b><br/>',
+          pointFormat: '<span style="color:{series.color.color}">{series.name}</span>: <b>{point.y} visitors</b><br/>',
           changeDecimals: 2,
           valueDecimals: 0
         },
@@ -917,16 +1285,20 @@ App.ReportController = Ember.Controller.extend({
         // apply the date pickers
         setTimeout(function(){
           $(".loading-data").hide();
-          $(".load-date").removeClass('disabled');
+          $(".visitor-count").css({"opacity":1})
+          $(".load-date, #table-report").removeClass('disabled');
           $('#report-chart .chart input.highcharts-range-selector')
           .datepicker({
             beforeShow: function(i,obj) {
+              var offset = $(this).offset(),
+                  h = $(this).height();
               $widget = obj.dpDiv;
               window.$uiDatepickerDiv = $widget;
-              $uiDatepickerDiv.addClass("ll-skin-melon").removeClass("report-dates")
-              if ($widget.data("top")) {
+              $uiDatepickerDiv.addClass("ll-skin-melon").removeClass("report-dates");
+              if (offset!==undefined) {
                 setTimeout(function() {
-                  $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+                  var top = offset.top +h;
+                  $uiDatepickerDiv.css( "top", top);
                 },50);
               }
             },
@@ -949,12 +1321,196 @@ App.ReportController = Ember.Controller.extend({
     
     $.getJSON(jsonUrl,function(data){
       oc_data =  data.data;
+      off_numbers =  {
+        total:data.total,
+        distinct:data.distinct
+      }
+      
       Ember.run.once(this,function(){
         Ember.run.next(this, function(){ 
           window.setTimeout(draw,500)
         });
       });
     })
+    
+  }).property("model.data"),
+  
+  drawTotalsChart: (function(){
+    var data = this.get("model.data"),
+    name = this.get("model.meta.title"),
+    total = this.get("model.total");
+    
+    var id = reportParams.get("id"),
+    lib = reportParams.get('lib'),
+    start = convertDate(reportParams.get('start')),
+    end = convertDate(reportParams.get('end'));
+    
+    var link = "/total_usage/"+lib,
+        timerange = "/"+start+"/"+end+"/",
+        names = ["student","faculty","staff"];
+        
+    var seriesData = [],
+        drilldownSeries =[],
+        seriesCounter = 0;
+        
+    function draw(){
+      $.each(names, function(i, name) {
+        var jsonURL = link+"/"+names[i]+timerange;
+        
+        // console.log(jsonURL);
+        
+        var json = $.getJSON(jsonURL)
+        
+        json.done(function(data){
+          if(data.data.length>0){
+            jsonResponse(data)
+          }
+          else {
+            data.data.push(0);
+            console.log("This is empty.")
+            jsonResponse(data)
+          }
+        })
+        
+        json.fail(function(){
+          console.log('Error: JSON Ajax function failed.')
+          var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
+          $container.html($error);
+          $error.fadeOut(0).fadeIn(500);
+          dataURL.set("drawing","")
+        });
+        
+        
+        function jsonResponse(data) {
+          d = data;
+          var point = {
+                        name: capitaliseFirstLetter(name),
+                        y: parseInt(d.total),
+                        drilldown: null
+                      }
+                      
+          // drilldownSeries.push({ 
+          //   id: name,
+          //   name: capitaliseFirstLetter(name),
+          //   data: d.data,
+          //   type:'column',
+          //   fillColor : {
+          //     linearGradient : {
+          //       x1: 0, 
+          //       y1: 0, 
+          //       x2: 0, 
+          //       y2: 1
+          //     },
+          //     stops : [
+          //     [0, 'rgb(65, 73, 85)'], 
+          //     [1, 'rgb(65, 73, 85)']
+          //     ]
+          //   },
+          //   pointInterval: 36 * 1000
+          // })
+                      
+          seriesData.push(point);
+          
+          
+          // As we're loading the data asynchronously, we don't know what order it will arrive. So
+          // we keep a counter and create the chart when all the data is loaded.
+          seriesCounter++;
+          
+          if (seriesCounter == names.length) {
+            chartTotals(seriesData,drilldownSeries);
+            dataURL.set("drawing",false)
+          }
+        }
+      });
+    }
+    var library_name = capitaliseFirstLetter(reportParams.get('lib'))
+    function chartTotals(seriesData,drilldownSeries ){
+      $('#report-chart .chart').highcharts({
+        chart: {
+          backgroundColor:'transparent',
+          plotBackgroundColor: null,
+          plotBorderWidth: 1,
+          plotBorderColor: 'transparent',
+          plotShadow: false,
+          type: "pie"
+        },
+        title: {
+          text: 'Student v Faculty v Staff for '+ library_name
+        },
+        tooltip: {
+          useHTML: true,
+          borderWidth: 0,
+          borderColor:null,
+          backgroundColor:'#888',
+          shadow: false,
+          style: {
+            padding: 0,
+            borderRadius:'5px'
+          },
+          pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b> <br/> ({point.y} patorns)',
+        },
+        
+        plotOptions: {
+          pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            dataLabels: {
+              enabled: true,
+              format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+              style: {
+                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+              }
+            }
+          }
+        },
+        series: [{
+          name:'Percentage Use',
+          data: seriesData,
+          innerSize: '50%'
+        }],
+        // drilldown: {
+        //   activeDataLabelStyle: {
+        //       textDecoration: 'none'
+        //   },
+        //   drillUpButton: {
+        //     theme: {
+        //       fill: 'transparent',
+        //       'stroke-width': 1,
+        //       stroke: '#6481DB',
+        //       style: {
+        //           color:"#6481DB",
+        //           cursor:"pointer"
+        //       },
+        //       r: 2,
+        //       states: {
+        //           hover: {
+        //               fill: '#6481DB',
+        //               style: {
+        //                  color:"#FFF",
+        //             }
+        //           },
+        //           select: {
+        //               fill: '#6481DB',
+        //               style: {
+        //                  color:"#FFF",
+        //                }
+        //           }
+        //       }
+        //     }
+        //   },
+        //   series: drilldownSeries,
+        // }
+      }).css('opacity',1);
+      $(".loading-data, .extended-load").hide();
+      $(".load-date, #table-report").removeClass('disabled');
+      var $total = $("<div/>").addClass("center-text").html(total+' <br/>visitors');
+      $(".chart").append($total);
+    }
+    Ember.run.once(this,function(){
+      Ember.run.next(this, function(){ 
+        window.setTimeout(draw,500)
+      });
+    });
     
   }).property("model.data")
   
@@ -1057,7 +1613,7 @@ App.AveragesController = Ember.Controller.extend({
         
         //Hide and Show the loading indicators
         $(".loading-data").not('.page-level').show();
-        $(".load-date").addClass('disabled');
+        $(".load-date, #table-report").addClass('disabled');
         $('#report-chart .chart').css('opacity',0)
         
         loadReport(this, "avg-report");
@@ -1108,12 +1664,15 @@ App.HourPicker = Ember.TextField.extend({
   didInsertElement: function(){
     $(".averages-dates.inputs input.timepicker").timepicker({
       beforeShow: function(i,obj) {
+        var offset = $(this).offset(),
+            h = $(this).height();
         $widget = obj.dpDiv;
         window.$uiDatepickerDiv = $widget;
         $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates").addClass("timepicker");
-        if ($widget.data("top")) {
+        if (offset!==undefined) {
           setTimeout(function() {
-            $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+            var top = offset.top +h;
+            $uiDatepickerDiv.css( "top", top);
           },50);
         }
       },
@@ -1245,7 +1804,7 @@ App.AvgReportController = Ember.Controller.extend({
       
       function chartAverages(seriesOptions){
         $(".loading-data").hide();
-        $(".load-date").removeClass('disabled');
+        $(".load-date, #table-report").removeClass('disabled');
 
         $('#averages-chart .counter').animateNumber({ number: total_averages });
         var $container = $('#averages-chart .chart'),
@@ -1286,7 +1845,7 @@ App.AvgReportController = Ember.Controller.extend({
             labels: {enabled:false}
           },
           yAxis: {
-            title:{text:"Number of patrons"},
+            title:{text:"Number of visitors"},
             labels: {
               formatter: function() {
                 return (this.value < 0 ? '-' : '') + Highcharts.numberFormat(this.value, 0);;
@@ -1313,7 +1872,7 @@ App.AvgReportController = Ember.Controller.extend({
               padding: 0,
               borderRadius:'5px'
             },
-            pointFormat: '<span>{series.name}</span>: <b>{point.y} patrons</b><br/>',
+            pointFormat: '<span>{series.name}</span>: <b>{point.y} visitors</b><br/>',
             changeDecimals: 2,
             valueDecimals: 0
           },
@@ -1661,12 +2220,15 @@ App.OptionalCalendarDatePicker = Ember.TextField.extend({
     $(".options-date-range .form-group>input")
     .datepicker({
       beforeShow: function(i,obj) {
+        var offset = $(this).offset(),
+            h = $(this).height();
         $widget = obj.dpDiv;
         window.$uiDatepickerDiv = $widget;
         $uiDatepickerDiv.addClass("ll-skin-melon").addClass("report-dates");
-        if ($widget.data("top")) {
+        if (offset!==undefined) {
           setTimeout(function() {
-            $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
+            var top = offset.top +h;
+            $uiDatepickerDiv.css( "top", top);
           },50);
         }
       },
@@ -1701,12 +2263,20 @@ App.ClearFiltersButtonComponent = Ember.Component.extend({
           else{
             lib = lib[0].toLowerCase().replace(" ","-");
           }
-          
-          dataURL.set('category',null),
-          dataURL.set('group',null)
-          
+          dataURL.set('category',null);
+          dataURL.set('campus',null);
+          dataURL.set('group',null);
+          $('.options-campus .switch input').prop("checked", false);
           link = "#/library/"+lib;
-          window.location = link;
+          
+          var location = window.location;
+          if(location.hash.substr(-1)=="/"){
+            window.location = link;
+          }
+          else{
+            window.location = link+"/";
+          }
+          
         })
       });
     });
@@ -1765,6 +2335,7 @@ App.OnOffCampusSwitchComponent = Ember.Component.extend({
           }
           if($("#container-lastweek").length>0 && $(".mp-pushed").length>0){
             $(".loading-data.page-level").show();
+            $(".visitor-count").css({"opacity":0})
             SUPERCHART();
           }
         });
@@ -1781,6 +2352,26 @@ var selection = []
 function formatDate(date){
   var formatted_date = (date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate())
   return formatted_date;
+}
+
+function setDatepickerPosition(chart) {
+  $('#'+chart.options.chart.renderTo.id + ' input.highcharts-range-selector')
+  .datepicker({
+    beforeShow: function(i,obj) {
+      var offset = $(this).offset(),
+          h = $(this).height();
+      $widget = obj.dpDiv;
+      window.$uiDatepickerDiv = $widget;
+      $uiDatepickerDiv.addClass("ll-skin-melon");
+      if (offset!==undefined) {
+        setTimeout(function() {
+          var top = offset.top +h;
+          $uiDatepickerDiv.css( "top", top);
+        },50);
+      }
+    }
+    ,maxDate:new Date
+  })
 }
 
 // function that builds both the charts on the Library pages
@@ -1943,12 +2534,12 @@ function SUPERCHART(){
          return number;
        }
        
-        $(".card .visitor-count .total .number").animateNumber({ number: total_sum,easing: 'easeInQuad' },duration(total_sum));
-        $(".card .visitor-count .distinct .number").animateNumber({ number: distinct_sum, easing: 'easeInQuad' },duration(distinct_sum));
+        $(".visitor-count .total .number").animateNumber({ number: total_sum,easing: 'easeInQuad' },duration(total_sum));
+        $(".visitor-count .distinct .number").animateNumber({ number: distinct_sum, easing: 'easeInQuad' },duration(distinct_sum));
         
         drawChart(seriesOptions);
         drawChartLastWeek(seriesOptions);
-        
+        $(".visitor-count").css({"opacity":1})
         $(".loading-data.page-level").hide();
         dataURL.set("drawing",false)
       }
@@ -2034,10 +2625,11 @@ function SUPERCHART(){
           enabled: enableLegend,
         },
         tooltip: {
-          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} patrons</b><br/>',
+          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} visitors</b><br/>',
           changeDecimals: 2,
           valueDecimals: 0
         },
+        inputEnabled:false,
         inputDateFormat: '%H:%M:%S.%L',
         inputEditDateFormat: '%H:%M:%S.%L',
         // Custom parser to parse the %H:%M:%S.%L format
@@ -2072,24 +2664,7 @@ function SUPERCHART(){
         // apply the date pickers
         setTimeout(function(){
           if(chart && chart.options.chart){
-            $($('#'+chart.options.chart.renderTo.id + ' input.highcharts-range-selector'))
-            .datepicker({
-              beforeShow: function(i,obj) {
-                $widget = obj.dpDiv;
-                window.$uiDatepickerDiv = $widget;
-                $uiDatepickerDiv.addClass("ll-skin-melon");
-                if ($widget.data("top")) {
-                  setTimeout(function() {
-                    $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
-                  },50);
-                }
-              }
-              ,maxDate:new Date
-              ,onClose: function(i,obj) {
-                $widget = obj.dpDiv;
-                $widget.data("top", $widget.position().top);
-              }
-            })
+            setDatepickerPosition(chart);
           }
         },0)
       });//end highcharts
@@ -2186,7 +2761,7 @@ function SUPERCHART(){
             }
         },
         tooltip: {
-          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} patrons</b><br/>',
+          pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y} visitors</b><br/>',
           changeDecimals: 2,
           valueDecimals: 0
         },
@@ -2208,30 +2783,7 @@ function SUPERCHART(){
       }, function(chart) {
         // apply the date pickers
         setTimeout(function(){
-          $('#'+chart.options.chart.renderTo.id+' input.highcharts-range-selector')
-          .datepicker({
-            beforeShow: function(i,obj) {
-              $widget = obj.dpDiv;
-              window.$uiDatepickerDiv = $widget;
-              $uiDatepickerDiv.addClass("ll-skin-melon").removeClass("report-dates")
-              if ($widget.data("top")) {
-                setTimeout(function() {
-                  $uiDatepickerDiv.css( "top", $uiDatepickerDiv.data("top") );
-                },50);
-              }
-            },
-            minDate: new Date(dataURL.get('start')),
-            maxDate: new Date(dataURL.get('end')),
-            onClose: function(i,obj) {
-              $widget = obj.dpDiv;
-              $widget.data("top", $widget.position().top);
-            },
-            dateFormat: 'yy-mm-dd',
-            onSelect: function(dateText) {
-              this.onchange();
-              this.onblur();
-            }
-          });
+          setDatepickerPosition(chart)
         },0)
       });//end highcharts
     }//end drawChart

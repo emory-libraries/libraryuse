@@ -110,6 +110,7 @@
                   </ul>
                 </div>
               </li>
+              {{!--
               <li class="icon icon-arrow-left">
                 <a href="#"><span class="glyphicon glyphicon-list-alt"></span> Degree</a>
                 <div class="mp-level filter-academic-plan">
@@ -132,6 +133,7 @@
                   </ul>
                 </div>
               </li>
+              --}}
               {{clear-filters-button}}
             </ul>
           </div>
@@ -266,28 +268,21 @@
     {{view App.NavView}}
 
     <section>
-    <div class="card">
       <div class="visitor-count">
         <dl class="total">
-          <dt>Total Patrons</dt>
+          <dt>Total Visits</dt>
           <dd class="number"><span>0</span></dd>
         </dl>
         <dl class="distinct">
-          <dt>Distinct Patrons</dt>
+          <dt>Distinct Visits</dt>
           <dd><span class="number">0</span></dd>
         </dl>
-        
       </div>
-    </div>
-    <div class="card">
-      {{json-chart}}
-    </div>
-    <div class="card">
-      {{json-table}}
-    </div>
-    <div class="card">
-      <div id="container-lastweek" style="height: 400px; min-width: 400px">
-
+      <div class="card chart">
+        {{json-chart}}
+      </div>
+      <div class="card chart">
+        <div id="container-lastweek" style="height: 400px; min-width: 400px">
       </div>
     </div>
     </section>
@@ -402,17 +397,18 @@
         <div class="row report-nav">
           <div class="col-xs-12 col-md-5 pull-right">
             <ul class="nav nav-pills report-types nav-justified">
+              <li {{bind-attr class="isTotals:active"}}>
+                <a href="#" {{action "setType" "totals"}}>Totals</a>
+              </li>
               <li {{bind-attr class="isAcad:active"}}>
                 <a href="#" {{action "setType" "top_academic_plan"}}>Academic</a>
+              </li>
+              <li {{bind-attr class="isCareer:active"}}>
+                <a href="#" {{action "setType" "top_academic_career"}}>Schools</a>
               </li>
               <li {{bind-attr class="isDiv:active"}}>
                 <a href="#" {{action "setType" "faculty_divs_dprt"}}>Divisons</a>
               </li>
-              {{!--
-              <li {{bind-attr class="isDprt:active"}}>
-                <a href="#" {{action "setType" "top_dprtn"}}>Departments</a>
-              </li>
-              --}}
               <li {{bind-attr class="isCampus:active"}}>
                 <a href="#" {{action "setType" "on_off_campus"}}>Campus</a>
               </li>
@@ -457,13 +453,14 @@
               <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
               <p class="extended-load text-center text-muted" style="display:none;">This might take a minute to load.</p>
             </div>
-           <div class="chart"></div>
+           <div class="chart pie"></div>
+           <div class="chart line" id="acca_i"></div>
            {{drawPieChart}}
          </div>
        </div>
        <div class="col-xs-12 col-sm-6 col-md-4">
          {{input type='text' value=theFilter placeholder=placeholder class="form-control"}}
-         <table id="table-report" class="table">
+         <table id="table-report" class="table disabled">
              <thead>
                  <tr>
                      <th {{action "sortBy" "id"}}>{{model.meta.title}}s</th>
@@ -493,12 +490,39 @@
      {{/if}}
   </script>
   
-  <script type="text/x-handlebars" data-template-name="report-campus">
+  <script type="text/x-handlebars" data-template-name="report-totals">
     <div id="report-chart">
        <div class="loading-data">
          <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
        </div>
       <div class="chart"></div>
+      {{drawTotalsChart}}
+    </div>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="report-campus">
+    <div id="report-chart">
+       <div class="loading-data">
+         <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
+       </div>
+       <div class="row">
+         <div class="visitor-count col-xs-12 col-sm-8 col-md-4 col-md-offset-2" style="opacity:0;">
+           <dl class="on-campus">
+             <dt>On Campus</dt>
+             <dd><span class="number total">0</span> total</dd>
+             <dd><span class="number distinct">0</span> distinct</dd>
+           </dl>
+           <dl class="off-campus">
+             <dt>Off Campus</dt>
+             <dd><span class="number total">0</span> total</dd>
+             <dd><span class="number distinct">0</span> distinct</dd>
+           </dl>
+         </div>
+        <div id="onoffcampus-chart" class="col-xs-12 col-sm-4">
+          <div class="chart pie"></div>
+        </div>
+       </div>
+      <div class="chart line"></div>
       {{drawCampusChart}}
     </div>
   </script>
@@ -551,7 +575,7 @@
   <script type="text/x-handlebars" id="avg-report">
     <div id="averages-chart" class="text-center">
       <h2>Weekly Averages</h2>
-      <p>This chart shows the average number of patrons to the library for the selected times.</p>
+      <p>This chart shows the average number of visitors to the library for the selected times.</p>
       <div class="chart"></div>
       {{drawAverages}}
       <div class="loading-data" style="display:none;">

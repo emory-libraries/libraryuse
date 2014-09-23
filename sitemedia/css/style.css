@@ -180,9 +180,12 @@ width: 1%;
     content:"\e094";    
 }
 
-div.card {
+div.card.chart {
     /*background-color: #FFF;*/
-    margin-bottom: 5em;
+    margin-bottom: 15px;
+    min-height: 400px;
+    position: relative;
+    width:100%;
 }
 
 .card .table{
@@ -483,6 +486,7 @@ a.list-group-item .list-group-item-heading {
 
 div#report-chart.affix {
   top: 10px;
+  position: fixed;
 }
 
 #result {
@@ -537,9 +541,15 @@ thead th {
 
 .nav-pills.report-types {
     margin: 25px 0 10px;
-    padding: 0 40px 0 30px;
     float: right;
 }
+
+@media(min-width:1070px){
+  .nav-pills.report-types {
+    padding: 0 40px 0 30px;
+  }
+}
+
 .nav-pills.report-types>li>a {
     color: rgb(36, 155, 108);
     padding: 7px 15px;
@@ -647,8 +657,27 @@ thead th {
     color: rgb(243, 181, 49);
 }
 
-#averages-chart .chart{
-  min-height:400px;
+#averages-chart .chart,
+#report-chart .chart{
+  min-height: 400px;
+}
+
+@media (max-width:1300px){
+  #averages-chart .chart,
+  #report-chart .chart{
+    max-height: 400px;
+  }
+}
+
+@media (min-width:1300px){
+  #averages-chart .chart,
+  #report-chart .chart{
+    min-height: 600px;
+  }
+}
+
+#report-chart .chart#acca_i{
+  min-height:0;
 }
 
 
@@ -677,9 +706,16 @@ p.instructions {
 
 
 .visitor-count {
-    width: 100%;
-    margin: -1em auto;
     position: relative;
+    height:110px;
+}
+
+section>.visitor-count{
+  margin: -1em auto;
+}
+
+#report-chart .visitor-count {
+  margin-top: 10em;
 }
 
 .visitor-count > dl {
@@ -689,8 +725,8 @@ p.instructions {
 }
 
 @media(min-width:767px){
-    .visitor-count {
-        width: 60%;
+    section>.visitor-count {
+      width:60%;
     }
     .visitor-count > dl {
         margin-bottom: 30px;
@@ -706,4 +742,37 @@ p.instructions {
 .visitor-count .number {
     font-size: 2em;
     color: rgb(99, 105, 139);
+}
+
+.highcharts-range-selector {
+    z-index: -3;
+}
+
+#onoffcampus-chart .pie.chart{
+  width:350px;
+  margin:auto;
+}
+
+div#report-chart {
+    position: relative;
+    margin-top: 20px;
+}
+
+div#report-chart {
+    position: relative;
+    margin-top: 20px;
+}
+#table-report.disabled{
+    opacity:0.2;
+}
+
+.chart .center-text {
+    position: absolute;
+    top: 47%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 1.5em;
+    z-index: -1;
+    opacity: 0.6;
 }

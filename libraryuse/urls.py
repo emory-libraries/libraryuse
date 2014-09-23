@@ -30,6 +30,7 @@ urlpatterns = patterns(
     url(r'^student_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.student_class, name='student_class'),
     url(r'^faculty_staff_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_staff_class, name='faculty_staff_class'),
     url(r'^top_academic_plan/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_academic_plan, name='top_academic_plan'),
+    url(r'^top_academic_career/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_academic_career, name='top_academic_career'),
     url(r'^top_dprtn/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn, name='top_dprtn'),
     url(r'^top_division/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_division, name='top_division'),
     url(r'^averages/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/(?P<start_hour>.+)/(?P<end_hour>.+)/(?P<dow>.+)/(?P<filter_on>.+)/$', views.averages, name='averages'),

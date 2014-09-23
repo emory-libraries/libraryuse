@@ -3,8 +3,7 @@ Highcharts.theme = {
             "#3BC553","#5AD76F","#81E793","#B2F4BD",
             "#FF594C","#FF756B","#FF978F","#FFBFBA",
             "#FFBE4C","#FFC96B","#FFD68F","#FFE6BA",
-            "#6E3FAF","#8A5EC8","#AA84DE","#CEB5F0",
-            "#434D5C"],
+            "#6E3FAF","#8A5EC8","#AA84DE","#CEB5F0"],
   chart: {
     borderWidth: 0,
     plotShadow: false,
@@ -83,7 +82,8 @@ Highcharts.theme = {
     style: {
       color: '#3E576F'
     }
-  }
+  },
+  credits: false
 };
 
 // Apply the theme
