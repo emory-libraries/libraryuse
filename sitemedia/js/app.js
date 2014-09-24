@@ -801,7 +801,7 @@ App.ReportController = Ember.Controller.extend({
         }
       }).css('opacity',1);
 
-      if($('#report-chart .chart.line').length>0 && model.meta.title=="Academic Career"){
+      if($('#report-chart .chart.line').length>0 && model.meta.title[0]=="Academic Career"){
         var seriesOptions = []
         
         $.each(datapoints,function(i){
@@ -843,6 +843,10 @@ App.ReportController = Ember.Controller.extend({
           $container.highcharts('StockChart', {
             chart:{
               backgroundColor:'transparent'
+            },
+            title: {
+              text: capitaliseFirstLetter(library_name) + 
+              ' Visitors per '+report_title+' over Time'
             },
             rangeSelector: {
               buttons: [{
@@ -927,12 +931,6 @@ App.ReportController = Ember.Controller.extend({
               changeDecimals: 2,
               valueDecimals: 0
             },
-            
-            title: {
-              text: '',
-              floating: true
-            },
-            
             xAxis: {
               tickPixelInterval: 120,
               type: 'datetime',
@@ -953,14 +951,16 @@ App.ReportController = Ember.Controller.extend({
       
       $(".loading-data, .extended-load").hide();
       $(".load-date, #table-report").removeClass('disabled');
-      $('#report-chart').affix({
-        offset: {
-          top: $('#report-chart').offset().top
-          , bottom: function () {
-            return (this.bottom = $('.footer').outerHeight(true))
+      if(model.meta.title[0]!=="Academic Career"){
+        $('#report-chart .chart').affix({
+          offset: {
+            top: $('#report-chart .chart').offset().top
+            , bottom: function () {
+              return (this.bottom = $('.footer').outerHeight(true))
+            }
           }
-        }
-      });
+        });
+      }
     }
     Ember.run.once(this,function(){
       Ember.run.next(this, function(){ 
@@ -1146,8 +1146,7 @@ App.ReportController = Ember.Controller.extend({
           useUTC: false
         }
       });
-      $('#report-chart .chart.line')
-      .highcharts('StockChart', {
+      $('#report-chart .chart.line').highcharts('StockChart', {
         chart:{
           backgroundColor:'transparent'
         },
@@ -1345,9 +1344,9 @@ App.ReportController = Ember.Controller.extend({
     start = convertDate(reportParams.get('start')),
     end = convertDate(reportParams.get('end'));
     
-    var link = "/total_usage/"+lib,
-        timerange = "/"+start+"/"+end+"/",
-        names = ["student","faculty","staff"];
+    var root = "/top_dprtn_",
+        timerange = start+"/"+end+"/",
+        names = ["students","faculty","staff"];
         
     var seriesData = [],
         drilldownSeries =[],
@@ -1355,9 +1354,9 @@ App.ReportController = Ember.Controller.extend({
         
     function draw(){
       $.each(names, function(i, name) {
-        var jsonURL = link+"/"+names[i]+timerange;
+        var jsonURL = root+names[i]+"/"+lib+"/"+timerange;
         
-        // console.log(jsonURL);
+        console.log(jsonURL);
         
         var json = $.getJSON(jsonURL)
         
@@ -1382,32 +1381,46 @@ App.ReportController = Ember.Controller.extend({
         
         
         function jsonResponse(data) {
-          d = data;
+          var d = data;
+          var dd_data = [];
           var point = {
                         name: capitaliseFirstLetter(name),
                         y: parseInt(d.total),
-                        drilldown: null
-                      }
-                      
-          // drilldownSeries.push({ 
-          //   id: name,
-          //   name: capitaliseFirstLetter(name),
-          //   data: d.data,
-          //   type:'column',
-          //   fillColor : {
-          //     linearGradient : {
-          //       x1: 0, 
-          //       y1: 0, 
-          //       x2: 0, 
-          //       y2: 1
-          //     },
-          //     stops : [
-          //     [0, 'rgb(65, 73, 85)'], 
-          //     [1, 'rgb(65, 73, 85)']
-          //     ]
-          //   },
-          //   pointInterval: 36 * 1000
-          // })
+                        drilldown: name
+                      };
+          var $table = $("#total-tables #"+name+"-totals")
+          $table.append($("<tr/>").addClass('header').append($("<th/>").html(point.name),$("<th/>").html(point.y)));  
+          $.each(d.data,function(){
+            var name = this.label,
+                value = this.value;
+            dd_data.push([name,value])
+            if(name=="CenterforCommunityPartnerships"){
+              name = "Center for Community Partnerships"
+            }
+            else if(name.indexOf('_')>-1){
+              name = name.replace(/_/g,' ')
+            }
+            $table.append($("<tr/>").append($("<td/>").html(name),$("<td/>").html(value)));
+          });
+
+          drilldownSeries.push({ 
+            id: name,
+            name: capitaliseFirstLetter(name),
+            data: dd_data,
+            type:'pie',
+            fillColor : {
+              linearGradient : {
+                x1: 0, 
+                y1: 0, 
+                x2: 0, 
+                y2: 1
+              },
+              stops : [
+              [0, 'rgb(65, 73, 85)'], 
+              [1, 'rgb(65, 73, 85)']
+              ]
+            }
+          })
                       
           seriesData.push(point);
           
@@ -1423,8 +1436,14 @@ App.ReportController = Ember.Controller.extend({
         }
       });
     }
-    var library_name = capitaliseFirstLetter(reportParams.get('lib'))
+    var library_name = capitaliseFirstLetter(reportParams.get('lib'));
+    
     function chartTotals(seriesData,drilldownSeries ){
+      Highcharts.setOptions({
+        lang: {
+          drillUpText: '< Back to all'
+        }
+      });
       $('#report-chart .chart').highcharts({
         chart: {
           backgroundColor:'transparent',
@@ -1435,7 +1454,7 @@ App.ReportController = Ember.Controller.extend({
           type: "pie"
         },
         title: {
-          text: 'Student v Faculty v Staff for '+ library_name
+          text: 'Students, Faculty, and Staff for '+ library_name +'<br/>( Total: '+total+' visitors )'
         },
         tooltip: {
           useHTML: true,
@@ -1466,45 +1485,43 @@ App.ReportController = Ember.Controller.extend({
         series: [{
           name:'Percentage Use',
           data: seriesData,
-          innerSize: '50%'
+          innerSize: '80%'
         }],
-        // drilldown: {
-        //   activeDataLabelStyle: {
-        //       textDecoration: 'none'
-        //   },
-        //   drillUpButton: {
-        //     theme: {
-        //       fill: 'transparent',
-        //       'stroke-width': 1,
-        //       stroke: '#6481DB',
-        //       style: {
-        //           color:"#6481DB",
-        //           cursor:"pointer"
-        //       },
-        //       r: 2,
-        //       states: {
-        //           hover: {
-        //               fill: '#6481DB',
-        //               style: {
-        //                  color:"#FFF",
-        //             }
-        //           },
-        //           select: {
-        //               fill: '#6481DB',
-        //               style: {
-        //                  color:"#FFF",
-        //                }
-        //           }
-        //       }
-        //     }
-        //   },
-        //   series: drilldownSeries,
-        // }
+        drilldown: {
+          activeDataLabelStyle: {
+              textDecoration: 'none'
+          },
+          drillUpButton: {
+            theme: {
+              fill: 'transparent',
+              'stroke-width': 1,
+              stroke: '#6481DB',
+              style: {
+                  color:"#6481DB",
+                  cursor:"pointer"
+              },
+              r: 2,
+              states: {
+                  hover: {
+                      fill: '#6481DB',
+                      style: {
+                         color:"#FFF",
+                    }
+                  },
+                  select: {
+                      fill: '#6481DB',
+                      style: {
+                         color:"#FFF",
+                       }
+                  }
+              }
+            }
+          },
+          series: drilldownSeries,
+        }
       }).css('opacity',1);
       $(".loading-data, .extended-load").hide();
       $(".load-date, #table-report").removeClass('disabled');
-      var $total = $("<div/>").addClass("center-text").html(total+' <br/>visitors');
-      $(".chart").append($total);
     }
     Ember.run.once(this,function(){
       Ember.run.next(this, function(){ 
@@ -1515,6 +1532,7 @@ App.ReportController = Ember.Controller.extend({
   }).property("model.data")
   
 });
+
 
 function convert24to12(str){
   var hours = parseInt(str);

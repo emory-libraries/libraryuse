@@ -480,12 +480,13 @@ a.list-group-item .list-group-item-heading {
   display: inline-block;
 }
 
-/******
-  Test
-******/
 
-div#report-chart.affix {
-  top: 10px;
+#report-chart .chart{
+  padding-top:10px;
+}
+
+#report-chart .chart.affix {
+  top:0px;
   position: fixed;
 }
 
@@ -520,8 +521,20 @@ thead th {
     padding: 8px;
 }
 
+table#table-report {
+    background-color: #EDF1F8;
+    border-radius: 2px; 
+    box-shadow: 0 4px 6px 1px rgba(50, 50, 50, 0.14); 
+    box-sizing: border-box; 
+    color: black; 
+    line-height: 1.5; 
+    margin: 1.5em auto 0;  
+    padding: 47px 35px 30px 37px; 
+    width: 100%; 
+}
+
 #table-report tbody>tr:nth-child(-n+60)>td {
-    background-color: #EFF2F8;
+    background-color: rgba(247, 250, 255, 0.87);
 }
 
 .report-dates.ll-skin-melon.ui-datepicker {
@@ -660,6 +673,7 @@ thead th {
 #averages-chart .chart,
 #report-chart .chart{
   min-height: 400px;
+  padding: 25px 0;
 }
 
 @media (max-width:1300px){
@@ -766,13 +780,25 @@ div#report-chart {
     opacity:0.2;
 }
 
-.chart .center-text {
-    position: absolute;
-    top: 47%;
-    left: 0;
+#total-tables .table {
+    background-color: white; border-radius: 2px; box-shadow: 0 4px 6px 1px rgba(50, 50, 50, 0.14); box-sizing: border-box; color: black; line-height: 1.5; 
+    margin: 3em auto 0;  
+    padding: 37px 35px 30px 37px; 
+    width: 100%; 
+    display: block;
+}
+
+#total-tables .table th{
+  border-top:0;
+  font-size:1.2em;
+  color: rgb(120, 123, 134);
+}
+
+#total-tables .table tbody {
     width: 100%;
-    text-align: center;
-    font-size: 1.5em;
-    z-index: -1;
-    opacity: 0.6;
+    display: table;
+}
+
+#total-tables .table td{
+  word-wrap: break-word;
 }

@@ -438,46 +438,48 @@
 
   <script type="text/x-handlebars" data-template-name="report">
       {{#if model.data}}
-      <div class="row">
-       <div class="col-xs-12 col-sm-6 col-md-8">
-         <h3>Total Visitors by {{model.meta.title}}s in <span class="library-name">{{model.meta.library}}</span></h3>
-         <p>Between {{formattedDate.start}} and {{formattedDate.end}}, 
-         we have had {{model.total}} visitors for <span class="library-name">{{model.meta.library}}</span>; 
-         the most coming from
-         {{#each item in firstItemInArray}}
-           the {{item.label}} {{model.meta.title}} with {{item.value}} visitors.
-         {{/each}}
-         </p>
-         <div id="report-chart">
+      <div id="report-chart">
+        <div class="row">
+         <div class="col-xs-12 col-sm-6 col-md-8">
+           <h3>Total Visitors by {{model.meta.title}}s in <span class="library-name">{{model.meta.library}}</span></h3>
+           <p>Between {{formattedDate.start}} and {{formattedDate.end}}, 
+           we have had {{model.total}} visitors for <span class="library-name">{{model.meta.library}}</span>; 
+           the most coming from
+           {{#each item in firstItemInArray}}
+             the {{item.label}} {{model.meta.title}} with {{item.value}} visitors.
+           {{/each}}
+           </p>
             <div class="loading-data" style="display:none;">
               <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
               <p class="extended-load text-center text-muted" style="display:none;">This might take a minute to load.</p>
             </div>
            <div class="chart pie"></div>
-           <div class="chart line" id="acca_i"></div>
-           {{drawPieChart}}
+         </div>
+         <div class="col-xs-12 col-sm-6 col-md-4">
+           {{input type='text' value=theFilter placeholder=placeholder class="form-control"}}
+           <table id="table-report" class="table disabled">
+               <thead>
+                   <tr>
+                       <th {{action "sortBy" "id"}}>{{model.meta.title}}s</th>
+                       <th>Top Visits</th>
+                       {{!-- <th>Unique Visits</th> --}}
+                   </tr>
+               </thead>
+               <tbody>
+                 {{#each item in filterPeople}}
+                   <tr>
+                     <td>{{item.label}}</td>
+                     <td class="val">{{item.value}}</td>
+                   </tr>
+                 {{/each}}
+               </tbody>
+           </table>
          </div>
        </div>
-       <div class="col-xs-12 col-sm-6 col-md-4">
-         {{input type='text' value=theFilter placeholder=placeholder class="form-control"}}
-         <table id="table-report" class="table disabled">
-             <thead>
-                 <tr>
-                     <th {{action "sortBy" "id"}}>{{model.meta.title}}s</th>
-                     <th>Top Visits</th>
-                     {{!-- <th>Unique Visits</th> --}}
-                 </tr>
-             </thead>
-             <tbody>
-               {{#each item in filterPeople}}
-                 <tr>
-                   <td>{{item.label}}</td>
-                   <td class="val">{{item.value}}</td>
-                 </tr>
-               {{/each}}
-             </tbody>
-         </table>
+       <div class="row">
+          <div class="chart line" id="acca_i"></div>
        </div>
+       {{drawPieChart}}
      </div>
      {{else}}
      <div class="row">
@@ -497,6 +499,20 @@
        </div>
       <div class="chart"></div>
       {{drawTotalsChart}}
+    </div>
+    <div class="row" id="total-tables">
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <table id="students-totals" class="table table-hover">
+        </table>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <table id="faculty-totals" class="table table-hover">
+        </table>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <table id="staff-totals" class="table table-hover">
+        </table>
+      </div>
     </div>
   </script>
   

@@ -239,25 +239,6 @@ def top_academic_plan(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
-# def top_academic_career(request, library, start, end):
-# 
-#     location = location_name(library)
-# 
-#     numbers = LibraryVisit.objects.values('acca_i') \
-#                 .annotate(total=Count('acca_i')) \
-#                 .order_by('-total') \
-#                 .filter(visit_time__range=[start, end]) \
-#                 .filter(location = location) \
-#                 .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
-# 
-#     distinct = numbers.values('acca_i').distinct().count()
-# 
-#     total = numbers.values('acca_i').count()
-# 
-#     data = chart_data(numbers, distinct, total, start, end, library)
-# 
-#     return StreamingHttpResponse(data, content_type='application/json')
-
 
 def top_dprtn(request, library, start, end):
 
@@ -268,6 +249,63 @@ def top_dprtn(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location)
+
+    distinct = numbers.values('dprt_n').distinct().count()
+
+    total = numbers.values('dprt_n').count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+    
+def top_dprtn_faculty(request, library, start, end):
+
+    location = location_name(library)
+
+    numbers = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'F'))
+
+    distinct = numbers.values('dprt_n').distinct().count()
+
+    total = numbers.values('dprt_n').count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+    
+def top_dprtn_students(request, library, start, end):
+
+    location = location_name(library)
+
+    numbers = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
+
+    distinct = numbers.values('dprt_n').distinct().count()
+
+    total = numbers.values('dprt_n').count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+    
+def top_dprtn_staff(request, library, start, end):
+
+    location = location_name(library)
+
+    numbers = LibraryVisit.objects.values('dprt_n') \
+                .annotate(total=Count('dprt_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'E'))
 
     distinct = numbers.values('dprt_n').distinct().count()
 
