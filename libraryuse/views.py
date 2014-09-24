@@ -68,6 +68,42 @@ def chart_data(numbers, distinct, total, start, end, library):
 
     return(data)
 
+
+def export(request,start, end):
+    context = RequestContext(request, {})
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = ('attachment; filename="libraryuse(%s).csv"') % (slugify('-'.join([start,end])))
+    writer = csv.writer(response)
+
+
+    visits = LibraryVisit.objects \
+              .filter(visit_time__range=[start, end])
+              
+    writer.writerow([('Data retreived from %s to %s') % (start,end) ])
+    writer.writerow([''])
+
+    writer.writerow(['visit_time', 'term_number', 'location', 'prsn_c_type', \
+                     'prsn_e_type', 'emjo_c_clsf', 'dprt_c', \
+                     'edprt_n', 'dvsn_i', 'dvsn_n', \
+                     'empe_c_fclt_rank', 'prsn_c_type_hc', \
+                     'prsn_e_type_hc', 'emjo8hc_c_clsf', 'dprt8hc_c', \
+                     'dprt8hc_n', 'dvsn8hc_i', 'dvsn8hc_n', \
+                     'acca_i', 'acpr_n', 'acpl_n',  \
+                     'stdn_e_clas', 'stdn_f_ungr', 'stdn_f_cmps_on'])
+    for v in visits:
+        writer.writerow([v.visit_time, v.term_number, v.location, \
+                        v.prsn_c_type, v.prsn_e_type, v.emjo_c_clsf, \
+                        v.dprt_c, v.dprt_n, v.dvsn_i, v.dvsn_n, \
+                        v.empe_c_fclt_rank, v.prsn_c_type_hc, \
+                        v.prsn_e_type_hc, v.emjo8hc_c_clsf, v.dprt8hc_c, \
+                        v.dprt8hc_n, v.dvsn8hc_i, v.dvsn8hc_n, v.acca_i, \
+                        v.acpr_n, v.acpl_n, v.stdn_e_clas, v.stdn_f_ungr, \
+                        v.stdn_f_cmps_on])
+
+    return response
+
+
 def location_name(library):
     if 'woodruff' in library:
         return('LOCATION: WL TURNSTILE (1&2)')
@@ -129,7 +165,7 @@ def get_classifications(filter_by):
 def total_usage(request, library, person_type, start, end):
 
     #distinct_flag = request.GET.get('distinct', False)
-
+    
     location = location_name(library)
 
     total_count = LibraryVisit.objects.values('visit_time') \
@@ -155,7 +191,7 @@ def total_usage(request, library, person_type, start, end):
     total = numbers.values("prsn_i_ecn").count()
 
     data = chart_data(numbers, distinct, total, start, end, library)
-
+    
     return StreamingHttpResponse(data, content_type='application/json')
 
 def on_off_campus(request, library, resident, start, end):

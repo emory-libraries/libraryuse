@@ -41,5 +41,7 @@ urlpatterns = patterns(
     url(r'^faculty_divs_dprt/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_divs_dprt, name='faculty_divs_dprt'),
     url(r'^faculty_dprt_count/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_dprt_count, name='faculty_dprt_count'),
 
+    url(r'^export/(?P<start>.+)/(?P<end>.+)/$', views.export, name='export'),
+
     url(r'^api/', include(v1_api.urls)),
 )
