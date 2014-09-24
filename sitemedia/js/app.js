@@ -663,7 +663,7 @@ App.ReportController = Ember.Controller.extend({
       else{
         consolidatedPoints.push(label);
         allothers+=parseInt(_this.value);
-        consolidatedSeries.push([label,parseInt(_this.value)])
+        consolidatedSeries.push({name:label,y:parseInt(_this.value),real:" | of total: "+(parseInt(_this.value)/parseInt(total_sum)*100).toPrecision(3)+"%"})
       }
     });
     
@@ -726,7 +726,7 @@ App.ReportController = Ember.Controller.extend({
             padding: 0,
             borderRadius:'5px'
           },
-          pointFormat: '{series.name}: <b>{point.y}</b> <br/> ({point.percentage:.2f}%)',
+          pointFormat: '{series.name}: <b>{point.y}</b> <br/> ({point.percentage:.2f}%{point.real})',
         },
         navigation: {
             buttonOptions: {
