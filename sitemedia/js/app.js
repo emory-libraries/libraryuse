@@ -1346,7 +1346,8 @@ App.ReportController = Ember.Controller.extend({
     
     var root = "/top_dprtn_",
         timerange = start+"/"+end+"/",
-        names = ["students","faculty","staff"];
+        names = ["students","faculty","staff"],
+        colors = ["rgb(60, 221, 182)","rgb(61, 188, 219)","rgb(139, 160, 241)"]
         
     var seriesData = [],
         drilldownSeries =[],
@@ -1356,7 +1357,7 @@ App.ReportController = Ember.Controller.extend({
       $.each(names, function(i, name) {
         var jsonURL = root+names[i]+"/"+lib+"/"+timerange;
         
-        console.log(jsonURL);
+        // console.log(jsonURL);
         
         var json = $.getJSON(jsonURL)
         
@@ -1386,10 +1387,12 @@ App.ReportController = Ember.Controller.extend({
           var point = {
                         name: capitaliseFirstLetter(name),
                         y: parseInt(d.total),
+                        color:colors[i],
                         drilldown: name
                       };
           var $table = $("#total-tables #"+name+"-totals")
-          $table.append($("<tr/>").addClass('header').append($("<th/>").html(point.name),$("<th/>").html(point.y)));  
+          $table.html('');
+          $table.append($("<tr/>").css({"border-top-color":colors[i]}).addClass('header').append($("<th/>").html(point.name),$("<th/>").html(point.y)));  
           $.each(d.data,function(){
             var name = this.label,
                 value = this.value;
@@ -1476,6 +1479,7 @@ App.ReportController = Ember.Controller.extend({
             dataLabels: {
               enabled: true,
               format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+              distance: 20,
               style: {
                 color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
               }
@@ -1485,6 +1489,7 @@ App.ReportController = Ember.Controller.extend({
         series: [{
           name:'Percentage Use',
           data: seriesData,
+          size: '90%',
           innerSize: '80%'
         }],
         drilldown: {

@@ -683,6 +683,12 @@ table#table-report {
   }
 }
 
+#report-chart .chart.totals{
+  min-height: 600px;
+  max-height: 800px;
+}
+
+
 @media (min-width:1300px){
   #averages-chart .chart,
   #report-chart .chart{
@@ -783,15 +789,17 @@ div#report-chart {
 #total-tables .table {
     background-color: white; border-radius: 2px; box-shadow: 0 4px 6px 1px rgba(50, 50, 50, 0.14); box-sizing: border-box; color: black; line-height: 1.5; 
     margin: 3em auto 0;  
-    padding: 37px 35px 30px 37px; 
+    padding: 25px 35px 30px 37px; 
     width: 100%; 
     display: block;
 }
 
 #total-tables .table th{
-  border-top:0;
   font-size:1.2em;
   color: rgb(120, 123, 134);
+  border-top-color: inherit;
+  padding-top: 1em;
+  padding-bottom: 1em;
 }
 
 #total-tables .table tbody {
