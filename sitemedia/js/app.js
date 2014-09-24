@@ -1447,7 +1447,7 @@ App.ReportController = Ember.Controller.extend({
             padding: 0,
             borderRadius:'5px'
           },
-          pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b> <br/> ({point.y} patorns)',
+          pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b> <br/> ({point.y} visitors)',
         },
         
         plotOptions: {
