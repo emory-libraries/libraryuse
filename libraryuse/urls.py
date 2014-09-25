@@ -29,17 +29,23 @@ urlpatterns = patterns(
     url(r'^on_off_campus/(?P<library>.+)/(?P<resident>.+)/(?P<start>.+)/(?P<end>.+)/$', views.on_off_campus, name='on_off_campus'),
     url(r'^student_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.student_class, name='student_class'),
     url(r'^faculty_staff_class/(?P<library>.+)/(?P<classification>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_staff_class, name='faculty_staff_class'),
-    url(r'^top_academic_plan/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_academic_plan, name='top_academic_plan'),
+    
+    url(r'^top_academic_plan/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_academic_plan, name='top_academic_plan'),    
     url(r'^top_academic_career/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_academic_career, name='top_academic_career'),
+    
     url(r'^top_dprtn/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn, name='top_dprtn'),
-    url(r'^top_dprtn_faculty/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn_faculty, name='top_dprtn_faculty'),
-    url(r'^top_dprtn_staff/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn_staff, name='top_dprtn_staff'),
-    url(r'^top_dprtn_students/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn_students, name='top_dprtn_students'),
+    url(r'^top_dprtn_type/(?P<library>.+)/(?P<person_type>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_dprtn_type, name='top_dprtn_type'),
+
     url(r'^top_division/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_division, name='top_division'),
+    url(r'^top_division_type/(?P<library>.+)/(?P<person_type>.+)/(?P<start>.+)/(?P<end>.+)/$', views.top_division_type, name='top_division_type'),
+    
     url(r'^averages/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/(?P<start_hour>.+)/(?P<end_hour>.+)/(?P<dow>.+)/(?P<filter_on>.+)/$', views.averages, name='averages'),
     url(r'^total_averages/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/(?P<start_hour>.+)/(?P<end_hour>.+)/(?P<dow>.+)/$', views.total_averages, name='total_averages'),
+    
     url(r'^faculty_divs_dprt/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_divs_dprt, name='faculty_divs_dprt'),
     url(r'^faculty_dprt_count/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_dprt_count, name='faculty_dprt_count'),
+    
+    url(r'^classification_totals/(?P<library>.+)/(?P<person_type>.+)/(?P<start>.+)/(?P<end>.+)/$', views.classification_totals, name='classification_totals'),
 
     url(r'^export/(?P<start>.+)/(?P<end>.+)/$', views.export, name='export'),
 

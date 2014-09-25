@@ -1334,6 +1334,8 @@ App.ReportController = Ember.Controller.extend({
     
   }).property("model.data"),
   
+  totalCategory: "classification_totals",
+  
   drawTotalsChart: (function(){
     var data = this.get("model.data"),
     name = this.get("model.meta.title"),
@@ -1344,18 +1346,19 @@ App.ReportController = Ember.Controller.extend({
     start = convertDate(reportParams.get('start')),
     end = convertDate(reportParams.get('end'));
     
-    var root = "/top_dprtn_",
+    var root = "/"+this.get("totalCategory"),
         timerange = start+"/"+end+"/",
-        names = ["students","faculty","staff"],
-        colors = ["rgb(60, 221, 182)","rgb(61, 188, 219)","rgb(139, 160, 241)"]
+        names = ["student","faculty","staff"],
+        colors = ["rgb(125, 213, 178)","rgb(61, 188, 219)","rgb(139, 160, 241)"]
         
     var seriesData = [],
         drilldownSeries =[],
-        seriesCounter = 0;
+        seriesCounter = 0,
+        seriesName = '';
         
     function draw(){
       $.each(names, function(i, name) {
-        var jsonURL = root+names[i]+"/"+lib+"/"+timerange;
+        var jsonURL = root+"/"+lib+"/"+names[i]+"/"+timerange;
         
         // console.log(jsonURL);
         
@@ -1364,6 +1367,7 @@ App.ReportController = Ember.Controller.extend({
         json.done(function(data){
           if(data.data.length>0){
             jsonResponse(data)
+            seriesName = data.meta.title;
           }
           else {
             data.data.push(0);
@@ -1375,14 +1379,14 @@ App.ReportController = Ember.Controller.extend({
         json.fail(function(){
           console.log('Error: JSON Ajax function failed.')
           var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
-          $container.html($error);
+          $('#report-chart .chart').html($error);
           $error.fadeOut(0).fadeIn(500);
           dataURL.set("drawing","")
         });
         
-        
         function jsonResponse(data) {
           var d = data;
+          var total_sum = parseInt(d.all_total);
           var dd_data = [];
           var point = {
                         name: capitaliseFirstLetter(name),
@@ -1395,8 +1399,8 @@ App.ReportController = Ember.Controller.extend({
           $table.append($("<tr/>").css({"border-top-color":colors[i]}).addClass('header').append($("<th/>").html(point.name),$("<th/>").html(point.y)));  
           $.each(d.data,function(){
             var name = this.label,
-                value = this.value;
-            dd_data.push([name,value])
+                value = parseInt(this.value);
+            dd_data.push({name:name,y:value,real:" | of total: "+(parseInt(value)/parseInt(total_sum)*100).toPrecision(3)+"%"})
             if(name=="CenterforCommunityPartnerships"){
               name = "Center for Community Partnerships"
             }
@@ -1469,7 +1473,7 @@ App.ReportController = Ember.Controller.extend({
             padding: 0,
             borderRadius:'5px'
           },
-          pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b> <br/> ({point.y} visitors)',
+          pointFormat: '{series.name}: <b>{point.y}</b> <br/> ({point.percentage:.2f}%{point.real})',
         },
         
         plotOptions: {
@@ -1534,8 +1538,7 @@ App.ReportController = Ember.Controller.extend({
       });
     });
     
-  }).property("model.data")
-  
+  }).property("model.data","totalCategory")
 });
 
 

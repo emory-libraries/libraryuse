@@ -275,7 +275,6 @@ def top_academic_plan(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
-
 def top_dprtn(request, library, start, end):
 
     location = location_name(library)
@@ -294,16 +293,27 @@ def top_dprtn(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
     
-def top_dprtn_faculty(request, library, start, end):
+    
+def top_dprtn_type(request, library, person_type, start, end):
 
+    #distinct_flag = request.GET.get('distinct', False)
+    
     location = location_name(library)
 
     numbers = LibraryVisit.objects.values('dprt_n') \
                 .annotate(total=Count('dprt_n')) \
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
-                .filter(location = location) \
-                .filter(Q(prsn_c_type = 'F'))
+                .filter(location = location)
+
+    if person_type == 'student':
+        numbers = numbers.filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
+
+    elif person_type == 'faculty':
+        numbers = numbers.filter(prsn_c_type = 'F')
+
+    elif person_type == 'staff':
+        numbers = numbers.filter(prsn_c_type = 'E')
 
     distinct = numbers.values('dprt_n').distinct().count()
 
@@ -313,43 +323,6 @@ def top_dprtn_faculty(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
     
-def top_dprtn_students(request, library, start, end):
-
-    location = location_name(library)
-
-    numbers = LibraryVisit.objects.values('dprt_n') \
-                .annotate(total=Count('dprt_n')) \
-                .order_by('-total') \
-                .filter(visit_time__range=[start, end]) \
-                .filter(location = location) \
-                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
-
-    distinct = numbers.values('dprt_n').distinct().count()
-
-    total = numbers.values('dprt_n').count()
-
-    data = chart_data(numbers, distinct, total, start, end, library)
-
-    return StreamingHttpResponse(data, content_type='application/json')
-    
-def top_dprtn_staff(request, library, start, end):
-
-    location = location_name(library)
-
-    numbers = LibraryVisit.objects.values('dprt_n') \
-                .annotate(total=Count('dprt_n')) \
-                .order_by('-total') \
-                .filter(visit_time__range=[start, end]) \
-                .filter(location = location) \
-                .filter(Q(prsn_c_type = 'E'))
-
-    distinct = numbers.values('dprt_n').distinct().count()
-
-    total = numbers.values('dprt_n').count()
-
-    data = chart_data(numbers, distinct, total, start, end, library)
-
-    return StreamingHttpResponse(data, content_type='application/json')
 
 def top_division(request, library, start, end):
 
@@ -368,6 +341,35 @@ def top_division(request, library, start, end):
     data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
+
+def top_division_type(request, library, person_type, start, end):
+
+    location = location_name(library)
+
+    numbers = LibraryVisit.objects.values('dvsn_n') \
+                .annotate(total=Count('dvsn_n')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location)
+                
+    if person_type == 'student':
+        numbers = numbers.filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
+
+    elif person_type == 'faculty':
+        numbers = numbers.filter(prsn_c_type = 'F')
+
+    elif person_type == 'staff':
+        numbers = numbers.filter(prsn_c_type = 'E')
+        
+    distinct = numbers.values('dvsn_n').distinct().count()
+
+    total = numbers.values('dvsn_n').count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+    
+
 
 def calculate_dates(start, end):
     start_date = datetime.strptime(start, '%Y-%m-%d').date()
@@ -808,7 +810,6 @@ def faculty_divs_dprt(request, library, start, end):
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 
-
 def top_academic_career(request, library, start, end):
 
     '''
@@ -911,8 +912,6 @@ def top_academic_career(request, library, start, end):
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 
-
-
 def percent_date(whole, part, label):
     return '[%s: %s]' % (label, (100 * float(part)/float(whole)))
 
@@ -961,25 +960,110 @@ def classifications(request):
 
 def student_classifications(request):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
-    acidemic_plans = LibraryVisit.objects.values_list('acpl_n', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
-    department = LibraryVisit.objects.values_list('dprt_n', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
-
     data = []
     jsonp = []
 
-    def add_classes(classes, title):
-        title_list = [title]
-        class_list = []
+    jsonp = '{'
+    jsonp += '"student_classes":["'
+    jsonp += '","'.join(student_classes)
+    jsonp += '"]'
+    jsonp += '}'
 
-        for item in classes:
-            class_list.append(str('%s' % item))
+    return HttpResponse(jsonp, content_type='application/json')
+    
+    
+def classification_totals(request, library, person_type, start, end):
+    student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
+    
+    location = location_name(library)
+    
+    def class_totals(location, person_type, start, end):
+        numbers =0
+                
+        if person_type == 'all':
+            numbers = LibraryVisit.objects.values('prsn_e_type') \
+                    .annotate(total=Count('prsn_e_type')) \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .order_by('-total')
 
-        list.append(class_list)
-        return title_list
+        elif person_type == 'student':
+            numbers = LibraryVisit.objects.values('stdn_e_clas') \
+                    .annotate(total=Count('stdn_e_clas')) \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .order_by('-total') \
+                    .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
 
-    data.append(add_classes(student_classes, 'student_classes'))
-    data.append(add_classes(acidemic_plans, 'acidemic_plans'))
-    data.append(add_classes(department, 'department'))
-    jsonp.append(json.dumps(data))
+        elif person_type == 'faculty':
+            numbers = LibraryVisit.objects.values('dvsn_n') \
+                    .annotate(total=Count('dvsn_n')) \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .order_by('-total') \
+                    .filter(prsn_c_type = 'F')
 
+        elif person_type == 'staff':
+            numbers = LibraryVisit.objects.values('dvsn_n') \
+                    .annotate(total=Count('dvsn_n')) \
+                    .filter(visit_time__range=[start, end]) \
+                    .filter(location = location) \
+                    .order_by('-total') \
+                    .filter(prsn_c_type = 'E')
+                
+        return numbers
+        
+        
+    student_total = class_totals(location, "student", start, end)
+    faculty_total = class_totals(location, "faculty", start, end)
+    staff_total = class_totals(location, "staff", start, end)
+    
+    all_total = student_total.values("prsn_i_ecn").count() + faculty_total.values("prsn_i_ecn").count() + staff_total.values("prsn_i_ecn").count()
+
+    jsonp = '{"data":['
+    
+    sort_by = "";
+    
+    if person_type == 'all':
+        sort_by = "prsn_e_type"
+
+    elif person_type == 'student':
+        sort_by = "stdn_e_clas"
+
+    elif (person_type == 'faculty' or person_type == 'staff'):
+        sort_by = "dvsn_n"
+    
+    class_list = class_totals(location, person_type, start, end)
+
+    for person_class in class_list:
+        
+        class_name = person_class[sort_by]
+
+        visit_count = person_class["total"]
+
+        jsonp += '{'
+
+        jsonp += '"label": "%s",' % class_name
+
+        jsonp += '"value": "%s"' % visit_count
+
+        jsonp += '},'
+
+    #remove last comma
+    if(jsonp[-1:] != '['):
+      jsonp = jsonp[:-1]
+    
+    total = class_list.values("prsn_i_ecn").count()
+    
+    
+    jsonp += '],'
+    jsonp += '"total":["%s"],' % total
+    jsonp += '"all_total":["%s"],' % all_total
+    jsonp += '"meta":{'
+    jsonp += '"strt_date":["%s"],' % start
+    jsonp += '"end_date":["%s"],' % end
+    jsonp += '"title":["%s"],' % ("classification totals for " +person_type)
+    jsonp += '"queried_at":["%s"]' % datetime.now()
+    jsonp += '}}'
+    
     return HttpResponse(jsonp, content_type='application/json')
