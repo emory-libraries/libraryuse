@@ -1493,7 +1493,7 @@ App.ReportController = Ember.Controller.extend({
         series: [{
           name:'Percentage Use',
           data: seriesData,
-          size: '90%',
+          size: '80%',
           innerSize: '80%'
         }],
         drilldown: {

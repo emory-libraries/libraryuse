@@ -378,12 +378,12 @@ a.list-group-item .list-group-item-heading {
 }
 
 
-@media(max-width:767px){
-    .highcharts-button, 
-    .highcharts-input-group{
+@media(max-width:640px){
+    .card .highcharts-button, 
+    .card .highcharts-input-group{
         display: none;
     }
-    .highcharts-scrollbar+text{
+    .card .highcharts-scrollbar+text{
       opacity:0;
     }
 }
@@ -684,7 +684,7 @@ table#table-report {
 }
 
 #report-chart .chart.totals{
-  min-height: 600px;
+  min-height: 500px;
   max-height: 800px;
 }
 
