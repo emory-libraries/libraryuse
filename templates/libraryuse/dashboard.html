@@ -81,15 +81,18 @@
                 </div>
               </li>
               <li class="icon icon-arrow-left">
-                <a href="#"><span class="glyphicon glyphicon-user"></span> Audience</a>
+                <a href="#"><span class="glyphicon glyphicon-user"></span> Affiliation</a>
                 <div class="mp-level filter-audience">
-                  <h2><span class="glyphicon glyphicon-user"></span> Audience</h2>
+                  <h2><span class="glyphicon glyphicon-user"></span> Affiliation</h2>
                   <ul>
                     <li class="icon icon-arrow-left">
                       <a href="#"><span class="fa fa-graduation-cap"></span> Students</a>
                       <div class="mp-level filter-students">
                         <h2><span class="fa fa-graduation-cap"> Students</h2>
                         <ul class="students">
+                          <li>
+                            <a href="#/library/all/students/all">all</a>
+                          </li>
                           {{#each item in model.student_classes}}
                             {{students-filter-button title=item}}
                           {{/each}}
@@ -101,7 +104,10 @@
                       <div class="mp-level filter-faculty">
                         <h2><span class="fa fa-coffee"></span> Faculty</h2>
                         <ul class="faculty">
-                          {{#each item in model.faculty_divisions}}
+                          <li>
+                            <a href="#/library/all/faculty/all">all</a>
+                          </li>
+                          {{#each item in model.departments}}
                             {{faculty-filter-button title=item}}
                           {{/each}}
                         </ul>
@@ -110,30 +116,37 @@
                   </ul>
                 </div>
               </li>
-              {{!--
+              
               <li class="icon icon-arrow-left">
                 <a href="#"><span class="glyphicon glyphicon-list-alt"></span> Degree</a>
                 <div class="mp-level filter-academic-plan">
                   <h2><span class="glyphicon glyphicon-list-alt"></span> Degree</h2>
-                  <ul>
+                  <ul class="degree">
+                    <li>
+                      <a href="#/library/all/degree/all">all</a>
+                    </li>
                     {{#each item in model.academic_plans}}
-                      {{filter-button title=item}}
+                      {{degree-filter-button title=item}}
                     {{/each}}
                   </ul>
                 </div>
               </li>
+              
               <li class="icon icon-arrow-left">
                 <a href="#"><span class="glyphicon glyphicon-briefcase"></span> School</a>
                 <div class="mp-level">
                   <h2><span class="glyphicon glyphicon-briefcase"></span> School</h2>
-                  <ul>
+                  <ul class="school">
+                    <li>
+                      <a href="#/library/all/school/all">all</a>
+                    </li>
                     {{#each item in model.academic_career}}
-                      {{filter-button title=item}}
+                      {{career-filter-button title=item}}
                     {{/each}}
                   </ul>
                 </div>
               </li>
-              --}}
+
               {{clear-filters-button}}
             </ul>
           </div>
@@ -157,6 +170,9 @@
                   {{/link-to}}
                   {{#link-to "averages" tagName="li"}}
                       <a {{bind-attr href="view.href"}}>Averages</a>
+                  {{/link-to}}
+                  {{#link-to "download" tagName="li"}}
+                      <a {{bind-attr href="view.href"}}>Download</a>
                   {{/link-to}}
                 </ul>
               </nav>
@@ -260,6 +276,29 @@
  	<p {{bind-attr class=':small :net-lib-change change.net_class'}}>{{change.value}}<span class="glyphicon glyphicon-arrow-up"></span></p>
   </script>
 
+  <script type="text/x-handlebars" id="download">
+    <div class="container" id="download">
+      <header>
+        <h2>Download the Raw CSV</h2>
+      </header>
+      <div class="report-dates inputs">
+        <form class="form-inline" role="form">
+          <label class="label" for="start"><span>From</span></label>
+          <label class="label" for="end"><span>To</span></label>
+          <div class="clearfix"></div>
+          {{view App.CalendarDatePicker valueBinding="start" class="start form-control" id="start"}}
+          {{view App.CalendarDatePicker valueBinding="end" class="end form-control" id="end"}}
+        </form>
+        {{#if download_link}}
+          <a class="btn btn-default btn-download" {{bind-attr download='download_link'}} {{bind-attr href='download_link'}}>Download CSV</a>
+        {{else}}
+          <a class="btn btn-default disabled">Download Unavailable :(</a>
+        {{/if}}
+      </div>
+      
+    </div>
+  </script>
+
   <script type="text/x-handlebars" id="library">
     {{outlet}}
   </script>
@@ -268,7 +307,7 @@
     {{view App.NavView}}
 
     <section>
-      <div class="visitor-count">
+      <div class="visitor-count" style="opacity:0;">
         <dl class="total">
           <dt>Total Visits</dt>
           <dd class="number"><span>0</span></dd>
@@ -306,7 +345,7 @@
     	</div>
     <section id="filterTabs" class="default-hidden">
       <ul class="nav nav-pills">
-        <li class="active"><a href="#audience" data-toggle="tab">Audience</a></li>
+        <li class="active"><a href="#audience" data-toggle="tab">Affiliation</a></li>
         <li><a href="#school" data-toggle="tab">School</a></li>
         <li><a href="#dept" data-toggle="tab">Dept</a></li>
         <li><a href="#academic" data-toggle="tab">Academic</a></li>

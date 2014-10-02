@@ -125,6 +125,7 @@ section#filterTabs {
 .error-loading {
     text-align: center;
     width: 100%;
+    float: left;
 }
 
 .error-loading .btn-refresh {
@@ -787,7 +788,12 @@ div#report-chart {
 }
 
 #total-tables .table {
-    background-color: white; border-radius: 2px; box-shadow: 0 4px 6px 1px rgba(50, 50, 50, 0.14); box-sizing: border-box; color: black; line-height: 1.5; 
+    background-color: white; 
+    border-radius: 2px; 
+    box-shadow: 0 4px 6px 1px rgba(50, 50, 50, 0.14); 
+    box-sizing: border-box; 
+    color: black; 
+    line-height: 1.5; 
     margin: 3em auto 0;  
     padding: 25px 35px 30px 37px; 
     width: 100%; 
@@ -809,4 +815,49 @@ div#report-chart {
 
 #total-tables .table td{
   word-wrap: break-word;
+}
+
+div#download {
+    background-color: white; 
+    border-radius: 2px; 
+    box-shadow: 0 4px 6px 1px rgba(50, 50, 50, 0.14); 
+    box-sizing: border-box; 
+    color: black; 
+    line-height: 1.5; 
+    margin: 3em auto 1em;  
+    padding: 25px 35px 30px 37px; 
+    max-width: 600px; 
+    display: block;
+}
+
+#download header{
+  text-align:center;
+  padding-top: 30px;
+}
+
+#download header h2 {
+    color: rgb(196, 203, 221);
+    font-size: 2.5em;
+}
+
+#download .report-dates.inputs {
+  text-align: center;
+  padding: 20px 0 35px;
+}
+
+a.btn.btn-default.btn-download {
+    margin: 40px 15px 0;
+    min-width: 25%;
+    padding: 15px;
+    background-color: rgb(97, 221, 161);
+    font-size: 1.2em;
+    color: white;
+    border-color: rgb(102, 201, 141);
+    border-bottom-width: 3px;
+}
+
+a.btn.btn-default.btn-download:focus,
+a.btn.btn-default.btn-download:hover{
+    border-color: rgb(107, 204, 157);
+    background-color: rgb(107, 204, 157);
 }

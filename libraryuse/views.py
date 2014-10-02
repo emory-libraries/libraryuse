@@ -239,14 +239,16 @@ def student_class(request, library, classification, start, end):
 def faculty_staff_class(request, library, classification, start, end):
 
     location = location_name(library)
-
+    
     numbers = LibraryVisit.objects.values('visit_time') \
                 .annotate(total=Count('visit_time')) \
                 .order_by('visit_time') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
-                .filter(Q(prsn_c_type = 'F')) \
-                .filter(dvsn_n = classification)
+                .filter(Q(prsn_c_type = 'F'))
+                
+    if classification != "all":
+      numbers = numbers.filter(dprt_n = classification)
 
     distinct = numbers.values("prsn_i_ecn").distinct().count()
 
@@ -255,6 +257,51 @@ def faculty_staff_class(request, library, classification, start, end):
     data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
+
+def degree_class(request, library, classification, start, end):
+
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('visit_time') \
+                .annotate(total=Count('visit_time')) \
+                .order_by('visit_time') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S') | Q(prsn_c_type = 'F') | Q(prsn_c_type = 'E'))
+                
+    if classification != "all":
+      numbers = numbers.filter(acpl_n = classification)
+
+    distinct = numbers.values("prsn_i_ecn").distinct().count()
+
+    total = numbers.values("prsn_i_ecn").count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
+def career_class(request, library, classification, start, end):
+
+    location = location_name(library)
+    
+    numbers = LibraryVisit.objects.values('visit_time') \
+                .annotate(total=Count('visit_time')) \
+                .order_by('visit_time') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = location) \
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S') | Q(prsn_c_type = 'F') | Q(prsn_c_type = 'E'))
+                
+    if classification != "all":
+      numbers = numbers.filter(acca_i = classification)
+
+    distinct = numbers.values("prsn_i_ecn").distinct().count()
+
+    total = numbers.values("prsn_i_ecn").count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
 
 def top_academic_plan(request, library, start, end):
 
@@ -265,7 +312,7 @@ def top_academic_plan(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = location) \
-                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S') | Q(prsn_c_type = 'F') | Q(prsn_c_type = 'E'))
 
     distinct = numbers.values('acpl_n').distinct().count()
 

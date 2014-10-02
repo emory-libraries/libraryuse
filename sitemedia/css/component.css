@@ -204,6 +204,10 @@ html, body, .container, .scroller {
   height: 90%;
 }
 
+.mp-level ul li{
+  text-transform: capitalize;
+}
+
 .mp-menu h2 {
   margin: 0;
   padding: 1em;

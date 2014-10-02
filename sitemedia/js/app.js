@@ -33,6 +33,7 @@ App.Router.map(function() {
     this.resource('avg-report', { path: '/:lib/:start/:end/:time1/:time2/:dow' });  
   });
   
+  this.resource('download');
   
   this.resource('json');
   // this.route("fourOhFour", { path: "*path"});
@@ -71,6 +72,16 @@ App.StudentsFilterButtonComponent = Ember.Component.extend({
 App.FacultyFilterButtonComponent = Ember.Component.extend({
   layoutName:"components/filter-button",
   addon: 'faculty'
+});
+
+App.DegreeFilterButtonComponent = Ember.Component.extend({
+  layoutName:"components/filter-button",
+  addon: 'degree'
+});
+
+App.CareerFilterButtonComponent = Ember.Component.extend({
+  layoutName:"components/filter-button",
+  addon: 'school'
 });
 
 
@@ -181,8 +192,8 @@ App.CalendarDatePicker = Ember.TextField.extend({
   }.observes("value"),
   
   didInsertElement: function(){
-    var formatted_start = convertDate(reportParams.get("start"))
-    var formatted_end = convertDate(reportParams.get("end"))
+    var formatted_start = convertDate(reportParams.get("start") || dataURL.get("start"))
+    var formatted_end = convertDate(reportParams.get("end") || dataURL.get("end"))
     
     
     var defaults = {
@@ -1381,6 +1392,7 @@ App.ReportController = Ember.Controller.extend({
           var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
           $('#report-chart .chart').html($error);
           $error.fadeOut(0).fadeIn(500);
+          $(".loading-data.page-level").hide()
           dataURL.set("drawing","")
         });
         
@@ -1782,6 +1794,7 @@ App.AvgReportController = Ember.Controller.extend({
           var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
           $container.html($error);
           $error.fadeOut(0).fadeIn(500);
+          $(".loading-data.page-level").hide()
           dataURL.set("drawing","")
         });
         
@@ -2069,6 +2082,12 @@ App.DemoRoute = Ember.Route.extend({
     else if(model.category=='faculty'){
       model.category = 'faculty_staff_class';
     }
+    else if(model.category=='degree'){
+      model.category = 'degree_class';
+    }
+    else if(model.category=='school'){
+      model.category = 'career_class';
+    }
     else{
       
     }
@@ -2225,6 +2244,25 @@ App.NetChangeComponent = Ember.Component.extend({
     
   }
 });
+
+App.DownloadRoute = Ember.Route.extend({
+  model:function(){
+    $(".global-loading").hide();
+  }
+});
+
+App.DownloadController = Ember.Controller.extend({
+  start:dataURL.get("start"),
+  end: dataURL.get("end"),
+  download_link:function(){
+    var start = this.get("start"),
+        end = this.get("end");
+    
+    var link ="/export/"+convertDate(start)+"/"+convertDate(end)+"/";
+    
+    return link;
+  }.property("","start","end")
+})
 
 
 //Options Date Range
@@ -2397,13 +2435,18 @@ function setDatepickerPosition(chart) {
       }
     }
     ,maxDate:new Date
-  })
+    ,dateFormat:"yy-mm-dd"
+  });
+
 }
 
 // function that builds both the charts on the Library pages
 function SUPERCHART(){
   if(dataURL.get("drawing")){
     return
+  }
+  if($("#container-lastweek").length>0 && $(".mp-pushed").length>0 && $(".clock").length==0){
+    $(".loading-data.page-level").show();
   }
   dataURL.set("drawing",true)
   
@@ -2474,6 +2517,7 @@ function SUPERCHART(){
       var $error = $('<div/>').attr({'class':'error-loading'}).append('<span/>').html("<p>Sorry, the data failed to load from the server.</p>");
       $container.html($error);
       $error.fadeOut(0).fadeIn(500);
+      $(".loading-data.page-level").hide()
       dataURL.set("drawing","")
     });
     
