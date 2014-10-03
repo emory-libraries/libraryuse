@@ -2258,6 +2258,9 @@ App.DownloadController = Ember.Controller.extend({
     var start = this.get("start"),
         end = this.get("end");
     
+    start = new Date(start);
+    end = new Date(end);
+    
     var link ="/export/"+convertDate(start)+"/"+convertDate(end)+"/";
     
     return link;
