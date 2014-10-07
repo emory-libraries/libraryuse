@@ -677,16 +677,16 @@ table#table-report {
   padding: 25px 0;
 }
 
-@media (max-width:1300px){
-  #averages-chart .chart,
-  #report-chart .chart{
-    max-height: 400px;
-  }
-}
 
 #report-chart .chart.totals{
   min-height: 500px;
   max-height: 800px;
+}
+
+#report-chart .chart.affix-force-top{
+    position: relative !important;
+    top:auto !important;
+    bottom:auto !important;
 }
 
 
@@ -694,6 +694,9 @@ table#table-report {
   #averages-chart .chart,
   #report-chart .chart{
     min-height: 600px;
+  }
+  #report-chart #onoffcampus-chart .chart{
+    min-height:400px;
   }
 }
 
@@ -740,7 +743,7 @@ section>.visitor-count{
 }
 
 .visitor-count > dl {
-    width: 50%;
+    width: 43%;
     float: left;
     text-align: center;
 }
@@ -751,6 +754,10 @@ section>.visitor-count{
     }
     .visitor-count > dl {
         margin-bottom: 30px;
+        margin-left: 14%;
+    }
+    .visitor-count > dl:first-child{
+      margin-left:0px;
     }
 }
 
@@ -765,24 +772,34 @@ section>.visitor-count{
     color: rgb(99, 105, 139);
 }
 
+.visitor-count>dl.on-campus>dt{
+  color: #53B465;
+}
+
+.visitor-count>dl.off-campus>dt{
+  color: #E48F6C;
+}
+
 .highcharts-range-selector {
     z-index: -3;
 }
 
 #onoffcampus-chart .pie.chart{
-  width:350px;
+  width: 100%;
   margin:auto;
 }
 
-div#report-chart {
-    position: relative;
-    margin-top: 20px;
+@media (min-width:768px) and (max-width:1200px){
+  #onoffcampus-chart .pie.chart .highcharts-data-labels{
+    display:none;
+  }
 }
 
 div#report-chart {
     position: relative;
     margin-top: 20px;
 }
+
 #table-report.disabled{
     opacity:0.2;
 }

@@ -970,7 +970,10 @@ App.ReportController = Ember.Controller.extend({
               return (this.bottom = $('.footer').outerHeight(true))
             }
           }
-        });
+        }).removeClass("affix-force-top");
+      }
+      else{
+        $('#report-chart .chart').addClass("affix-force-top");
       }
     }
     Ember.run.once(this,function(){
@@ -1070,6 +1073,8 @@ App.ReportController = Ember.Controller.extend({
         series: [{
             type: 'pie',
             name: 'On-Campus v Off-Campus Usage',
+            size: '65%',
+            innerSize: '65%',
             data: [
               {
                 name:"On Campus",
