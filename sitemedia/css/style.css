@@ -38,6 +38,18 @@ body >.ember-view{
   margin-top: 15%;
 }
 
+.catchall {
+    text-align: center;
+    padding: 50px 1em;
+    opacity: 0.4;
+    color: rgb(77, 81, 97);
+}
+
+.catchall span.fa {
+    font-size: 15em;
+    opacity: 0.25;
+}
+
 section {
     width: 100%;
     float: left;
@@ -84,6 +96,10 @@ a{
 #header .navbar-nav>li {
     float: left;
     position:relative;
+}
+
+#header .navbar-nav>li a{
+    color: rgb(235, 198, 48);
 }
 
 #header .navbar-nav>li.active>a {
@@ -664,11 +680,11 @@ table#table-report {
 
 #averages-chart .loading-data {
     position: absolute;
-    top: 50%;
+    top: 44%;
     left:0;
     width:100%;
     text-align:center;
-    color: rgb(243, 181, 49);
+    color: rgb(179, 179, 179);
 }
 
 #averages-chart .chart,
@@ -903,4 +919,15 @@ a.btn.btn-default.btn-download.disabled {
 
 .btn-download.disabled+.download-message{
   opacity:1;
+}
+
+.loading-reports{
+  position: absolute;
+  width:100%;
+  text-align:center;
+  top:44%;
+  left:0;
+  color: rgb(255, 194, 0);
+  z-index: 4;
+  text-shadow: 0px 0px 5px rgba(39, 39, 39, 0.48);
 }

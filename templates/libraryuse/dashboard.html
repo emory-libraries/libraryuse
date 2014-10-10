@@ -23,6 +23,8 @@
   <div class="global-loading" id="onLoad">
     Initializing App <span class="fa fa-circle-o-notch fa-spin"></span>
   </div>
+  <div class="loading-reports" style="display:none;"><span class="fa fa-circle-o-notch fa-spin"></span> Loading Reports</div>
+  
   <span class="loading-data page-level" style="display:none;"><span class="fa fa-circle-o-notch fa-spin"></span> Fetching Data</span>
 
 {% verbatim myblock %}
@@ -184,6 +186,13 @@
         </div><!-- /scroller -->
     </div><!-- /pusher -->
 
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="catchall">
+    <div class="catchall">
+        <h2>Sorry, that url is not valid.</h2>
+        <span class="fa fa-meh-o"></span>
+    </div>
   </script>
   
   <script type="text/x-handlebars" data-template-name="components/reload-chart-data-button">
@@ -424,13 +433,13 @@
         <div class="row">
           <ul class="nav nav-tabs nav-justified">
               <li {{bind-attr class="isWoodruff:active"}}>
-                <a href="#" {{action "setLibrary" "woodruff"}}>Woodruff</a>
+                <a href="#/reports/totals/woodruff/" {{action "setLibrary" "woodruff"}}>Woodruff</a>
               </li>
               <li {{bind-attr class="isHealth:active"}}>
-                <a href="#" {{action "setLibrary" "health"}}>Health Science</a>
+                <a href="#/reports/totals/health/" {{action "setLibrary" "health"}}>Health Science</a>
               </li>
               <li {{bind-attr class="isLaw:active"}}>
-                <a href="#" {{action "setLibrary" "law"}}>Law</a>
+                <a href="#/reports/totals/law/" {{action "setLibrary" "law"}}>Law</a>
               </li>
           </ul>
         </div>
@@ -438,19 +447,19 @@
           <div class="col-xs-12 col-md-5 pull-right">
             <ul class="nav nav-pills report-types nav-justified">
               <li {{bind-attr class="isTotals:active"}}>
-                <a href="#" {{action "setType" "totals"}}>Totals</a>
+                <a href="#/reports/totals" {{action "setType" "totals"}}>Totals</a>
               </li>
               <li {{bind-attr class="isAcad:active"}}>
-                <a href="#" {{action "setType" "top_academic_plan"}}>Academic</a>
+                <a href="#/reports/top_academic_plan" {{action "setType" "top_academic_plan"}}>Academic</a>
               </li>
               <li {{bind-attr class="isCareer:active"}}>
-                <a href="#" {{action "setType" "top_academic_career"}}>Schools</a>
+                <a href="#/reports/top_academic_career" {{action "setType" "top_academic_career"}}>Schools</a>
               </li>
               <li {{bind-attr class="isDiv:active"}}>
-                <a href="#" {{action "setType" "faculty_divs_dprt"}}>Divisons</a>
+                <a href="#/reports/faculty_divs_dprt" {{action "setType" "faculty_divs_dprt"}}>Divisons</a>
               </li>
               <li {{bind-attr class="isCampus:active"}}>
-                <a href="#" {{action "setType" "on_off_campus"}}>Campus</a>
+                <a href="#/reports/on_off_campus" {{action "setType" "on_off_campus"}}>Campus</a>
               </li>
             </ul>
           </div>

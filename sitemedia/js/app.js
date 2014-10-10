@@ -5,7 +5,7 @@ App = Ember.Application.create({
 
 App.Router.map(function() {
   this.resource('index', { path: '/' });
-  // this.route('catchall', {path: '/*wildcard'});
+  this.route('catchall', {path: '/*wildcard'});
   this.resource('library', { path: '/library' },function(){
     this.route('all');
     this.route('woodruff');
@@ -98,6 +98,12 @@ App.IndexRoute = Ember.Route.extend({
     this.transitionTo('library.all');
   }
 });
+
+App.CatchallRoute = Ember.Route.extend({
+  model:function(){
+    $(".global-loading").hide();
+  }
+})
 
 App.reportsStore = Ember.Object.extend({
   id: undefined,
@@ -273,12 +279,24 @@ App.AveragesIndexRoute = Ember.Route.extend({
 App.ReportsRoute = App.AveragesRoute = Ember.Route.extend({
   model: function(params) {
     $(document).attr('title', "Reports");
-    Ember.run.next(this, function(){ 
-      $(".visitor-count").css({"opacity":0})
       $(".load-date, #table-report, #total-tables").removeClass('disabled');
-    });
   }
 });
+
+App.ReportsRoute = App.ReportsRoute.extend({
+  model:function(params){
+    this._super();
+    Ember.run.next(this, function(){ 
+      $(".visitor-count").css({"opacity":0.2})
+      if($(".chart").length>0){
+        $( document ).ajaxStop();
+        $(".mp-pusher").addClass("mp-loading");
+        $(".loading-reports").show();
+      }
+    });
+  }
+})
+
 
 App.ReportRoute = App.AvgReportRoute = Ember.Route.extend({
   model: function(params) {
@@ -385,6 +403,10 @@ App.ReportRoute = App.ReportRoute.extend({
     dow: 1
   },
   renderTemplate:function(){
+    Ember.run.next(this, function(){ 
+      $(".mp-pusher").removeClass("mp-loading");
+      $(".loading-reports").hide();
+    });
     if(reportParams.get("id")=="on_off_campus"){
       this.render('report-campus')
     }
