@@ -800,7 +800,11 @@ div#report-chart {
     margin-top: 20px;
 }
 
-#table-report.disabled{
+#total-tables{
+  transition:opacity 0.5s ease;
+}
+
+#table-report.disabled,#total-tables.disabled{
     opacity:0.2;
 }
 
@@ -877,4 +881,26 @@ a.btn.btn-default.btn-download:focus,
 a.btn.btn-default.btn-download:hover{
     border-color: rgb(107, 204, 157);
     background-color: rgb(107, 204, 157);
+}
+
+a.btn.btn-default.btn-download.disabled {
+    background-color: rgb(177, 230, 204);
+    border-color: rgb(183, 219, 197);
+    color: rgb(153, 189, 161);
+}
+
+.download-message{
+  opacity:0;
+  color: #6D79A0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  left: 0;
+  bottom: 30px;
+  transition: opacity 0.5s ease;
+}
+
+.btn-download.disabled+.download-message{
+  opacity:1;
 }

@@ -290,7 +290,8 @@
           {{view App.CalendarDatePicker valueBinding="end" class="end form-control" id="end"}}
         </form>
         {{#if download_link}}
-          <a class="btn btn-default btn-download" {{bind-attr download='download_link'}} {{bind-attr href='download_link'}}>Download CSV</a>
+          <a class="btn btn-default btn-download" draggable="true" {{bind-attr download='download_link'}} {{bind-attr href='download_link'}}>Download CSV</a>
+          <p class="download-message">Download will start momentarily.</p>
         {{else}}
           <a class="btn btn-default disabled">Download Unavailable :(</a>
         {{/if}}
@@ -539,17 +540,26 @@
       <div class="chart totals"></div>
       {{drawTotalsChart}}
     </div>
-    <div class="row" id="total-tables">
+    <div class="row disabled" id="total-tables">
       <div class="col-xs-12 col-sm-6 col-md-4">
         <table id="student-totals" class="table table-hover">
+            <tr>
+              <td><p class="text-center text-muted"><span class="fa fa-circle-o-notch fa-spin"></span></p></td>
+            </tr>
         </table>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
         <table id="faculty-totals" class="table table-hover">
+            <tr>
+              <td><p class="text-center text-muted"><span class="fa fa-circle-o-notch fa-spin"></span></p></td>
+            </tr>
         </table>
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
         <table id="staff-totals" class="table table-hover">
+            <tr>
+              <td><p class="text-center text-muted"><span class="fa fa-circle-o-notch fa-spin"></span></p></td>
+            </tr>
         </table>
       </div>
     </div>

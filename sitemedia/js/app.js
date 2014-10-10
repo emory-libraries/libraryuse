@@ -167,7 +167,7 @@ function loadReport(_this, route){
   var link = '/'+id+'/'+lib+'/'+start+'/'+end,
   name = "Report: "+id+"|"+lib+"|"+start+"|"+end;
   $("#report-chart .loading-data").show();
-  $(".load-date, #table-report").addClass('disabled');
+  $(".load-date, #table-report, #total-tables").addClass('disabled');
   $(".visitor-count").css({"opacity":0})
 
 
@@ -275,7 +275,7 @@ App.ReportsRoute = App.AveragesRoute = Ember.Route.extend({
     $(document).attr('title', "Reports");
     Ember.run.next(this, function(){ 
       $(".visitor-count").css({"opacity":0})
-      $(".load-date, #table-report").removeClass('disabled');
+      $(".load-date, #table-report, #total-tables").removeClass('disabled');
     });
   }
 });
@@ -534,7 +534,7 @@ App.ReportsController = Ember.Controller.extend({
         
         //Hide and Show the loading indicators
         $(".loading-data").not('.page-level').show();
-        $(".load-date, #table-report").addClass('disabled');
+        $(".load-date, #table-report, #total-tables").addClass('disabled');
         $('#report-chart .chart').css('opacity',0)
         
         loadReport(this);
@@ -961,7 +961,7 @@ App.ReportController = Ember.Controller.extend({
       }
       
       $(".loading-data, .extended-load").hide();
-      $(".load-date, #table-report").removeClass('disabled');
+      $(".load-date, #table-report, #total-tables").removeClass('disabled');
       if(model.meta.title[0]!=="Academic Career"){
         $('#report-chart .chart').affix({
           offset: {
@@ -1301,7 +1301,7 @@ App.ReportController = Ember.Controller.extend({
         setTimeout(function(){
           $(".loading-data").hide();
           $(".visitor-count").css({"opacity":1})
-          $(".load-date, #table-report").removeClass('disabled');
+          $(".load-date, #table-report, #total-tables").removeClass('disabled');
           $('#report-chart .chart input.highcharts-range-selector')
           .datepicker({
             beforeShow: function(i,obj) {
@@ -1547,7 +1547,7 @@ App.ReportController = Ember.Controller.extend({
         }
       }).css('opacity',1);
       $(".loading-data, .extended-load").hide();
-      $(".load-date, #table-report").removeClass('disabled');
+      $(".load-date, #table-report, #total-tables").removeClass('disabled');
     }
     Ember.run.once(this,function(){
       Ember.run.next(this, function(){ 
@@ -1656,7 +1656,7 @@ App.AveragesController = Ember.Controller.extend({
         
         //Hide and Show the loading indicators
         $(".loading-data").not('.page-level').show();
-        $(".load-date, #table-report").addClass('disabled');
+        $(".load-date, #table-report, #total-tables").addClass('disabled');
         $('#report-chart .chart').css('opacity',0)
         
         loadReport(this, "avg-report");
@@ -1848,7 +1848,7 @@ App.AvgReportController = Ember.Controller.extend({
       
       function chartAverages(seriesOptions){
         $(".loading-data").hide();
-        $(".load-date, #table-report").removeClass('disabled');
+        $(".load-date, #table-report, #total-tables").removeClass('disabled');
 
         $('#averages-chart .counter').animateNumber({ number: total_averages });
         var $container = $('#averages-chart .chart'),
@@ -2253,6 +2253,11 @@ App.NetChangeComponent = Ember.Component.extend({
 App.DownloadRoute = Ember.Route.extend({
   model:function(){
     $(".global-loading").hide();
+    Ember.run.next(function(){
+      $(".btn-download").on('click',function(){
+        $(this).addClass('disabled');
+      });
+    })
   }
 });
 
@@ -2267,7 +2272,7 @@ App.DownloadController = Ember.Controller.extend({
     end = new Date(end);
     
     var link ="/export/"+convertDate(start)+"/"+convertDate(end)+"/";
-    
+    $(".btn-download").removeClass('disabled');
     return link;
   }.property("","start","end")
 })
@@ -2611,9 +2616,9 @@ function SUPERCHART(){
          }
          return number;
        }
-       
-        $(".visitor-count .total .number").animateNumber({ number: total_sum,easing: 'easeInQuad' },duration(total_sum));
-        $(".visitor-count .distinct .number").animateNumber({ number: distinct_sum, easing: 'easeInQuad' },duration(distinct_sum));
+        var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',')
+        $(".visitor-count .total .number").animateNumber({ number: total_sum,easing: 'easeInQuad',numberStep: comma_separator_number_step },duration(total_sum));
+        $(".visitor-count .distinct .number").animateNumber({ number: distinct_sum, easing: 'easeInQuad',numberStep: comma_separator_number_step },duration(distinct_sum));
         
         drawChart(seriesOptions);
         drawChartLastWeek(seriesOptions);
