@@ -236,10 +236,12 @@ App.CalendarDatePicker = Ember.TextField.extend({
     });
     
     $(".report-dates.inputs>form>input.start")
-    .datepicker("setDate", new Date(urlDate.start));
+    .datepicker("setDate", new Date(urlDate.start))
+    .datepicker( "option", "minDate", new Date(urlDate.start) );
     
     $(".report-dates.inputs>form>input.end")
     .datepicker("setDate", new Date(urlDate.end))
+    .datepicker( "option", "minDate", new Date(urlDate.start) );
   }
 });
 
@@ -1409,7 +1411,7 @@ App.ReportController = Ember.Controller.extend({
           }
           else {
             data.data.push(0);
-            console.log("This is empty.")
+            // console.log("This is empty.")
             jsonResponse(data)
           }
         })
@@ -1811,7 +1813,7 @@ App.AvgReportController = Ember.Controller.extend({
           }
           else {
             data.data.average.push(0);
-            console.log("This is empty.")
+            // console.log("This is empty.")
             jsonResponse(data)
           }
         })
@@ -2454,6 +2456,10 @@ function formatDate(date){
 }
 
 function setDatepickerPosition(chart) {
+  var min_date = $('input.highcharts-range-selector').first().val();
+  min_date = new Date(min_date);
+  min_date = new Date(min_date.getFullYear(), min_date.getMonth(), (min_date.getDate()+1))
+
   $('#'+chart.options.chart.renderTo.id + ' input.highcharts-range-selector')
   .datepicker({
     beforeShow: function(i,obj) {
@@ -2469,6 +2475,7 @@ function setDatepickerPosition(chart) {
         },50);
       }
     }
+    ,minDate: min_date
     ,maxDate:new Date
     ,dateFormat:"yy-mm-dd"
   });
@@ -2529,7 +2536,7 @@ function SUPERCHART(){
   $.each(names, function(i, name) {
     var jsonURL = uri_root+uri_category+path[i]+uri_persons+uri_users+campus_tag+date_range+distinct_tag;
     
-    console.log(jsonURL);
+    // console.log(jsonURL);
     
     var json = $.getJSON(jsonURL)
     
