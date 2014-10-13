@@ -1178,7 +1178,7 @@ App.ReportController = Ember.Controller.extend({
               }
             ]
         }
-      });
+      }).css("opacity",1);
       
       
       Highcharts.setOptions({
