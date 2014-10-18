@@ -41,7 +41,7 @@ def doc():
 def build():
     '''Run a full local build/test cycle.'''
     all_deps()
-    test()
+    #test()
     doc()
 
 
