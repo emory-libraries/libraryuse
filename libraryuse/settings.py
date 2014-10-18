@@ -1,5 +1,5 @@
 # file libraryuse/settings.py
-# 
+#
 #   Copyright 2013 Emory University General Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,7 +99,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, '..', 'templates'),
-    
+
 )
 
 LOGIN_URL = '/admin'
@@ -150,7 +150,8 @@ except ImportError:
         setup details.'''
     del sys
 
-TEST_RUNNER = 'digitizedbooks.testutil.ManagedModelTestRunner'
+TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+TEST_OUTPUT_DIR = 'test-results'
 
 
 # disable south tests and migrations when running tests

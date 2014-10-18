@@ -42,37 +42,37 @@ class LibraryVisitKey(models.Model):
     key = models.CharField(max_length=30, choices=LIBRARY_VISIT_KEY_CHOICES)
 
 class LibraryVisit(models.Model):
-    prsn_i_pblc = models.CharField(max_length=32L, db_column='PRSN_I_PBLC', blank=True) #md5 hash of public identifier of person
-    prsn_i_ecn = models.CharField(max_length=32L, db_column='PRSN_I_ECN', blank=True) #md5 hash of EmoryCard number
-    prsn_i_hr = models.CharField(max_length=7L, db_column='PRSN_I_HR', blank=True) #HR (emplid) of person
-    prsn8hc_i_hr = models.CharField(max_length=7L, db_column='PRSN8HC_I_HR', blank=True) #Healthcare HR ID (emplid) of person
-    prsn_i_sa = models.CharField(max_length=7L, db_column='PRSN_I_SA', blank=True) #SA (emplid) of the person
-    prsn_e_titl_dtry = models.CharField(max_length=70L, db_column='PRSN_E_TITL_DTRY', blank=True) #directory title of person
+    prsn_i_pblc = models.CharField(max_length=32L, db_column='PRSN_I_PBLC', null=True) #md5 hash of public identifier of person
+    prsn_i_ecn = models.CharField(max_length=32L, db_column='PRSN_I_ECN', null=True) #md5 hash of EmoryCard number
+    prsn_i_hr = models.CharField(max_length=7L, db_column='PRSN_I_HR', null=True) #HR (emplid) of person
+    prsn8hc_i_hr = models.CharField(max_length=7L, db_column='PRSN8HC_I_HR', null=True) #Healthcare HR ID (emplid) of person
+    prsn_i_sa = models.CharField(max_length=7L, db_column='PRSN_I_SA', null=True) #SA (emplid) of the person
+    prsn_e_titl_dtry = models.CharField(max_length=70L, db_column='PRSN_E_TITL_DTRY', null=True) #directory title of person
     visit_time = models.DateTimeField() #"normalized" to minute to minimize multiswipe entrances
     location = models.CharField(max_length=80L)
-    prsn_c_type = models.CharField(max_length=1L, db_column='PRSN_C_TYPE', blank=True) #EU type code of the person
-    prsn_e_type = models.CharField(max_length=30L, db_column='PRSN_E_TYPE', blank=True) #EU type description of the person
-    emjo_c_clsf = models.CharField(max_length=1L, db_column='EMJO_C_CLSF', blank=True) #EU classification code of the employee job (primary)
-    dprt_c = models.CharField(max_length=10L, db_column='DPRT_C', blank=True) #EU department code of the primary job
-    dprt_n = models.CharField(max_length=40L, db_column='DPRT_N', blank=True) #EU department name of the primary job
-    dvsn_i = models.CharField(max_length=10L, db_column='DVSN_I', blank=True) #EU division identifier of the primary job
-    dvsn_n = models.CharField(max_length=40L, db_column='DVSN_N', blank=True) #EU division name of the the primary job
-    empe_c_fclt_rank = models.CharField(max_length=2L, db_column='EMPE_C_FCLT_RANK', blank=True) #EU faculty rank code
-    prsn_c_type_hc = models.CharField(max_length=1L, db_column='PRSN_C_TYPE_HC', blank=True) #HC type code of the person
-    prsn_e_type_hc = models.CharField(max_length=30L, db_column='PRSN_E_TYPE_HC', blank=True) #HC type description of the person
-    emjo8hc_c_clsf = models.CharField(max_length=1L, db_column='EMJO8HC_C_CLSF', blank=True) #HC classification code of the employee job
-    dprt8hc_c = models.CharField(max_length=10L, db_column='DPRT8HC_C', blank=True) #HC department code of the employee job
-    dprt8hc_n = models.CharField(max_length=40L, db_column='DPRT8HC_N', blank=True) #HC department name of the employee job
-    dvsn8hc_i = models.CharField(max_length=10L, db_column='DVSN8HC_I', blank=True) #HC division identifier of the employee job
-    dvsn8hc_n = models.CharField(max_length=40L, db_column='DVSN8HC_N', blank=True) #HC division name of the employee job
-    acca_i = models.CharField(max_length=4L, db_column='ACCA_I', blank=True) #Academic career identifier of the student (primary)
-    acpr_n = models.CharField(max_length=30L, db_column='ACPR_N', blank=True) #Academic program name of the student
-    acpl_n = models.CharField(max_length=30L, db_column='ACPL_N', blank=True) #Academic plan name of the student
-    stdn_e_clas = models.CharField(max_length=30L, db_column='STDN_E_CLAS', blank=True) #Class description of the student
-    stdn_f_ungr = models.CharField(max_length=1L, db_column='STDN_F_UNGR', blank=True) #Undergraduate flag of the student
-    stdn_f_cmps_on = models.CharField(max_length=1L, db_column='STDN_F_CMPS_ON', blank=True) #On-campus flag of the student
+    prsn_c_type = models.CharField(max_length=1L, db_column='PRSN_C_TYPE', null=True) #EU type code of the person
+    prsn_e_type = models.CharField(max_length=30L, db_column='PRSN_E_TYPE', null=True) #EU type description of the person
+    emjo_c_clsf = models.CharField(max_length=1L, db_column='EMJO_C_CLSF', null=True) #EU classification code of the employee job (primary)
+    dprt_c = models.CharField(max_length=10L, db_column='DPRT_C', null=True) #EU department code of the primary job
+    dprt_n = models.CharField(max_length=40L, db_column='DPRT_N', null=True) #EU department name of the primary job
+    dvsn_i = models.CharField(max_length=10L, db_column='DVSN_I', null=True) #EU division identifier of the primary job
+    dvsn_n = models.CharField(max_length=40L, db_column='DVSN_N', null=True) #EU division name of the the primary job
+    empe_c_fclt_rank = models.CharField(max_length=2L, db_column='EMPE_C_FCLT_RANK', null=True) #EU faculty rank code
+    prsn_c_type_hc = models.CharField(max_length=1L, db_column='PRSN_C_TYPE_HC', null=True) #HC type code of the person
+    prsn_e_type_hc = models.CharField(max_length=30L, db_column='PRSN_E_TYPE_HC', null=True) #HC type description of the person
+    emjo8hc_c_clsf = models.CharField(max_length=1L, db_column='EMJO8HC_C_CLSF', null=True) #HC classification code of the employee job
+    dprt8hc_c = models.CharField(max_length=10L, db_column='DPRT8HC_C', null=True) #HC department code of the employee job
+    dprt8hc_n = models.CharField(max_length=40L, db_column='DPRT8HC_N', null=True) #HC department name of the employee job
+    dvsn8hc_i = models.CharField(max_length=10L, db_column='DVSN8HC_I', null=True) #HC division identifier of the employee job
+    dvsn8hc_n = models.CharField(max_length=40L, db_column='DVSN8HC_N', null=True) #HC division name of the employee job
+    acca_i = models.CharField(max_length=4L, db_column='ACCA_I', null=True) #Academic career identifier of the student (primary)
+    acpr_n = models.CharField(max_length=30L, db_column='ACPR_N', null=True) #Academic program name of the student
+    acpl_n = models.CharField(max_length=30L, db_column='ACPL_N', null=True) #Academic plan name of the student
+    stdn_e_clas = models.CharField(max_length=30L, db_column='STDN_E_CLAS', null=True) #Class description of the student
+    stdn_f_ungr = models.CharField(max_length=1L, db_column='STDN_F_UNGR', null=True) #Undergraduate flag of the student
+    stdn_f_cmps_on = models.CharField(max_length=1L, db_column='STDN_F_CMPS_ON', null=True) #On-campus flag of the student
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'libraryvisit_mv'
         app_label = 'libraryuse'
