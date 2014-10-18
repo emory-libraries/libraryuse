@@ -1,0 +1,705 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API &mdash; Library Use 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Library Use 1.0.0 documentation" href="index.html" />
+    <link rel="prev" title="DEPLOYNOTES" href="deploynotes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="deploynotes.html" title="DEPLOYNOTES"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Library Use 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="libraries">
+<h2>Libraries<a class="headerlink" href="#libraries" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>woodruff</li>
+<li>law</li>
+<li>health</li>
+</ul>
+</div>
+<div class="section" id="date-formats">
+<h2>Date formats<a class="headerlink" href="#date-formats" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>YYYY-MM-DD</li>
+</ul>
+</div>
+<div class="section" id="total-usage-by-library">
+<h2>Total usage by library<a class="headerlink" href="#total-usage-by-library" title="Permalink to this headline">¶</a></h2>
+<p><cite>/total_usage/&lt;library&gt;/&lt;person type&gt;/&lt;start date&gt;/&lt;end date&gt;/</cite></p>
+<div class="section" id="person-types">
+<h3>Person Types:<a class="headerlink" href="#person-types" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>all</li>
+<li>student</li>
+<li>faculty</li>
+<li>staff</li>
+</ul>
+</div>
+<div class="section" id="filtered-by">
+<h3>Filtered by:<a class="headerlink" href="#filtered-by" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Library</li>
+<li>persn_c_type</li>
+</ul>
+</div>
+<div class="section" id="example-output">
+<h3>Example output:<a class="headerlink" href="#example-output" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    data: [
+        [
+            1412164800000,
+            5
+        ],
+        [
+            1412164920000,
+            1
+        ],
+        [
+            1412164980000,
+            1
+        ],
+        &lt;..truncated..&gt;
+    ],
+    meta: {
+        strt_date: [
+            &quot;2014-10-01&quot;
+        ],
+        end_date: [
+            &quot;2014-10-03&quot;
+        ],
+        library: [
+            &quot;law&quot;
+        ],
+        title: [
+            &quot;&quot;
+        ]
+    },
+    distinct: [
+        &quot;611&quot;
+    ],
+    total: [
+        &quot;1411&quot;
+    ],
+    queried_at: [
+        &quot;2014-10-16 20:48:28.167524&quot;
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="total-students-living-on-or-off-campus-by-library">
+<h2>Total students living on or off campus by library<a class="headerlink" href="#total-students-living-on-or-off-campus-by-library" title="Permalink to this headline">¶</a></h2>
+<p><cite>/on_off_campus/&lt;library&gt;/&lt;Y/N&gt;/&lt;start date&gt;/&lt;end date&gt;/</cite></p>
+<div class="section" id="id1">
+<h3>Filtered by:<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Library</li>
+<li>stdn_f_cmps_on</li>
+<li>prsn_c_type (students only)</li>
+</ul>
+</div>
+<div class="section" id="id2">
+<h3>Example output:<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    data: [
+        [
+            1412168280000,
+            1
+        ],
+        [
+            1412168520000,
+            1
+        ],
+        [
+            1412170260000,
+            1
+        ],
+        &lt;...truncated...&gt;
+    ],
+    meta: {
+        strt_date: [
+            &quot;2014-10-01&quot;
+        ],
+        end_date: [
+            &quot;2014-10-03&quot;
+        ],
+        library: [
+            &quot;law&quot;
+        ],
+        title: [
+            &quot;&quot;
+        ]
+    },
+    distinct: [
+        &quot;13&quot;
+    ],
+    total: [
+        &quot;20&quot;
+    ],
+    queried_at: [
+        &quot;2014-10-16 21:02:49.834051&quot;
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="totals-by-student-classifications-by-library">
+<h2>Totals by student classifications by library<a class="headerlink" href="#totals-by-student-classifications-by-library" title="Permalink to this headline">¶</a></h2>
+<p><cite>/student_class/&lt;library&gt;/&lt;stdn_e_clas&gt;/&lt;start date&gt;/&lt;end date&gt;/</cite></p>
+<div class="section" id="id3">
+<h3>Filtered by:<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Library</li>
+<li>stdn_e_clas</li>
+<li>prsn_c_type (students only)</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h3>Example output:<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    data: [
+        [
+            1412136000000,
+            1
+        ],
+        [
+            1412136240000,
+            1
+        ],
+        [
+            1412137080000,
+            1
+        ],
+        &lt;..truncated..&gt;
+    ],
+    meta: {
+        strt_date: [
+            &quot;2014-10-01&quot;
+        ],
+        end_date: [
+            &quot;2014-10-03&quot;
+        ],
+        library: [
+            &quot;woodruff&quot;
+        ],
+        title: [
+            &quot;&quot;
+        ]
+    },
+    distinct: [
+        &quot;558&quot;
+    ],
+    total: [
+        &quot;859&quot;
+    ],
+    queried_at: [
+        &quot;2014-10-17 09:47:40.256205&quot;
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="totals-by-faculty-classifications-by-library">
+<h2>Totals by faculty classifications by library<a class="headerlink" href="#totals-by-faculty-classifications-by-library" title="Permalink to this headline">¶</a></h2>
+<p><cite>/faculty_staff_class/&lt;library&gt;/&lt;dvsn_n&gt;/&lt;start date&gt;/&lt;end date&gt;/</cite></p>
+<div class="section" id="id5">
+<h3>Filtered by:<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Library</li>
+<li>dvsn_n</li>
+<li>prsn_c_type (faculty only)</li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h3>Example output:<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="n">data</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">[</span>
+            <span class="mi">1412172240000</span><span class="p">,</span>
+            <span class="mi">1</span>
+        <span class="p">],</span>
+        <span class="p">[</span>
+            <span class="mi">1412176440000</span><span class="p">,</span>
+            <span class="mi">1</span>
+        <span class="p">]</span>
+    <span class="p">],</span>
+    <span class="n">meta</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">strt_date</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s">&quot;2014-10-01&quot;</span>
+        <span class="p">],</span>
+        <span class="n">end_date</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s">&quot;2014-10-03&quot;</span>
+        <span class="p">],</span>
+        <span class="n">library</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s">&quot;woodruff&quot;</span>
+        <span class="p">],</span>
+        <span class="n">title</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s">&quot;&quot;</span>
+        <span class="p">]</span>
+    <span class="p">},</span>
+    <span class="n">distinct</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s">&quot;1&quot;</span>
+    <span class="p">],</span>
+        <span class="n">total</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s">&quot;2&quot;</span>
+    <span class="p">],</span>
+    <span class="n">queried_at</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s">&quot;2014-10-17 10:08:47.299183&quot;</span>
+        <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="top-academic-plans">
+<h2>Top Academic Plans<a class="headerlink" href="#top-academic-plans" title="Permalink to this headline">¶</a></h2>
+<p><cite>/top_academic_plan/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/</cite></p>
+<div class="section" id="id7">
+<h3>Filtered by:<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Library</li>
+<li>acpl_n</li>
+<li>prsn_c_type (students only)</li>
+</ul>
+</div>
+<div class="section" id="id8">
+<h3>Example output:<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    data: [
+        {
+            label: &quot;Law&quot;,
+            value: 27881
+        },
+        {
+            label: &quot;Business Administration&quot;,
+            value: 327
+        },
+        {
+            label: &quot;Juridical Science&quot;,
+            value: 247
+        },
+        &lt;..truncated..&gt;
+    ],
+    meta: {
+        strt_date: [
+            &quot;2014-07-01&quot;
+        ],
+        end_date: [
+            &quot;2014-10-30&quot;
+        ],
+        library: [
+            &quot;law&quot;
+        ],
+        title: [
+            &quot;Academic Plan&quot;
+        ]
+    },
+    distinct: [
+        &quot;53&quot;
+    ],
+    total: [
+        &quot;30253&quot;
+    ],
+    queried_at: [
+        &quot;2014-10-17 10:20:01.423390&quot;
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="top-departments">
+<h2>Top Departments<a class="headerlink" href="#top-departments" title="Permalink to this headline">¶</a></h2>
+<p><cite>/top_dprtn/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/</cite></p>
+<div class="section" id="id9">
+<h3>Filtered by:<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Library</li>
+<li>dprt_n</li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h3>Example output<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    data: [
+        {
+            label: &quot;LITS: Library IT Expense&quot;,
+            value: 288
+        },
+        {
+            label: &quot;GBS: MBA Admissions&quot;,
+            value: 191
+        },
+        {
+            label: &quot;ECAS: Academic Support&quot;,
+            value: 154
+        },
+        &lt;...truncated..&gt;
+    ],
+    meta: {
+        strt_date: [
+            &quot;2014-10-01&quot;
+        ],
+        end_date: [
+            &quot;2014-10-03&quot;
+        ],
+        library: [
+            &quot;woodruff&quot;
+        ],
+        title: [
+            &quot;Department&quot;
+        ]
+    },
+    distinct: [
+        &quot;287&quot;
+    ],
+    total: [
+        &quot;3585&quot;
+    ],
+    queried_at: [
+        &quot;2014-10-17 11:00:19.795288&quot;
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="top-divisions">
+<h2>Top Divisions<a class="headerlink" href="#top-divisions" title="Permalink to this headline">¶</a></h2>
+<p><cite>/top_division/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/</cite></p>
+<div class="section" id="id11">
+<h3>Filtered by:<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Library</li>
+<li>dvsn_n</li>
+</ul>
+</div>
+<div class="section" id="id12">
+<h3>Example output<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    data: [
+        {
+            label: &quot;LITS: Library and IT Services&quot;,
+            value: 1133
+        },
+        {
+            label: &quot;Emory College&quot;,
+            value: 714
+        },
+        {
+            label: &quot;Campus Life Activities&quot;,
+            value: 421
+        },
+        &lt;...truncated...&gt;
+    ],
+    meta: {
+        strt_date: [
+            &quot;2014-10-01&quot;
+        ],
+        end_date: [
+            &quot;2014-10-03&quot;
+        ],
+        library: [
+            &quot;woodruff&quot;
+        ],
+        title: [
+            &quot;Faculty Division&quot;
+        ]
+    },
+    distinct: [
+        &quot;28&quot;
+    ],
+    total: [
+        &quot;3585&quot;
+    ],
+    queried_at: [
+        &quot;2014-10-17 10:57:03.188432&quot;
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="average-by-day-hour-s-and-classification">
+<h2>Average by day, hour(s) and classification<a class="headerlink" href="#average-by-day-hour-s-and-classification" title="Permalink to this headline">¶</a></h2>
+<p><cite>/averages/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/&lt;start hour&gt;/&lt;end hour&gt;/&lt;dow&gt;/&lt;filter&gt;</cite></p>
+<ul class="simple">
+<li>Hours are 0 - 23</li>
+<li>Days are ints with Sunday = 1...Saturday = 7</li>
+</ul>
+<div class="section" id="filters">
+<h3>Filters:<a class="headerlink" href="#filters" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>stdn_e_clas (student_classes)</li>
+<li>acpl_n (acidemic_plans)</li>
+<li>dprt_n (departments)</li>
+<li>acca_i (academic_career)</li>
+<li>dvsn_n (faculty_divisions)</li>
+</ul>
+</div>
+<div class="section" id="id13">
+<h3>Example output<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    data: {
+        advanced-standing: {
+            label: &quot;Advanced Standing&quot;,
+            value: 55
+        },
+        freshman: {
+            label: &quot;Freshman&quot;,
+            value: 11
+        },
+        full-standing: {
+            label: &quot;Full Standing&quot;,
+            value: 18
+        },
+        graduate: {
+            label: &quot;Graduate&quot;,
+            value: 0
+        },
+        &lt;..turncated..&gt;
+    },
+    meta: {
+        strt_date: [
+            &quot;2014-10-01&quot;
+        ],
+        end_date: [
+            &quot;2014-10-03&quot;
+        ],
+        strt_hour: [
+            &quot;13&quot;
+        ],
+        end_hour: [
+            &quot;15&quot;
+        ],
+        dow: [
+            &quot;Thursday&quot;
+        ],
+        queried_at: [
+            &quot;2014-10-17 10:53:38.601905&quot;
+        ]
+    }
+}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="total-average-by-day-and-hour-s">
+<h2>Total Average by day and hour(s)<a class="headerlink" href="#total-average-by-day-and-hour-s" title="Permalink to this headline">¶</a></h2>
+<p><cite>/total_averages/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/&lt;start hour&gt;/&lt;end hour&gt;/&lt;dow&gt;</cite>
+* Hours are 0 - 23
+* Days are ints with Sunday = 1...Saturday = 7</p>
+<div class="section" id="id14">
+<h3>Example output<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">{</span>
+    <span class="n">start_date</span><span class="p">:</span> <span class="s">&quot;2014-10-01&quot;</span><span class="p">,</span>
+    <span class="n">end_date</span><span class="p">:</span> <span class="s">&quot;2014-10-02&quot;</span><span class="p">,</span>
+    <span class="n">start_hour</span><span class="p">:</span> <span class="s">&quot;13&quot;</span><span class="p">,</span>
+    <span class="n">end_hour</span><span class="p">:</span> <span class="s">&quot;15&quot;</span><span class="p">,</span>
+    <span class="n">dow</span><span class="p">:</span> <span class="s">&quot;5&quot;</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">average</span><span class="p">:</span> <span class="s">&quot;912&quot;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="classifications">
+<h2>Classifications<a class="headerlink" href="#classifications" title="Permalink to this headline">¶</a></h2>
+<p><cite>/classifications</cite></p>
+<ul class="simple">
+<li>student_classes = stdn_e_clas</li>
+<li>acidemic_plans = acpl_n</li>
+<li>departments = dprt_n</li>
+<li>academic_career = acca_i</li>
+<li>faculty_divisions = dvsn_n</li>
+</ul>
+<div class="section" id="id15">
+<h3>Example output<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre>{
+    student_classes: [
+        &quot;Advanced Standing&quot;,
+        &quot;Freshman&quot;,
+        &quot;Full Standing&quot;,
+        &lt;..truncated..&gt;
+    ],
+    academic_plans: [
+        &quot;Acute Care&quot;,
+        &quot;Adult Certificate&quot;,
+        &quot;Adult-Gerontology NP&quot;,
+        &lt;...truncated..&gt;
+    ],
+    academic_career: [
+        &quot;GAH&quot;,
+        &quot;GBUS&quot;,
+        &quot;GNUR&quot;,
+        &lt;...truncated..&gt;
+    ],
+    faculty_divisions: [
+        &quot;Affiliated&quot;,
+        &quot;Campus Lif&quot;,
+        &quot;Campus Life Activities&quot;,
+        &lt;...truncated..&gt;
+    ],
+    departments: [
+        &quot;Ala Longstreet Means&quot;,
+        &quot;Alpha Epsilon Pi Fraternity Ac&quot;,
+        &quot;Alpha Epxilan Phi&quot;,
+        &lt;...truncated..&gt;
+    ]
+}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API</a><ul>
+<li><a class="reference internal" href="#libraries">Libraries</a></li>
+<li><a class="reference internal" href="#date-formats">Date formats</a></li>
+<li><a class="reference internal" href="#total-usage-by-library">Total usage by library</a><ul>
+<li><a class="reference internal" href="#person-types">Person Types:</a></li>
+<li><a class="reference internal" href="#filtered-by">Filtered by:</a></li>
+<li><a class="reference internal" href="#example-output">Example output:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#total-students-living-on-or-off-campus-by-library">Total students living on or off campus by library</a><ul>
+<li><a class="reference internal" href="#id1">Filtered by:</a></li>
+<li><a class="reference internal" href="#id2">Example output:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#totals-by-student-classifications-by-library">Totals by student classifications by library</a><ul>
+<li><a class="reference internal" href="#id3">Filtered by:</a></li>
+<li><a class="reference internal" href="#id4">Example output:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#totals-by-faculty-classifications-by-library">Totals by faculty classifications by library</a><ul>
+<li><a class="reference internal" href="#id5">Filtered by:</a></li>
+<li><a class="reference internal" href="#id6">Example output:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#top-academic-plans">Top Academic Plans</a><ul>
+<li><a class="reference internal" href="#id7">Filtered by:</a></li>
+<li><a class="reference internal" href="#id8">Example output:</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#top-departments">Top Departments</a><ul>
+<li><a class="reference internal" href="#id9">Filtered by:</a></li>
+<li><a class="reference internal" href="#id10">Example output</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#top-divisions">Top Divisions</a><ul>
+<li><a class="reference internal" href="#id11">Filtered by:</a></li>
+<li><a class="reference internal" href="#id12">Example output</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#average-by-day-hour-s-and-classification">Average by day, hour(s) and classification</a><ul>
+<li><a class="reference internal" href="#filters">Filters:</a></li>
+<li><a class="reference internal" href="#id13">Example output</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#total-average-by-day-and-hour-s">Total Average by day and hour(s)</a><ul>
+<li><a class="reference internal" href="#id14">Example output</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#classifications">Classifications</a><ul>
+<li><a class="reference internal" href="#id15">Example output</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="deploynotes.html"
+                        title="previous chapter">DEPLOYNOTES</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/apidocs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="deploynotes.html" title="DEPLOYNOTES"
+             >previous</a> |</li>
+        <li><a href="index.html">Library Use 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Emory University Libraries Software Engineering Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>

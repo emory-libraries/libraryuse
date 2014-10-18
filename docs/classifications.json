@@ -1,0 +1,32 @@
+{
+    student_classes: [
+        "Advanced Standing",
+        "Freshman",
+        "Full Standing",
+        <..truncated..>
+    ],
+    academic_plans: [
+        "Acute Care",
+        "Adult Certificate",
+        "Adult-Gerontology NP",
+        <...truncated..>
+    ],
+    academic_career: [
+        "GAH",
+        "GBUS",
+        "GNUR",
+        <...truncated..>
+    ],
+    faculty_divisions: [
+        "Affiliated",
+        "Campus Lif",
+        "Campus Life Activities",
+        <...truncated..>
+    ],
+    departments: [
+        "Ala Longstreet Means",
+        "Alpha Epsilon Pi Fraternity Ac",
+        "Alpha Epxilan Phi",
+        <...truncated..>
+    ]
+}

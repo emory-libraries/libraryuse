@@ -1,0 +1,88 @@
+.. _APIDOCS:
+
+Libraries:
+----------
+* woodruff
+* law
+* health
+
+Date formats:
+-------------
+* YYYY-MM-DD
+
+Total usage by library
+----------------------
+:: /total_usage/<library>/<person type>/<start date>/<end date>/
+:: Person Types:
+:: * all
+:: * student
+faculty
+staff
+Filtered by:
+Location
+persn_c_type
+
+Total students living on or off campus by library
+    /on_off_campus/<library>/<Y/N>/<start date>/<end date>/
+    Filtered by:
+Location
+stdn_f_cmps_on
+prsn_c_type (students only)
+
+Totals by student classifications by library
+    /student_class/<library>/<stdn_e_clas>/<start date>/<end date>/
+    Filtered by:
+Location
+stdn_e_clas
+prsn_c_type (students only)
+
+Totals by faculty classifications by library
+    /faculty_staff_class/<library>/<dvsn_n>/<start date>/<end date>/
+    Filtered by:
+Location
+dvsn_n
+prsn_c_type (faculty only)
+
+Top Academic Plans (filtered by students, no distinct)
+    /top_academic_plan/<library>/<start date>/<end date>/
+    Filtered by:
+Location
+acpl_n
+prsn_c_type (students only)
+
+Top Departments (no distinct)
+    /top_dprtn/<library>/<start date>/<end date>/
+    Filtered by:
+Location
+dprt_n
+
+Top Divisions (no distinct)
+    /top_division/<library>/<start date>/<end date>/
+    Filtered by:
+Location
+dvsn_n
+
+Average by day, hour(s) and classification (no distinct)
+    /total_averages/<library>/<start date>/<end date>/<start hour>/<end hour>/<dow>/<filter>
+/averages/woodruff/2014-7-1/2014-9-11/11/12/1
+    Hours are 0 - 23
+    Days are ints with Sunday = 1...Saturday = 7
+    filters:
+stdn_e_clas (student_classes)
+acpl_n (acidemic_plans)
+dprt_n (departments)
+acca_i (academic_career)
+dvsn_n (faculty_divisions)
+
+Total Average by day and hour(s) (no distinct)
+    /total_averages/<library>/<start date>/<end date>/<start hour>/<end hour>/<dow>
+    Hours are 0 - 23
+    Days are ints with Sunday = 1...Saturday = 7
+
+Classifications
+    /classifications
+    student_classes = stdn_e_clas
+    acidemic_plans = acpl_n
+    departments = dprt_n
+    academic_career = acca_i
+faculty_divisions = dvsn_n

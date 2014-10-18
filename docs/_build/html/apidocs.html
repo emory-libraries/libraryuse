@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Libraries: &mdash; Library Use 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Library Use 1.0.0 documentation" href="index.html" />
+    <link rel="prev" title="DEPLOYNOTES" href="deploynotes.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="deploynotes.html" title="DEPLOYNOTES"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Library Use 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="libraries">
+<span id="apidocs"></span><h1>Libraries:<a class="headerlink" href="#libraries" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>woodruff</li>
+<li>law</li>
+<li>health</li>
+</ul>
+</div>
+<div class="section" id="date-formats">
+<h1>Date formats:<a class="headerlink" href="#date-formats" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>YYYY-MM-DD</li>
+</ul>
+</div>
+<div class="section" id="total-usage-by-library">
+<h1>Total usage by library<a class="headerlink" href="#total-usage-by-library" title="Permalink to this headline">¶</a></h1>
+<p>:: /total_usage/&lt;library&gt;/&lt;person type&gt;/&lt;start date&gt;/&lt;end date&gt;/
+:: Person Types:
+:: * all
+:: * student
+faculty
+staff
+Filtered by:
+Location
+persn_c_type</p>
+<dl class="docutils">
+<dt>Total students living on or off campus by library</dt>
+<dd>/on_off_campus/&lt;library&gt;/&lt;Y/N&gt;/&lt;start date&gt;/&lt;end date&gt;/
+Filtered by:</dd>
+</dl>
+<p>Location
+stdn_f_cmps_on
+prsn_c_type (students only)</p>
+<dl class="docutils">
+<dt>Totals by student classifications by library</dt>
+<dd>/student_class/&lt;library&gt;/&lt;stdn_e_clas&gt;/&lt;start date&gt;/&lt;end date&gt;/
+Filtered by:</dd>
+</dl>
+<p>Location
+stdn_e_clas
+prsn_c_type (students only)</p>
+<dl class="docutils">
+<dt>Totals by faculty classifications by library</dt>
+<dd>/faculty_staff_class/&lt;library&gt;/&lt;dvsn_n&gt;/&lt;start date&gt;/&lt;end date&gt;/
+Filtered by:</dd>
+</dl>
+<p>Location
+dvsn_n
+prsn_c_type (faculty only)</p>
+<dl class="docutils">
+<dt>Top Academic Plans (filtered by students, no distinct)</dt>
+<dd>/top_academic_plan/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/
+Filtered by:</dd>
+</dl>
+<p>Location
+acpl_n
+prsn_c_type (students only)</p>
+<dl class="docutils">
+<dt>Top Departments (no distinct)</dt>
+<dd>/top_dprtn/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/
+Filtered by:</dd>
+</dl>
+<p>Location
+dprt_n</p>
+<dl class="docutils">
+<dt>Top Divisions (no distinct)</dt>
+<dd>/top_division/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/
+Filtered by:</dd>
+</dl>
+<p>Location
+dvsn_n</p>
+<dl class="docutils">
+<dt>Average by day, hour(s) and classification (no distinct)</dt>
+<dd>/total_averages/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/&lt;start hour&gt;/&lt;end hour&gt;/&lt;dow&gt;/&lt;filter&gt;</dd>
+<dt>/averages/woodruff/2014-7-1/2014-9-11/11/12/1</dt>
+<dd>Hours are 0 - 23
+Days are ints with Sunday = 1...Saturday = 7
+filters:</dd>
+</dl>
+<p>stdn_e_clas (student_classes)
+acpl_n (acidemic_plans)
+dprt_n (departments)
+acca_i (academic_career)
+dvsn_n (faculty_divisions)</p>
+<dl class="docutils">
+<dt>Total Average by day and hour(s) (no distinct)</dt>
+<dd>/total_averages/&lt;library&gt;/&lt;start date&gt;/&lt;end date&gt;/&lt;start hour&gt;/&lt;end hour&gt;/&lt;dow&gt;
+Hours are 0 - 23
+Days are ints with Sunday = 1...Saturday = 7</dd>
+<dt>Classifications</dt>
+<dd>/classifications
+student_classes = stdn_e_clas
+acidemic_plans = acpl_n
+departments = dprt_n
+academic_career = acca_i</dd>
+</dl>
+<p>faculty_divisions = dvsn_n</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Libraries:</a></li>
+<li><a class="reference internal" href="#date-formats">Date formats:</a></li>
+<li><a class="reference internal" href="#total-usage-by-library">Total usage by library</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="deploynotes.html"
+                        title="previous chapter">DEPLOYNOTES</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/apidocs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="deploynotes.html" title="DEPLOYNOTES"
+             >previous</a> |</li>
+        <li><a href="index.html">Library Use 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Emory University Libraries Software Engineering Team.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.1.
+    </div>
+  </body>
+</html>
