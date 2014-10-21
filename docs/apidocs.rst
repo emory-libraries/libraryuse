@@ -31,7 +31,7 @@ Filtered by:
 
 Example output:
 ^^^^^^^^^^^^^^^
-.. literalinclude:: totalusage.json
+.. literalinclude:: sample_json/totalusage.json
 
 Total students living on or off campus by library
 -------------------------------------------------
@@ -45,7 +45,7 @@ Filtered by:
 
 Example output:
 ^^^^^^^^^^^^^^^
-.. literalinclude:: on_off_campus.json
+.. literalinclude:: sample_json/on_off_campus.json
 
 Totals by student classifications by library
 --------------------------------------------
@@ -59,7 +59,7 @@ Filtered by:
 
 Example output:
 ^^^^^^^^^^^^^^^
-.. literalinclude:: student_class.json
+.. literalinclude:: sample_json/student_class.json
 
 Totals by faculty classifications by library
 --------------------------------------------
@@ -73,7 +73,7 @@ Filtered by:
 
 Example output:
 ^^^^^^^^^^^^^^^
-.. literalinclude:: faculty_staff_class.json
+.. literalinclude:: sample_json/faculty_staff_class.json
 
 Top Academic Plans
 ------------------
@@ -87,7 +87,7 @@ Filtered by:
 
 Example output:
 ^^^^^^^^^^^^^^^
-.. literalinclude:: top_academic_plan.json
+.. literalinclude:: sample_json/top_academic_plan.json
 
 Top Departments
 ---------------
@@ -100,7 +100,7 @@ Filtered by:
 
 Example output
 ^^^^^^^^^^^^^^
-.. literalinclude:: top_dprtn.json
+.. literalinclude:: sample_json/top_dprtn.json
 
 Top Divisions
 -------------
@@ -113,7 +113,7 @@ Filtered by:
 
 Example output
 ^^^^^^^^^^^^^^
-.. literalinclude:: top_division.json
+.. literalinclude:: sample_json/top_division.json
 
 Average by day, hour(s) and classification
 ------------------------------------------
@@ -131,7 +131,7 @@ Filters:
 
 Example output
 ^^^^^^^^^^^^^^
-.. literalinclude:: averages.json
+.. literalinclude:: sample_json/averages.json
 
 Total Average by day and hour(s)
 --------------------------------
@@ -141,7 +141,7 @@ Total Average by day and hour(s)
 
 Example output
 ^^^^^^^^^^^^^^
-.. literalinclude:: total_averages.json
+.. literalinclude:: sample_json/total_averages.json
 
 Classifications
 ---------------
@@ -155,4 +155,4 @@ Classifications
 
 Example output
 ^^^^^^^^^^^^^^
-.. literalinclude:: classifications.json
+.. literalinclude:: sample_json/classifications.json
