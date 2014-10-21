@@ -228,7 +228,7 @@ def faculty_staff_class(request, library, classification, start, end):
                 .filter(Q(prsn_c_type = 'F'))
 
     if classification != "all":
-      numbers = numbers.filter(dprt_n = classification)
+      numbers = numbers.filter(dvsn_n = classification)
 
     distinct = numbers.values("prsn_i_ecn").distinct().count()
 
