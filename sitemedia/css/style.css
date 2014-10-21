@@ -408,7 +408,7 @@ a.list-group-item .list-group-item-heading {
 
 .loading{
     position: relative;
-    z-index: 1;
+    z-index: 0;
 }
 .loading span{
     left:0px;
