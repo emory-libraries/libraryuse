@@ -28,8 +28,7 @@ def test():
     if os.path.exists('test-results'):
         shutil.rmtree('test-results')
 
-    local('python manage.py test' #--with-coverage --cover-package=%(project)s --cover-xml --with-xunit' % env)
-
+    local('python manage.py test --with-coverage --cover-package=%(project)s --cover-xml --with-xunit' % env)
 
 def doc():
     '''Locally build documentation.'''
@@ -41,7 +40,7 @@ def doc():
 def build():
     '''Run a full local build/test cycle.'''
     all_deps()
-    #test()
+    test()
     doc()
 
 
