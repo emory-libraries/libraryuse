@@ -205,8 +205,10 @@ def student_class(request, library, classification, start, end):
                 .order_by('visit_time') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = library) \
-                .filter(stdn_e_clas = classification) \
                 .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
+    
+    if classification!='all':
+      numbers = numbers.filter(stdn_e_clas = classification)
 
     distinct = numbers.values("prsn_i_ecn").distinct().count()
 

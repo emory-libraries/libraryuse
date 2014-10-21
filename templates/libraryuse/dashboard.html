@@ -244,9 +244,9 @@
   <script type="text/x-handlebars" data-template-name="components/filter-button">
     <li>
       {{#if addon}}
-      <a href="#/library/all/{{unbound addon}}/{{unbound title}}">{{title}}</a>
+      <a href="#/library/{{unbound addon}}/{{unbound title}}">{{title}}</a>
       {{else}}
-    <a href="#/library/all/{{unbound title}}">{{title}}</a>
+      <a href="#/library/all/{{unbound title}}">{{title}}</a>
     {{/if}}
   </li>
   </script>

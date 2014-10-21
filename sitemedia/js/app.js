@@ -288,6 +288,7 @@ App.ReportsRoute = App.AveragesRoute = Ember.Route.extend({
 App.ReportsRoute = App.ReportsRoute.extend({
   model:function(params){
     this._super();
+    dataURL.set('category','')
     Ember.run.next(this, function(){ 
       $(".visitor-count").css({"opacity":0.2})
       if($(".chart").length>0){
@@ -2506,6 +2507,12 @@ function SUPERCHART(){
     uri_users='/'+uri_users;
   }
   
+  console.log(dataURL.get('persons'));
+  
+  if(uri_users!==''){
+    uri_persons='';
+  }
+  
   var $container = $('#container'),
       seriesOptions = [],
       yAxisOptions = [],
@@ -2536,7 +2543,7 @@ function SUPERCHART(){
   $.each(names, function(i, name) {
     var jsonURL = uri_root+uri_category+path[i]+uri_persons+uri_users+campus_tag+date_range+distinct_tag;
     
-    // console.log(jsonURL);
+    console.log(jsonURL);
     
     var json = $.getJSON(jsonURL)
     
