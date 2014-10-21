@@ -4,6 +4,16 @@ from django.test import Client
 import json
 from django.test.simple import DjangoTestSuiteRunner
 
+
+def getJsonString(response):
+  json_string = ''
+
+  for line in response.streaming_content:
+      json_string += line
+  
+  # json.loads will throw an error if json is not valid. 
+  return json.loads(json_string)
+
 class TotalUsageTestCase(TestCase):
 
     fixtures = ['test.json']
@@ -26,12 +36,7 @@ class TotalUsageTestCase(TestCase):
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
 
-        json_string = ''
-
-        for line in response.streaming_content:
-            json_string += line
-
-        data = json.loads(json_string)
+        data = getJsonString(response)
 
         self.assertEquals(data['data'][5][0], 1412136480000)
         self.assertEquals(data['data'][5][1], 3)
