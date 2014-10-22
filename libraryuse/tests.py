@@ -13,8 +13,8 @@ def getJsonString(response):
 
   for line in response.streaming_content:
       json_string += line
-  
-  # json.loads will throw an error if json is not valid. 
+
+  # json.loads will throw an error if json is not valid.
   return json.loads(json_string)
 
 class TotalUsageTestCase(TestCase):
@@ -41,14 +41,14 @@ class TotalUsageTestCase(TestCase):
 
         data = getJsonString(response)
 
-        self.assertEquals(data['data'][5][0], 1412136480000)
-        self.assertEquals(data['data'][5][1], 3)
+        self.assertEquals(data['data'][5][0], 1412179500000)
+        self.assertEquals(data['data'][5][1], 5)
         self.assertEquals("%s" % data['meta']['strt_date'], "[u'%s']" % start_date)
         self.assertEquals("%s" % data['meta']['end_date'],"[u'%s']" %  end_date)
         self.assertEquals("%s" % data['meta']['library'], "[u'%s']" % library)
-        self.assertEquals("%s" % data['distinct'], "[u'3568']")
+        self.assertEquals("%s" % data['distinct'], "[u'811']")
         self.assertIsNotNone(data['queried_at'])
-        
+
 class DateFormatTestCase(TestCase):
 
     fixtures = ['test.json']
@@ -73,7 +73,7 @@ class DateFormatTestCase(TestCase):
 
         self.assertFalse(" " in data['meta']['strt_date'][0], "Start datetime should be in YYYY-MM-DD format.")
         self.assertFalse(" " in data['meta']['end_date'][0], "End datetime should be in YYYY-MM-DD format.")
-        
+
 
 class TotalUsageByLibraryTestCase(TestCase):
 
@@ -95,11 +95,11 @@ class TotalUsageByLibraryTestCase(TestCase):
 
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
-        
+
         data = getJsonString(response)
-        
+
         self.assertEquals(data['meta']['library'][0], library)
-        
+
 
     def test_law_json_response(self):
 
@@ -117,9 +117,9 @@ class TotalUsageByLibraryTestCase(TestCase):
 
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
-        
+
         data = getJsonString(response)
-        
+
         self.assertEquals(data['meta']['library'][0], library)
 
     def test_health_json_response(self):
@@ -138,12 +138,12 @@ class TotalUsageByLibraryTestCase(TestCase):
 
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
-        
+
         data = getJsonString(response)
-        
+
         self.assertEquals(data['meta']['library'][0], library)
-        
-        
+
+
 class TotalUsageByPersonTypeTestCase(TestCase):
 
     fixtures = ['test.json']
@@ -164,12 +164,12 @@ class TotalUsageByPersonTypeTestCase(TestCase):
 
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
-        
+
         data = getJsonString(response)
-        
+
         totalSum = data['total'][0]
-        
-        #Student 
+
+        #Student
         client = Client()
         person_type = 'student'
 
@@ -181,14 +181,14 @@ class TotalUsageByPersonTypeTestCase(TestCase):
 
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
-        
+
         data = getJsonString(response)
-        
+
         studentSum = data['total'][0]
-        
+
         self.assertTrue(totalSum>studentSum, "Usage filtered by Students should be less than Total Usage")
-        
-        #Faculty 
+
+        #Faculty
         client = Client()
         person_type = 'staff'
 
@@ -200,14 +200,14 @@ class TotalUsageByPersonTypeTestCase(TestCase):
 
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
-        
+
         data = getJsonString(response)
-        
+
         FacultySum = data['total'][0]
-        
+
         self.assertTrue(totalSum>FacultySum,"Usage filtered by Faculty should be less than Total Usage")
-        
-        #Staff 
+
+        #Staff
         client = Client()
         person_type = 'staff'
 
@@ -219,13 +219,13 @@ class TotalUsageByPersonTypeTestCase(TestCase):
 
         self.assertEquals(str(response), 'Content-Type: application/json')
         self.assertEquals(response.status_code, 200)
-        
+
         data = getJsonString(response)
-        
+
         staffSum = data['total'][0]
-        
+
         self.assertTrue(totalSum>staffSum,"Usage filtered by Staff should be less than Total Usage")
-        
+
 class TotalStudentsByOnOffCampusTestCase(TestCase):
 
       fixtures = ['test.json']
@@ -246,15 +246,15 @@ class TotalStudentsByOnOffCampusTestCase(TestCase):
 
           self.assertEquals(str(response), 'Content-Type: application/json')
           self.assertEquals(response.status_code, 200)
-          
+
           data = getJsonString(response)
-          
+
           studentSum = int(data['total'][0])
-          
+
           client = Client()
-          
+
           campus = 'Y'
-          
+
           response = client.get(reverse('on_off_campus', kwargs={ \
                                           'library': library, \
                                           'resident': campus, \
@@ -263,17 +263,17 @@ class TotalStudentsByOnOffCampusTestCase(TestCase):
 
           self.assertEquals(str(response), 'Content-Type: application/json')
           self.assertEquals(response.status_code, 200)
-          
+
           data = getJsonString(response)
-          
+
           onCampusTotal = int(data['total'][0])
-          
+
           self.assertTrue(studentSum>onCampusTotal,"On campus usage should not be greater than the total student usage.")
-          
+
           client = Client()
-          
+
           campus = 'N'
-          
+
           response = client.get(reverse('on_off_campus', kwargs={ \
                                           'library': library, \
                                           'resident': campus, \
@@ -282,13 +282,11 @@ class TotalStudentsByOnOffCampusTestCase(TestCase):
 
           self.assertEquals(str(response), 'Content-Type: application/json')
           self.assertEquals(response.status_code, 200)
-          
+
           data = getJsonString(response)
-          
+
           offCampusTotal = int(data['total'][0])
-          
+
           self.assertTrue(studentSum>offCampusTotal,"Off campus usage should not be greater than the total student usage.")
-          
+
           self.assertTrue(int(studentSum)==(offCampusTotal+onCampusTotal),"Total student usage should add up to the sum of On and Off Campus usage.")
-          
-  
