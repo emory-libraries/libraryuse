@@ -24,30 +24,36 @@ class TotalUsageTestCase(TestCase):
     def test_json_response(self):
 
         client = Client()
-        library = 'woodruff'
+        libraries = [ \
+            {'library': 'woodruff', 'date': 1412179500000, 'count': 5, 'distinct': 811, 'total': 845, 'person_type': 'all'}, \
+            {'library': 'law', 'date': 1412179500000, 'count': 5, 'distinct': 185, 'total': 207, 'person_type': 'student'}, \
+            {'library': 'health', 'date': 1412185020000, 'count': 1, 'distinct': 10, 'total': 11, 'person_type': 'faculty'} \
+        ]
         start_date = '2014-10-01'
         end_date = '2014-10-02'
 
-        response = client.get(reverse('total_usage', kwargs={ \
-                                        'library': library, \
-                                        'person_type': 'all', \
+        for library in libraries:
+            response = client.get(reverse('total_usage', kwargs={ \
+                                        'library': library['library'], \
+                                        'person_type': library['person_type'], \
                                         'start': start_date, \
                                         'end': end_date }))
 
 
 
-        self.assertEquals(str(response), 'Content-Type: application/json')
-        self.assertEquals(response.status_code, 200)
+            self.assertEquals(str(response), 'Content-Type: application/json')
+            self.assertEquals(response.status_code, 200)
 
-        data = getJsonString(response)
+            data = getJsonString(response)
 
-        self.assertEquals(data['data'][5][0], 1412179500000)
-        self.assertEquals(data['data'][5][1], 5)
-        self.assertEquals("%s" % data['meta']['strt_date'], "[u'%s']" % start_date)
-        self.assertEquals("%s" % data['meta']['end_date'],"[u'%s']" %  end_date)
-        self.assertEquals("%s" % data['meta']['library'], "[u'%s']" % library)
-        self.assertEquals("%s" % data['distinct'], "[u'811']")
-        self.assertIsNotNone(data['queried_at'])
+            self.assertEquals(data['data'][5][0], library['date'])
+            self.assertEquals(data['data'][5][1], library['count'])
+            self.assertEquals("%s" % data['meta']['strt_date'], "[u'%s']" % start_date)
+            self.assertEquals("%s" % data['meta']['end_date'],"[u'%s']" %  end_date)
+            self.assertEquals("%s" % data['meta']['library'], "[u'%s']" % library['library'])
+            self.assertEquals("%s" % data['distinct'], "[u'%s']" % library['distinct'])
+            self.assertEquals("%s" % data['total'], "[u'%s']" % library['total'])
+            self.assertIsNotNone(data['queried_at'])
 
 class DateFormatTestCase(TestCase):
 
@@ -402,6 +408,6 @@ class TotalsByClassificationsTestCase(TestCase):
 
       data = getJsonString(response)
 
-      iTotal = int(data['total'][0])
+      Total = int(data['total'][0])
 
-      self.assertTrue(totalFacultyStaff>iTotal, 'Individual filtered total should not be greater than the total Faculty/Staff usage.')
+      self.assertTrue(totalFacultyStaff>Total, 'Individual filtered total should not be greater than the total Faculty/Staff usage.')
