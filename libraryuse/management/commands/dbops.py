@@ -217,7 +217,7 @@ class Command(BaseCommand):
 
         try:
 
-            cmd = '''INSERT INTO libraryvisit_mv (id, idnumber, lastname, firstname,
+            cmd = '''INSERT INTO libraryvisit_mv_fy2014 (id, idnumber, lastname, firstname,
             visit_time, location, term_number, prsn_i_pblc, prsn_i_ecn,
             prsn_i_hr, prsn8hc_i_hr, prsn_i_sa, prsn_e_titl_dtry, prsn_c_type,
             prsn_e_type, emjo_c_clsf, dprt_c, dprt_n, dvsn_i, dvsn_n,

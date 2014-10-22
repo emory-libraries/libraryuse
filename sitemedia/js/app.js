@@ -2022,7 +2022,7 @@ App.LibraryAllRoute = Ember.Route.extend({
 App.LibRoute = Ember.Route.extend({
   model:function(params){
     var libs = params.libs || dataURL.names;
-    console.log(params.lib)
+    // console.log(params.lib)
     if(libs=="woodruff"){
       var data = {
         title: 'Woodruff',
@@ -2507,8 +2507,6 @@ function SUPERCHART(){
     uri_users='/'+uri_users;
   }
   
-  console.log(dataURL.get('persons'));
-  
   if(uri_users!==''){
     uri_persons='';
   }
@@ -2543,7 +2541,7 @@ function SUPERCHART(){
   $.each(names, function(i, name) {
     var jsonURL = uri_root+uri_category+path[i]+uri_persons+uri_users+campus_tag+date_range+distinct_tag;
     
-    console.log(jsonURL);
+    // console.log(jsonURL);
     
     var json = $.getJSON(jsonURL)
     
