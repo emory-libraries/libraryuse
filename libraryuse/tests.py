@@ -290,15 +290,13 @@ class TotalStudentsByOnOffCampusTestCase(TestCase):
           self.assertTrue(studentSum>offCampusTotal,"Off campus usage should not be greater than the total student usage.")
 
           self.assertTrue(int(studentSum)==(offCampusTotal+onCampusTotal),"Total student usage should add up to the sum of On and Off Campus usage.")
-<<<<<<< HEAD
-=======
-          
+
 class TotalsByClassificationsTestCase(TestCase):
-  
+
     fixtures = ['test.json']
 
     def test_student_classifications(self):
-      
+
       client = Client()
       library = 'woodruff'
       start_date = '2014-10-01'
@@ -309,52 +307,52 @@ class TotalsByClassificationsTestCase(TestCase):
                                       'person_type': 'all', \
                                       'start': start_date, \
                                       'end': end_date }))
-      
+
       data = getJsonString(response)
-      
+
       totalSum = int(data['total'][0])
-      
+
       classification = 'all'
-      
+
       client = Client()
       response = client.get(reverse('student_class', kwargs={ \
                                       'library': library, \
                                       'classification': classification, \
                                       'start': start_date, \
                                       'end': end_date }))
-                                      
+
       self.assertEquals(str(response), 'Content-Type: application/json')
       self.assertEquals(response.status_code, 200)
-      
+
       data = getJsonString(response)
-      
+
       totalStudents = int(data['total'][0])
-      
+
       self.assertTrue(totalSum>totalStudents, 'Students filtered usage should not be greater than the total.')
-      
-      
+
+
       client = Client()
-      
+
       classification = "Freshmen"
-      
+
       response = client.get(reverse('student_class', kwargs={ \
                                       'library': library, \
                                       'classification': classification, \
                                       'start': start_date, \
                                       'end': end_date }))
-                                      
+
       self.assertEquals(str(response), 'Content-Type: application/json')
       self.assertEquals(response.status_code, 200)
-      
+
       data = getJsonString(response)
-      
+
       iTotal = int(data['total'][0])
-      
+
       self.assertTrue(totalStudents>iTotal, 'Individual filtered total should not be greater than the total Faculty/Staff usage.')
 
-    
+
     def test_faculty_classifications(self):
-      
+
       client = Client()
       library = 'woodruff'
       start_date = '2014-10-01'
@@ -365,46 +363,45 @@ class TotalsByClassificationsTestCase(TestCase):
                                       'person_type': 'all', \
                                       'start': start_date, \
                                       'end': end_date }))
-      
+
       data = getJsonString(response)
-      
+
       totalSum = int(data['total'][0])
-      
+
       classification = 'all'
-      
+
       client = Client()
       response = client.get(reverse('faculty_staff_class', kwargs={ \
                                       'library': library, \
                                       'classification': classification, \
                                       'start': start_date, \
                                       'end': end_date }))
-                                      
+
       self.assertEquals(str(response), 'Content-Type: application/json')
       self.assertEquals(response.status_code, 200)
-      
+
       data = getJsonString(response)
-      
+
       totalFacultyStaff = int(data['total'][0])
-      
+
       self.assertTrue(totalSum>totalFacultyStaff, 'Faculty/Staff filtered usage should not be greater than the total.')
-      
-      
+
+
       client = Client()
-      
+
       classification = "LITS: Library and IT Services"
-      
+
       response = client.get(reverse('faculty_staff_class', kwargs={ \
                                       'library': library, \
                                       'classification': classification, \
                                       'start': start_date, \
                                       'end': end_date }))
-                                      
+
       self.assertEquals(str(response), 'Content-Type: application/json')
       self.assertEquals(response.status_code, 200)
-      
+
       data = getJsonString(response)
-      
+
       iTotal = int(data['total'][0])
-      
+
       self.assertTrue(totalFacultyStaff>iTotal, 'Individual filtered total should not be greater than the total Faculty/Staff usage.')
->>>>>>> 14aa2f87931507b5459407ce59d8ed3351cd81e4

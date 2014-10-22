@@ -53,7 +53,7 @@ urlpatterns = patterns(
 
     url(r'^api/', include(v1_api.urls)),
 
-    url(r'^login/$', views.login_user, name='login_user'),
+    #url(r'^login/$', views.login_user, name='login_user'),
 
-    url(r'^logout/$', 'logout', {'next_page': '/'}, name='libraryuse_logout'),
+    #url(r'^logout/$', 'logout', {'next_page': '/'}, name='libraryuse_logout'),
 )
