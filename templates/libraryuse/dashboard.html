@@ -672,26 +672,15 @@
 
   {% endverbatim myblock %}
 
-  <script src="{% static 'js/libs/jquery-1.10.2.js' %}"></script>
-  <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
-  <script src="{% static 'js/libs/jquery-ui-1.10.4.custom.min.js' %}"></script>
+  {# Vendor javascripts #}
+  {% include "jquery.html" %}
+  {% include "csrf.html" %}
+  {% include "highstock.html" %}
+  {% include "components.html" %}
+  {% include "ember.html" %}
   
-  <script src="{% static 'js/libs/handlebars-1.1.2.js' %}"></script>
-  <script src="{% static 'js/libs/ember-1.5.0.js' %}"></script>
-
-  <script src="http://code.highcharts.com/stock/highstock.js"></script>
-  <script src="{% static 'js/libs/highstock.theme.js' %}"></script>
-  <script src="{% static 'js/libs/highcharts.modules.js' %}"></script>
-
-  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-
-  <script src="{% static 'js/libs/flipclock/flipclock.js' %}"></script>
-  <script src="{% static 'js/libs/jquery.easing.js' %}"></script>
-  <script src="{% static 'js/libs/mlpushmenu.js' %}"></script>
-
-  <script src="{% static 'js/local.js' %}"></script>
-  <script src="{% static 'js/app.js '%}"></script>
-  <!-- to activate the test runner, add the "?test" query string parameter -->
-  <script src="{% static 'tests/runner.js' %}"></script>
+  {# Application #}
+  {% include "app.html" %}
+  
 </body>
 </html>
