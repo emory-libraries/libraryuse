@@ -3,6 +3,8 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
+from django.contrib.auth import authenticate, login
+from django.core.context_processors import csrf
 import json
 from django.db.models import Q, Count
 from datetime import datetime
@@ -206,7 +208,7 @@ def student_class(request, library, classification, start, end):
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = library) \
                 .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
-    
+
     if classification!='all':
       numbers = numbers.filter(stdn_e_clas = classification)
 
@@ -1066,3 +1068,22 @@ def classification_totals(request, library, person_type, start, end):
     jsonp += '}}'
 
     return HttpResponse(jsonp, content_type='application/json')
+
+# def login_user(request):
+#     state = "Please log in below..."
+#     username = password = ''
+#     if request.POST:
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+#
+#         user = authenticate(username=username, password=password)
+#         if user is not None:
+#             if user.is_active:
+#                 login(request, user)
+#                 return redirect('/')
+#             else:
+#                 state = "Your account is not active, please contact the site admin."
+#         else:
+#             state = "Your username and/or password were incorrect."
+#
+#     return render_to_response('auth.html',{'state':state, 'username': username}, context_instance=RequestContext(request))
