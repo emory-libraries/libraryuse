@@ -673,14 +673,14 @@
   {% endverbatim myblock %}
 
   {# Vendor javascripts #}
-  {% include "jquery.html" %}
-  {% include "csrf.html" %}
-  {% include "highstock.html" %}
-  {% include "components.html" %}
-  {% include "ember.html" %}
-  
+  {% include "libraryuse/include/jquery.html" %}
+  {% include "libraryuse/include/csrf.html" %}
+  {% include "libraryuse/include/highstock.html" %}
+  {% include "libraryuse/include/components.html" %}
+  {% include "libraryuse/include/ember.html" %}
+
   {# Application #}
-  {% include "app.html" %}
+  {% include "libraryuse/include/app.html" %}
   
 </body>
 </html>
