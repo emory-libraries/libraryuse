@@ -280,7 +280,6 @@ def career_class(request, library, classification, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
-
 def top_academic_plan(request, library, start, end):
 
     numbers = LibraryVisit.objects.values('acpl_n') \
@@ -314,7 +313,6 @@ def top_dprtn(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
-
 def top_dprtn_type(request, library, person_type, start, end):
 
     numbers = LibraryVisit.objects.values('dprt_n') \
@@ -339,7 +337,6 @@ def top_dprtn_type(request, library, person_type, start, end):
     data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
-
 
 def top_division(request, library, start, end):
 
@@ -381,7 +378,6 @@ def top_division_type(request, library, person_type, start, end):
     data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
-
 
 
 def calculate_dates(start, end):
@@ -973,7 +969,6 @@ def student_classifications(request):
     jsonp += '}'
 
     return HttpResponse(jsonp, content_type='application/json')
-
 
 def classification_totals(request, library, person_type, start, end):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)

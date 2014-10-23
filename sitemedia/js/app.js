@@ -2022,7 +2022,7 @@ App.LibraryAllRoute = Ember.Route.extend({
 App.LibRoute = Ember.Route.extend({
   model:function(params){
     var libs = params.libs || dataURL.names;
-    // console.log(params.lib)
+    console.log(params.lib)
     if(libs=="woodruff"){
       var data = {
         title: 'Woodruff',
@@ -2037,7 +2037,7 @@ App.LibRoute = Ember.Route.extend({
         student_info:[1,2,3]
       }
       dataURL.set('names', [data.title]);
-      dataURL.set('paths', ["health-science"]);
+      dataURL.set('paths', ["health"]);
     }
     else if(libs=='law'){
       var data = {
@@ -2058,7 +2058,7 @@ App.LibRoute = Ember.Route.extend({
 
 function getLibName(path){
   var url = path,
-  libList = ['all','woodruff','health-science','law'],
+  libList = ['all','woodruff','health','law'],
   libNameList = ['All', 'Woodruff','Health Science','Law'],
   libName = 'all';
   $.each(libList,function(i){
@@ -2157,7 +2157,8 @@ App.LibraryWoodruffRoute = Ember.Route.extend({
     dataURL.set('names', [data.title]);
     dataURL.set('paths', ["woodruff"]);
     dataURL.set('category',['total_usage'])
-    dataURL.set('group',[''])
+    dataURL.set('group',['all'])
+    dataURL.set('persons','')
     return data;
   },
   renderTemplate: function() {
@@ -2186,7 +2187,8 @@ App.LibraryBusinessRoute = Ember.Route.extend({
     dataURL.set('names', [data.title]);
     dataURL.set('paths', ["woodruff"]);
     dataURL.set('category',['total_usage'])
-    dataURL.set('group',[''])
+    dataURL.set('group',['all'])
+    dataURL.set('persons','')
     return data;
   },
   renderTemplate: function() {
@@ -2212,9 +2214,10 @@ App.LibraryHealthScienceRoute = Ember.Route.extend({
       acad_info:['Acad1','Acad2','Acad3']
     }
     dataURL.set('names', [data.title]);
-    dataURL.set('paths', ['health-science']);
+    dataURL.set('paths', ['health']);
     dataURL.set('category',['total_usage'])
-    dataURL.set('group',[''])
+    dataURL.set('group',['all'])
+    dataURL.set('persons','')
     return data;
   },
   renderTemplate: function() {
@@ -2236,7 +2239,8 @@ App.LibraryLawRoute = Ember.Route.extend({
     dataURL.set('names', [data.title]);
     dataURL.set('paths', ["law"]);
     dataURL.set('category',['total_usage'])
-    dataURL.set('group',[''])
+    dataURL.set('group',['all'])
+    dataURL.set('persons','')
     return data;
   },
   renderTemplate: function() {
@@ -2507,6 +2511,9 @@ function SUPERCHART(){
     uri_users='/'+uri_users;
   }
   
+  console.log(uri_users);
+  console.log(uri_persons);
+  
   if(uri_users!==''){
     uri_persons='';
   }
@@ -2541,7 +2548,7 @@ function SUPERCHART(){
   $.each(names, function(i, name) {
     var jsonURL = uri_root+uri_category+path[i]+uri_persons+uri_users+campus_tag+date_range+distinct_tag;
     
-    // console.log(jsonURL);
+    console.log(jsonURL);
     
     var json = $.getJSON(jsonURL)
     
