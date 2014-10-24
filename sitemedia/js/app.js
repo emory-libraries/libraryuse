@@ -255,7 +255,7 @@ App.ReportsIndexRoute = Ember.Route.extend({
       start:  formatDate(dataURL.get("start")),
       end: formatDate(dataURL.get("end"))
     }
-  
+    $(".report-types.nav li").removeClass("active").first().addClass("active");
     $(".global-loading").hide();
     this.transitionTo("report", defaults.id,defaults.lib,defaults.start,defaults.end);
   }
