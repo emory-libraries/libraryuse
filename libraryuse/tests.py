@@ -425,6 +425,172 @@ class TotalsByClassificationsTestCase(TestCase):
         self.assertTrue(totalFacultyStaff > Total,
                         'Individual filtered total should not be greater than the total Faculty/Staff usage.')
 
+class TopDepartmentTestCase(TestCase):
+    fixtures = ['test.json']
+
+    def test_json_response(self):
+        client = Client()
+        libraries = [
+            {
+                'library': 'woodruff',
+                'label': 'LITS: Library IT Expense',
+                'value': 33,
+                'distinct': 118,
+                'total': 329
+            },
+            {
+                'library': 'law',
+                'label': 'School of Law',
+                'value': 14,
+                'distinct': 7,
+                'total': 24
+            },
+            {
+                'library': 'health',
+                'label': 'WHSC Library',
+                'value': 4,
+                'distinct': 39,
+                'total': 58
+            }
+        ]
+
+        title = 'Department'
+        start_date = '2014-10-01'
+        end_date = '2014-10-02'
+
+        for library in libraries:
+            response = client.get(reverse('top_dprtn', kwargs={
+                'library': library['library'],
+                'start': start_date,
+                'end': end_date}))
+
+            self.assertEquals(str(response), 'Content-Type: application/json')
+            self.assertEquals(response.status_code, 200)
+
+            data = getJsonString(response)
+
+            self.assertEquals(data['data'][0]['value'], library['value'])
+            self.assertEquals(data['data'][0]['label'], library['label'])
+            self.assertEquals("%s" % data['meta']['title'], "[u'%s']" % title)
+            self.assertEquals("%s" % data['meta']['strt_date'], "[u'%s']" % start_date)
+            self.assertEquals("%s" % data['meta']['end_date'], "[u'%s']" % end_date)
+            self.assertEquals("%s" % data['meta']['library'], "[u'%s']" % library['library'])
+            self.assertEquals("%s" % data['distinct'], "[u'%s']" % library['distinct'])
+            self.assertEquals("%s" % data['total'], "[u'%s']" % library['total'])
+            self.assertIsNotNone(data['queried_at'])
+
+class TopDivisionTestCase(TestCase):
+    fixtures = ['test.json']
+
+    def test_json_response(self):
+        client = Client()
+        libraries = [
+            {
+                'library': 'woodruff',
+                'label': 'Campus Life Activities',
+                'value': 35,
+                'distinct': 18,
+                'total': 329
+            },
+            {
+                'library': 'law',
+                'label': 'LITS: Library and IT Services',
+                'value': 2,
+                'distinct': 4,
+                'total': 24
+            },
+            {
+                'library': 'health',
+                'label': 'Emory College',
+                'value': 10,
+                'distinct': 9,
+                'total': 58
+            }
+        ]
+
+        title = 'Faculty Division'
+        start_date = '2014-10-01'
+        end_date = '2014-10-02'
+
+        for library in libraries:
+            response = client.get(reverse('top_division', kwargs={
+                'library': library['library'],
+                'start': start_date,
+                'end': end_date}))
+
+            self.assertEquals(str(response), 'Content-Type: application/json')
+            self.assertEquals(response.status_code, 200)
+
+            data = getJsonString(response)
+
+            self.assertEquals(data['data'][2]['value'], library['value'])
+            self.assertEquals(data['data'][2]['label'], library['label'])
+            self.assertEquals("%s" % data['meta']['title'], "[u'%s']" % title)
+            self.assertEquals("%s" % data['meta']['strt_date'], "[u'%s']" % start_date)
+            self.assertEquals("%s" % data['meta']['end_date'], "[u'%s']" % end_date)
+            self.assertEquals("%s" % data['meta']['library'], "[u'%s']" % library['library'])
+            self.assertEquals("%s" % data['distinct'], "[u'%s']" % library['distinct'])
+            self.assertEquals("%s" % data['total'], "[u'%s']" % library['total'])
+            self.assertIsNotNone(data['queried_at'])
+
+class TotalAveragesByClassificationTestCase(TestCase):
+    fixtures = ['test.json']
+
+    def test_json_response(self):
+        client = Client()
+        libraries = [
+            {
+                'library': 'woodruff',
+                'value': 17,
+                'filter_on': 'stdn_e_clas',
+                'class': 'graduate-year-1',
+                'label': 'Graduate Year 1'
+            },
+            {
+                'library': 'law',
+                'value': 17,
+                'filter_on': 'dvsn_n',
+                'class': 'school-of-law',
+                'label': 'School Of Law'
+            },
+            {
+                'library': 'health',
+                'value': 59,
+                'filter_on': 'acca_i',
+                'class': 'ucol',
+                'label': 'UCOL'
+            }
+        ]
+
+        start_date = '2014-10-01'
+        end_date = '2014-10-02'
+        start_hour = 12
+        end_hour = 14
+        dow = 4
+        dow_alphe = 'Wednesday'
+
+        for library in libraries:
+            response = client.get(reverse('averages', kwargs={
+                'library': library['library'],
+                'start': start_date,
+                'end': end_date,
+                'start_hour': start_hour,
+                'end_hour': end_hour,
+                'dow': dow,
+                'filter_on': library['filter_on']}))
+
+            self.assertEquals(str(response), 'Content-Type: application/json')
+            self.assertEquals(response.status_code, 200)
+
+            data = getJsonString(response)
+
+            self.assertEquals(int(data['data'][library['class']]['value']), library['value'])
+            self.assertEquals("%s" % data['data'][library['class']]['label'], library['label'])
+            self.assertEquals("%s" % data['meta']['strt_date'], "[u'%s']" % start_date)
+            self.assertEquals("%s" % data['meta']['end_date'], "[u'%s']" % end_date)
+            self.assertEquals("%s" % data['meta']['strt_hour'], "[u'%s']" % start_hour)
+            self.assertEquals("%s" % data['meta']['end_hour'], "[u'%s']" % end_hour)
+            self.assertEquals("%s" % data['meta']['dow'], "[u'%s']" % dow_alphe)
 
 class TotalAveragesTestCase(TestCase):
     fixtures = ['test.json']
