@@ -3,8 +3,6 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.utils.text import slugify
-from django.contrib.auth import authenticate, login
-from django.core.context_processors import csrf
 import json
 from django.db.models import Q, Count
 from datetime import datetime
@@ -208,7 +206,7 @@ def student_class(request, library, classification, start, end):
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = library) \
                 .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
-
+    
     if classification!='all':
       numbers = numbers.filter(stdn_e_clas = classification)
 
@@ -280,6 +278,7 @@ def career_class(request, library, classification, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
+
 def top_academic_plan(request, library, start, end):
 
     numbers = LibraryVisit.objects.values('acpl_n') \
@@ -313,6 +312,7 @@ def top_dprtn(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
+
 def top_dprtn_type(request, library, person_type, start, end):
 
     numbers = LibraryVisit.objects.values('dprt_n') \
@@ -337,6 +337,7 @@ def top_dprtn_type(request, library, person_type, start, end):
     data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
+
 
 def top_division(request, library, start, end):
 
@@ -378,6 +379,7 @@ def top_division_type(request, library, person_type, start, end):
     data = chart_data(numbers, distinct, total, start, end, library)
 
     return StreamingHttpResponse(data, content_type='application/json')
+
 
 
 def calculate_dates(start, end):
@@ -738,61 +740,69 @@ def faculty_divs_dprt(request, library, start, end):
         else:
             return 0
 
-    faculty_divisions = get_classifications('dvsn_n')
-
     jsonp = '{"data":{"divs":['
 
     faculty_divisions_list = division_totals(library, start, end)
+    
+    if (faculty_divisions_list):
+      
+      for faculty_division in faculty_divisions_list:
+      
+          faculty_division_name = faculty_division["dvsn_n"]
+      
+          visit_count = faculty_division["total"]
+      
+          departments_list = get_classifications(faculty_division_name)
+          
+          print faculty_division_name
+          print departments_list
+          print '\n'
+          print '\n'
 
-    for faculty_division in faculty_divisions_list:
+          
+          last_departments = departments_list.reverse()[:1]
+      
+          jsonp += '{'
+      
+          jsonp += '"label": "%s",' % faculty_division_name
+      
+          jsonp += '"value": "%s",' % visit_count
+          
 
-        faculty_division_name = faculty_division["dvsn_n"]
-
-        visit_count = faculty_division["total"]
-
-        departments = get_classifications(faculty_division_name)
-        departments_list = department_totals(library, start, end)
-        last_departments = departments.reverse()[:1]
-
-        jsonp += '{'
-
-        jsonp += '"label": "%s",' % faculty_division_name
-
-        jsonp += '"value": "%s",' % visit_count
-
-        jsonp += '"depts":['
-
-        for department in departments_list:
-
-            department_name = department["dprt_n"]
-
-            department_visit_count = department["total"]
-
-            jsonp += '{'
-
-            jsonp += '"label": "%s",' % department_name
-
-            jsonp += '"value": "%s"' % department_visit_count
-
-            jsonp += '},'
-
-        for last_department in last_departments:
-            #remove last comma
-            if(jsonp[-1:] != '['):
-              jsonp = jsonp[:-1]
-
-        jsonp += ']},'
-
-    last_faculty_divisions = faculty_divisions.reverse()[:1]
-
-    for last_faculty_division in last_faculty_divisions:
-        #remove last comma
-        if(jsonp[-1:] != '['):
-          jsonp = jsonp[:-1]
-
-        jsonp += ']'
-        jsonp += '}'
-
+          jsonp += '"depts":['
+      
+          for department in departments_list:
+              
+              department_name = department
+      
+              department_visit_count = department_count(department,library,start,end)
+      
+              jsonp += '{'
+      
+              jsonp += '"label": "%s",' % department_name
+      
+              jsonp += '"value": "%s"' % department_visit_count
+      
+              jsonp += '},'
+          
+          if(jsonp[-1:] != '['):  
+            jsonp = jsonp[:-1]
+            
+          jsonp += ']},'
+      
+      last_faculty_divisions = faculty_divisions_list.reverse()[:1]
+      
+      for last_faculty_division in last_faculty_divisions:
+          #remove last comma
+          if(jsonp[-1:] != '['):
+            jsonp = jsonp[:-1]
+      
+          jsonp += ']'
+          jsonp += '}'
+    else:
+      jsonp += ']'
+      jsonp += '}'
+      
     jsonp += ',"meta":{'
 
     jsonp += '"library":["%s"],' % library
@@ -970,6 +980,7 @@ def student_classifications(request):
 
     return HttpResponse(jsonp, content_type='application/json')
 
+
 def classification_totals(request, library, person_type, start, end):
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
 
@@ -1063,22 +1074,3 @@ def classification_totals(request, library, person_type, start, end):
     jsonp += '}}'
 
     return HttpResponse(jsonp, content_type='application/json')
-
-# def login_user(request):
-#     state = "Please log in below..."
-#     username = password = ''
-#     if request.POST:
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#
-#         user = authenticate(username=username, password=password)
-#         if user is not None:
-#             if user.is_active:
-#                 login(request, user)
-#                 return redirect('/')
-#             else:
-#                 state = "Your account is not active, please contact the site admin."
-#         else:
-#             state = "Your username and/or password were incorrect."
-#
-#     return render_to_response('auth.html',{'state':state, 'username': username}, context_instance=RequestContext(request))
