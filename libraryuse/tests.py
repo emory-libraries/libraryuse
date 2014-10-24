@@ -487,22 +487,22 @@ class TopDivisionTestCase(TestCase):
         libraries = [
             {
                 'library': 'woodruff',
-                'label': 'Campus Life Activities',
-                'value': 35,
+                'label': 'School Of Medicine',
+                'value': 19,
                 'distinct': 18,
                 'total': 329
             },
             {
                 'library': 'law',
-                'label': 'LITS: Library and IT Services',
-                'value': 2,
+                'label': 'None',
+                'value': 0,
                 'distinct': 4,
                 'total': 24
             },
             {
                 'library': 'health',
-                'label': 'Emory College',
-                'value': 10,
+                'label': 'School Of Public Health',
+                'value': 5,
                 'distinct': 9,
                 'total': 58
             }
@@ -523,8 +523,8 @@ class TopDivisionTestCase(TestCase):
 
             data = getJsonString(response)
 
-            self.assertEquals(data['data'][2]['value'], library['value'])
-            self.assertEquals(data['data'][2]['label'], library['label'])
+            self.assertEquals(data['data'][4]['value'], library['value'])
+            self.assertEquals(data['data'][4]['label'], library['label'])
             self.assertEquals("%s" % data['meta']['title'], "[u'%s']" % title)
             self.assertEquals("%s" % data['meta']['strt_date'], "[u'%s']" % start_date)
             self.assertEquals("%s" % data['meta']['end_date'], "[u'%s']" % end_date)
