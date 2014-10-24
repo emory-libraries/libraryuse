@@ -102,8 +102,7 @@ TEMPLATE_DIRS = (
 
 )
 
-LOGIN_URL = 'libraryuse_login'
-LOGOUT_URL = 'libraryuse_logout'
+LOGIN_URL = '/admin'
 LOGIN_REDIRECT_URL = '/'
 
 INSTALLED_APPS = (
@@ -122,6 +121,7 @@ INSTALLED_APPS = (
     'eullocal.django.emory_ldap',
     'libraryuse',
     'tastypie',
+    #'tastypie_mongoengine',
 
 )
 
@@ -158,8 +158,6 @@ TEST_OUTPUT_DIR = 'test-results'
 # - without these settings, test fail on loading initial fixtured data
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False
-
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 AUTH_USER_MODEL = 'emory_ldap.EmoryLDAPUser'
 
