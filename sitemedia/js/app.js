@@ -172,6 +172,11 @@ function loadReport(_this, route){
   
   var link = '/'+id+'/'+lib+'/'+start+'/'+end,
   name = "Report: "+id+"|"+lib+"|"+start+"|"+end;
+  
+  if(window.location.hash.indexOf(link) > -1){
+    return
+  }
+  
   $("#report-chart .loading-data").show();
   $(".load-date, #table-report, #total-tables").addClass('disabled');
   $(".visitor-count").css({"opacity":0})
@@ -237,11 +242,11 @@ App.CalendarDatePicker = Ember.TextField.extend({
     
     $(".report-dates.inputs>form>input.start")
     .datepicker("setDate", new Date(urlDate.start))
-    .datepicker( "option", "minDate", new Date(urlDate.start) );
+    // .datepicker( "option", "minDate", new Date(urlDate.start) );
     
     $(".report-dates.inputs>form>input.end")
     .datepicker("setDate", new Date(urlDate.end))
-    .datepicker( "option", "minDate", new Date(urlDate.start) );
+    // .datepicker( "option", "minDate", new Date(urlDate.start) );
   }
 });
 
@@ -255,7 +260,6 @@ App.ReportsIndexRoute = Ember.Route.extend({
       start:  formatDate(dataURL.get("start")),
       end: formatDate(dataURL.get("end"))
     }
-    $(".report-types.nav li").removeClass("active").first().addClass("active");
     $(".global-loading").hide();
     this.transitionTo("report", defaults.id,defaults.lib,defaults.start,defaults.end);
   }
@@ -406,6 +410,7 @@ App.ReportRoute = App.ReportRoute.extend({
     dow: 1
   },
   renderTemplate:function(){
+    $(".report-types.nav li").first().removeClass("active");
     Ember.run.next(this, function(){ 
       $(".mp-pusher").removeClass("mp-loading");
       $(".loading-reports").hide();
@@ -524,6 +529,9 @@ App.ReportsController = Ember.Controller.extend({
     },
     
     setType: function(idName) {
+      if(idName==this.get('id')){
+        return
+      }
       this.set('id', idName)
       $('#report-chart .chart').css('opacity',0)
       setGlobalReportVariables('id',idName, this)
@@ -1342,8 +1350,6 @@ App.ReportController = Ember.Controller.extend({
                 },50);
               }
             },
-            minDate: new Date(dataURL.get('start')),
-            maxDate: new Date(dataURL.get('end')),
             onClose: function(i,obj) {
               $widget = obj.dpDiv;
               $widget.data("top", $widget.position().top);
@@ -1488,6 +1494,7 @@ App.ReportController = Ember.Controller.extend({
     var library_name = capitaliseFirstLetter(reportParams.get('lib'));
     
     function chartTotals(seriesData,drilldownSeries ){
+      $(".report-types.nav li").removeClass("active").first().addClass("active");
       Highcharts.setOptions({
         lang: {
           drillUpText: '< Back to all'
