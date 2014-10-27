@@ -931,3 +931,68 @@ a.btn.btn-default.btn-download.disabled {
   z-index: 4;
   text-shadow: 0px 0px 5px rgba(39, 39, 39, 0.48);
 }
+
+
+.card.login{
+  background-color: #4B5064;
+  border-radius: 2px; 
+  box-shadow: 0 4px 6px 1px rgba(50, 50, 50, 0.14); 
+  margin: 50px auto;
+  padding: 20px 40px;
+  max-width: 400px;
+  text-align: center;
+  color: rgb(204, 206, 216);
+  position: relative;
+}
+
+h2.form-title {
+    margin: 5px 0 25px;
+    color: #C9CCD8;
+    text-align: left;
+}
+
+.card.login label {
+    font-weight: normal;
+}
+
+.card.login input{
+    border-color: rgba(187, 187, 187, 0.45);
+    border-left-width:0;
+}
+
+.card.login .input-group .input-group-addon{
+  border-top-left-radius:3px;
+  border-bottom-left-radius:3px;
+}
+
+.card.login .input-group{
+  margin:20px 0;
+}
+
+.card.login .input-group .input-group-addon.error {
+  background-color: rgb(236, 151, 151);
+  border-color: rgb(236, 151, 151);
+}
+
+.errors .errorlist {
+  list-style: none;
+  padding: 0;
+  background: rgb(236, 151, 151);
+  position: absolute;
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  margin: 0;
+  color: rgb(48, 56, 84);
+}
+
+#header .navbar-nav>li>a.logout {
+    background-color: rgb(35, 30, 42);
+    opacity: 0.5;
+    transition:opacity 0.5s ease;
+}
+
+#header .navbar-nav>li>a.logout:hover,
+#header .navbar-nav>li>a.logout:focus{
+    opacity:1;
+}

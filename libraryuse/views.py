@@ -1,18 +1,30 @@
-from django.http import HttpResponse, StreamingHttpResponse
-from django.shortcuts import render_to_response, redirect
-from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
-from django.utils.text import slugify
-import json
-from django.db.models import Q, Count
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import csv
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q, Count
+from django.http import HttpResponse, StreamingHttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response, redirect, render
+from django.template import RequestContext
+from django.utils.text import slugify
 from forms import DataExportForm
-from models import LibraryVisit
+from models import LibraryVisit, LoginForm
+import csv
+import json
 import time
 
-@login_required
+def login_user(request):
+    form = LoginForm(request.POST or None)
+    if request.POST and form.is_valid():
+        user = form.login(request)
+        hash = request.POST['hash']
+        if user:
+            login(request, user)
+            return HttpResponseRedirect('/'+hash)
+    return render(request, 'admin/login.html', {'login_form': form })
+
+
+@login_required(login_url='/login/')
 def index(request):
     context = {}
     return render_to_response('libraryuse/dashboard.html', context)

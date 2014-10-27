@@ -1,11 +1,43 @@
+from datetime import timedelta
+from django import forms
 from django.db import models
 import datetime
-from datetime import timedelta
+from django.contrib.auth import authenticate
 
 class DataExport(models.Model):
     start_date = models.DateField('start date', null=True, blank=True)
     end_date = models.DateField('end date', null=True, blank=True)
 
+class LoginForm(forms.Form):
+    username = forms.CharField(max_length=255, required=True)
+    username.widget = forms.TextInput(attrs={
+        "class":"form-control",
+        "placeholder":"Username",
+        "required":"required"
+      })
+    password = forms.CharField(widget=forms.PasswordInput, required=True)
+    password.widget = forms.PasswordInput(attrs={
+        "class":"form-control",
+        "placeholder":"Password",
+        "required":"required"
+    })
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+        if not username or not password:
+          raise forms.ValidationError("Sorry, that login was invalid. Please try again.")
+          return self.cleaned_data
+        user = authenticate(username=username, password=password)
+        if not user or not user.is_active or user == None:
+            raise forms.ValidationError("Sorry, that login was invalid. Please try again.")
+        return self.cleaned_data
+
+    def login(self, request):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        return user
 
 class LibraryVisitKey(models.Model):
     LIBRARY_VISIT_KEY_CHOICES = (
