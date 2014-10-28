@@ -13,6 +13,75 @@ Date formats
 ------------
 * YYYY-MM-DD
 
+Field Names
+-----------
+
+Emory Shared Data Fields
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The field names for the filters are based on Emory Shared Data (ESD):
+
++----------------+-----------------------------------------------------+
+| ESD Field      | Explination                                         |
++================+=====================================================+
+| prsn_i_ecn     | EmoryCard number identifer of person                |
++----------------+-----------------------------------------------------+
+| prsn_c_type    | EU type code of the person                          |
++----------------+-----------------------------------------------------+
+| prsn_e_type    | EU type description of the person                   |
++----------------+-----------------------------------------------------+
+| dprt_c         | EU department code of the primary job               |
++----------------+-----------------------------------------------------+
+| dprt_n         | EU department name of the primary job               |
++----------------+-----------------------------------------------------+
+| dvsn_i         | EU division identifier of the primary job           |
++----------------+-----------------------------------------------------+
+| dvsn_n         | EU division name of the the primary job             |
++----------------+-----------------------------------------------------+
+| acca_i         | Academic career identifier of the student (primary) |
++----------------+-----------------------------------------------------+
+| acpr_n         | Academic program name of the student                |
++----------------+-----------------------------------------------------+
+| acpl_n         | Academic plan name of the student                   |
++----------------+-----------------------------------------------------+
+| stdn_e_clas    | Class description of the student                    |
++----------------+-----------------------------------------------------+
+| stdn_f_cmps_on | On-campus flag of the student                       |
++----------------+-----------------------------------------------------+
+
+Person Type codes
+^^^^^^^^^^^^^^^^^
+
+These are the codes for the *prsn_e_type* from ESD.
+
+We use **B** and **S** to filter for students, **F** for faculty and **E** for staff. No other codes are used.
+
++---+-------------------+
+| A | administrative    |
++---+-------------------+
+| B | student/staff     |
++---+-------------------+
+| C | staff/student     |
++---+-------------------+
+| E | staff             |
++---+-------------------+
+| F | faculty           |
++---+-------------------+
+| J | EU job eligible   |
++---+-------------------+
+| O | student applicant |
++---+-------------------+
+| P | sponsored         |
++---+-------------------+
+| R | retired           |
++---+-------------------+
+| S | student           |
++---+-------------------+
+| U | unknown           |
++---+-------------------+
+| X | pre-start         |
++---+-------------------+
+
 Total usage by library
 ----------------------
 `/total_usage/<library>/<person type>/<start date>/<end date>/`
@@ -121,6 +190,7 @@ Average by day, hour(s) and classification
 
 * Hours are 0 - 23
 * Days are ints with Sunday = 1...Saturday = 7
+
 Filters:
 ^^^^^^^^
 * stdn_e_clas (student_classes)
