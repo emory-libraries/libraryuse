@@ -2,6 +2,10 @@ App = Ember.Application.create({
   LOG_TRANSITIONS:true
 });
 
+$(document).ready(function() {
+  $.ajaxSetup({ cache: true });
+});
+
 
 App.Router.map(function() {
   this.resource('index', { path: '/' });
@@ -294,8 +298,8 @@ App.ReportsRoute = App.ReportsRoute.extend({
     this._super();
     dataURL.set('category','')
     Ember.run.next(this, function(){ 
-      $(".visitor-count").css({"opacity":0.2})
       if($(".chart").length>0){
+        $(".visitor-count").css({"opacity":0.2})
         $( document ).ajaxStop();
         $(".mp-pusher").addClass("mp-loading");
         $(".loading-reports").show();
@@ -2029,7 +2033,7 @@ App.LibraryAllRoute = Ember.Route.extend({
 App.LibRoute = Ember.Route.extend({
   model:function(params){
     var libs = params.libs || dataURL.names;
-    console.log(params.lib)
+
     if(libs=="woodruff"){
       var data = {
         title: 'Woodruff',
@@ -2518,9 +2522,6 @@ function SUPERCHART(){
     uri_users='/'+uri_users;
   }
   
-  console.log(uri_users);
-  console.log(uri_persons);
-  
   if(uri_users!==''){
     uri_persons='';
   }
@@ -2555,8 +2556,8 @@ function SUPERCHART(){
   $.each(names, function(i, name) {
     var jsonURL = uri_root+uri_category+path[i]+uri_persons+uri_users+campus_tag+date_range+distinct_tag;
     
-    console.log(jsonURL);
-    
+    // console.log(jsonURL);
+
     var json = $.getJSON(jsonURL)
     
     json.done(function(data){
