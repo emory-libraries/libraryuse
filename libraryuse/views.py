@@ -24,6 +24,7 @@ def login_user(request):
     return render(request, 'admin/login.html', {'login_form': form })
 
 def is_staff_check(user):
+    '''Check to see if user is super.```
     print(user.is_superuser)
     return user.is_superuser
 
