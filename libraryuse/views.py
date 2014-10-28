@@ -1,7 +1,7 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q, Count
 from django.http import HttpResponse, StreamingHttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect, render
@@ -23,7 +23,11 @@ def login_user(request):
             return HttpResponseRedirect('/'+hash)
     return render(request, 'admin/login.html', {'login_form': form })
 
+def is_staff_check(user):
+    print(user.is_superuser)
+    return user.is_superuser
 
+@user_passes_test(is_staff_check)
 @login_required(login_url='/login/')
 def index(request):
     context = {}
