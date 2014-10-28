@@ -24,7 +24,7 @@ The field names for the filters are based on Emory Shared Data (ESD):
 +----------------+-----------------------------------------------------+
 | ESD Field      | Explination                                         |
 +================+=====================================================+
-| prsn_i_ecn     | EmoryCard number identifer of person                |
+| prsn_i_ecn     | EmoryCard number identifer of person (Hashed in DB  |
 +----------------+-----------------------------------------------------+
 | prsn_c_type    | EU type code of the person                          |
 +----------------+-----------------------------------------------------+
@@ -48,6 +48,46 @@ The field names for the filters are based on Emory Shared Data (ESD):
 +----------------+-----------------------------------------------------+
 | stdn_f_cmps_on | On-campus flag of the student                       |
 +----------------+-----------------------------------------------------+
+
+These are fields we are not using anywhere but do exist in the data:
+
++------------------+------------------------------------------------------+
+| ESD Field        | Explination                                          |
++==================+======================================================+
+| prsn_i_pblc      | Public identifier of the person (PPID) (Hashed in DB |
++------------------+------------------------------------------------------+
+| prsn_i_hr        | HR (emplid) identifier of the person                 |
++------------------+------------------------------------------------------+
+| prsn8hc_i_hr     | Healthcare HR (emplid) identifier of the person      |
++------------------+------------------------------------------------------+
+| prsn_i_sa        | SA (emplid) identifier of the person                 |
++------------------+------------------------------------------------------+
+| prsn_e_titl_dtry | directory title of the person                        |
++------------------+------------------------------------------------------+
+| emjo_c_clsf      | EU classification code of the employee job (primary) |
++------------------+------------------------------------------------------+
+| dprt_c           | EU department code of the primary job                |
++------------------+------------------------------------------------------+
+| empe_c_fclt_rank | EU faculty rank code                                 |
++------------------+------------------------------------------------------+
+| prsn_c_type_hc   | HC type code of the person                           |
++------------------+------------------------------------------------------+
+| prsn_e_type_hc   | HC type description of the person                    |
++------------------+------------------------------------------------------+
+| emjo8hc_c_clsf   | HC classification code of the employee job           |
++------------------+------------------------------------------------------+
+| dprt8hc_c        | HC department code of the employee jobt              |
++------------------+------------------------------------------------------+
+| dprt8hc_n        | HC department name of the employee job               |
++------------------+------------------------------------------------------+
+| dvsn8hc_i        | HC division identifier of the employee job           |
++------------------+------------------------------------------------------+
+| dvsn8hc_n        | HC division name of the employee job                 |
++------------------+------------------------------------------------------+
+| acpr_n           | Academic program name of the student                 |
++------------------+------------------------------------------------------+
+| stdn_f_ungr      | Undergraduate flag of the student                    |
++------------------+------------------------------------------------------+
 
 Person Type codes
 ^^^^^^^^^^^^^^^^^
