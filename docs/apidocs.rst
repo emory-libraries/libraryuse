@@ -163,7 +163,7 @@ Totals by student classifications by library
 Filtered by:
 ^^^^^^^^^^^^
 * Library
-* stdn_e_clas
+* stdn_e_clas (*all* or a specified)
 * prsn_c_type (students only)
 
 Example output:
@@ -177,12 +177,40 @@ Totals by faculty classifications by library
 Filtered by:
 ^^^^^^^^^^^^
 * Library
-* dvsn_n
+* dvsn_n (*all* or a specified)
 * prsn_c_type (faculty only)
 
 Example output:
 ^^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/faculty_staff_class.json
+
+Degree Class
+------------
+`/degree_class/<library>/<classificatino>/<start date>/<end date>/`
+
+Filtered by:
+^^^^^^^^^^^^
+* Library
+* acpl_n (*all* or a specified)
+* prsn_c_type (students, faculty and staff)
+
+Example output:
+^^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/degree_class.json
+
+Career Class
+------------
+`/career_class/<library>/<classificatino>/<start date>/<end date>/`
+
+Filtered by:
+^^^^^^^^^^^^
+* Library
+* acca_i (*all* or a specified)
+* prsn_c_type (students, faculty and staff)
+
+Example output:
+^^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/career_class.json
 
 Top Academic Plans
 ------------------
@@ -192,7 +220,11 @@ Filtered by:
 ^^^^^^^^^^^^
 * Library
 * acpl_n
-* prsn_c_type (students only)
+* prsn_c_type (students, faculty and staff)
+
+Ordered by:
+^^^^^^^^^^^
+* Count of acpl_n
 
 Example output:
 ^^^^^^^^^^^^^^^
@@ -207,6 +239,10 @@ Filtered by:
 * Library
 * dprt_n
 
+Ordered by:
+^^^^^^^^^^^
+* Count of dprt_n
+
 Example output
 ^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/top_dprtn.json
@@ -220,9 +256,37 @@ Filtered by:
 * Library
 * dvsn_n
 
+Ordered by:
+^^^^^^^^^^^
+* Count of dvsn_n
+
 Example output
 ^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/top_division.json
+
+Top Division Type
+-----------------
+`/top_division/<library>/<start date>/<end date>/`
+
+Person Types:
+^^^^^^^^^^^^^
+* all
+* student
+* faculty
+* staff
+
+Filtered by:
+^^^^^^^^^^^^
+* Library
+* dvsn_n
+
+Ordered by:
+^^^^^^^^^^^
+* Count of dvsn_n
+
+Example output
+^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/top_division_type.json
 
 Average by day, hour(s) and classification
 ------------------------------------------
