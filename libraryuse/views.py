@@ -313,6 +313,23 @@ def top_academic_plan(request, library, start, end):
 
     return StreamingHttpResponse(data, content_type='application/json')
 
+def top_academic_career(request, library, start, end):
+
+    numbers = LibraryVisit.objects.values('acca_i') \
+                .annotate(total=Count('acca_i')) \
+                .order_by('-total') \
+                .filter(visit_time__range=[start, end]) \
+                .filter(location = library) \
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S') | Q(prsn_c_type = 'F') | Q(prsn_c_type = 'E'))
+
+    distinct = numbers.values('acca_i').distinct().count()
+
+    total = numbers.values('acca_i').count()
+
+    data = chart_data(numbers, distinct, total, start, end, library)
+
+    return StreamingHttpResponse(data, content_type='application/json')
+
 def top_dprtn(request, library, start, end):
 
     numbers = LibraryVisit.objects.values('dprt_n') \
@@ -838,7 +855,7 @@ def faculty_divs_dprt(request, library, start, end):
 
     return StreamingHttpResponse(jsonp, content_type='application/json')
 
-def top_academic_career(request, library, start, end):
+def academic_career_count(request, library, start, end):
 
     '''
     {

@@ -46,6 +46,7 @@ urlpatterns = patterns(
 
     url(r'^faculty_divs_dprt/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_divs_dprt, name='faculty_divs_dprt'),
     url(r'^faculty_dprt_count/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.faculty_dprt_count, name='faculty_dprt_count'),
+    url(r'^academic_career_count/(?P<library>.+)/(?P<start>.+)/(?P<end>.+)/$', views.academic_career_count, name='academic_career_count'),
 
     url(r'^classification_totals/(?P<library>.+)/(?P<person_type>.+)/(?P<start>.+)/(?P<end>.+)/$', views.classification_totals, name='classification_totals'),
 
