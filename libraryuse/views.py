@@ -28,13 +28,13 @@ def is_staff_check(user):
     print(user.is_superuser)
     return user.is_superuser
 
-@user_passes_test(is_staff_check)
 @login_required(login_url='/login/')
+@user_passes_test(is_staff_check)
 def index(request):
     context = {}
     return render_to_response('libraryuse/dashboard.html', context)
 
-@login_required
+@login_required(login_url='/login/')
 def reports_index(request):
     context = {}
     return redirect('/#/reports')
@@ -1016,6 +1016,9 @@ def student_classifications(request):
 
 
 def classification_totals(request, library, person_type, start, end):
+    '''
+    Calculates totals based on specific classifications.
+    '''
     student_classes = LibraryVisit.objects.values_list('stdn_e_clas', flat=True).distinct().exclude(stdn_e_clas__isnull=True)
 
     def class_totals(location, person_type, start, end):
@@ -1029,8 +1032,8 @@ def classification_totals(request, library, person_type, start, end):
                     .order_by('-total')
 
         elif person_type == 'student':
-            numbers = LibraryVisit.objects.values('stdn_e_clas') \
-                    .annotate(total=Count('stdn_e_clas')) \
+            numbers = LibraryVisit.objects.values('acca_i') \
+                    .annotate(total=Count('acca_i')) \
                     .filter(visit_time__range=[start, end]) \
                     .filter(location = library) \
                     .order_by('-total') \
@@ -1069,7 +1072,7 @@ def classification_totals(request, library, person_type, start, end):
         sort_by = "prsn_e_type"
 
     elif person_type == 'student':
-        sort_by = "stdn_e_clas"
+        sort_by = "acca_i"
 
     elif (person_type == 'faculty' or person_type == 'staff'):
         sort_by = "dvsn_n"

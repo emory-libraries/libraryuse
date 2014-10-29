@@ -199,6 +199,10 @@ function capitaliseFirstLetter(string)
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(?:\d{3})+(?!\d))/g, ",");
+}
+
 App.CalendarDatePicker = Ember.TextField.extend({
   _picker: null,
   
@@ -510,7 +514,7 @@ App.ReportsController = Ember.Controller.extend({
   }.property("id"),
   
   isCareer:function(){
-    if(this.get("id")=="top_academic_career"){
+    if(this.get("id")=="academic_career_count"){
       return true
     }
   }.property("id"),
@@ -1045,11 +1049,13 @@ App.ReportController = Ember.Controller.extend({
         }
     
     function draw(){
-      $('.visitor-count .on-campus .number.total').animateNumber({ number: parseInt(on_numbers.total) });
-      $('.visitor-count .on-campus .number.distinct').animateNumber({ number: parseInt(on_numbers.distinct) });
+      var comma_separator_number_step = $.animateNumber.numberStepFactories.separator(',')
       
-      $('.visitor-count .off-campus .number.total').animateNumber({ number: parseInt(off_numbers.total) });
-      $('.visitor-count .off-campus .number.distinct').animateNumber({ number: parseInt(off_numbers.distinct) });
+      $('.visitor-count .on-campus .number.total').animateNumber({ number: parseInt(on_numbers.total),numberStep: comma_separator_number_step });
+      $('.visitor-count .on-campus .number.distinct').animateNumber({ number: parseInt(on_numbers.distinct),numberStep: comma_separator_number_step });
+      
+      $('.visitor-count .off-campus .number.total').animateNumber({ number: parseInt(off_numbers.total),numberStep: comma_separator_number_step });
+      $('.visitor-count .off-campus .number.distinct').animateNumber({ number: parseInt(off_numbers.distinct),numberStep: comma_separator_number_step });
       
       Highcharts.setOptions({
         lang: {
@@ -1448,7 +1454,7 @@ App.ReportController = Ember.Controller.extend({
                       };
           var $table = $("#total-tables #"+name+"-totals")
           $table.html('');
-          $table.append($("<tr/>").css({"border-top-color":colors[i]}).addClass('header').append($("<th/>").html(point.name),$("<th/>").html(point.y)));  
+          $table.append($("<tr/>").css({"border-top-color":colors[i]}).addClass('header').append($("<th/>").html(point.name),$("<th/>").html(numberWithCommas(point.y))));  
           $.each(d.data,function(){
             var name = this.label,
                 value = parseInt(this.value);
@@ -1459,7 +1465,7 @@ App.ReportController = Ember.Controller.extend({
             else if(name.indexOf('_')>-1){
               name = name.replace(/_/g,' ')
             }
-            $table.append($("<tr/>").append($("<td/>").html(name),$("<td/>").html(value)));
+            $table.append($("<tr/>").append($("<td/>").html(name),$("<td/>").html(numberWithCommas(value))));
           });
 
           drilldownSeries.push({ 
@@ -1514,7 +1520,7 @@ App.ReportController = Ember.Controller.extend({
           type: "pie"
         },
         title: {
-          text: 'Students, Faculty, and Staff for '+ library_name +'<br/>( Total: '+total+' visitors )'
+          text: 'Students, Faculty, and Staff for '+ library_name +'<br/>( Total: '+numberWithCommas(total)+' visitors )'
         },
         tooltip: {
           useHTML: true,
