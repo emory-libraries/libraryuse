@@ -149,7 +149,7 @@ def setup_virtualenv():
             #    && export ORACLE_HOME=%(oracle_home)s' % env
             #sudo(setenv_cmd, user=env.remote_acct)
 
-            pip_cmd = setenv_cmd + '; pip install -r pip-install-req.txt'
+            pip_cmd = 'pip install -r pip-install-req.txt'
             if env.remote_proxy:
                 pip_cmd += ' --proxy=%(remote_proxy)s' % env
             sudo(pip_cmd, user=env.remote_acct)
