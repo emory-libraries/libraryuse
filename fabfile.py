@@ -145,8 +145,8 @@ def setup_virtualenv():
         # activate the environment and install required packages
         with prefix('source env/bin/activate'):
 
-            setenv_cmd = 'export LD_LIBRARY_PATH=%(ld_library_path)s \
-                && export ORACLE_HOME=%(oracle_home)s' % env
+            #setenv_cmd = 'export LD_LIBRARY_PATH=%(ld_library_path)s \
+            #    && export ORACLE_HOME=%(oracle_home)s' % env
             #sudo(setenv_cmd, user=env.remote_acct)
 
             pip_cmd = setenv_cmd + '; pip install -r pip-install-req.txt'
