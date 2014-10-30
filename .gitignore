@@ -1,5 +1,5 @@
 *.pyc
-*.DS_Store
+.DS_Store
 libuse-openshift.komodoproject
 static
 venv
@@ -9,7 +9,8 @@ libraryuse/api/__init__.pyc
 localsettings.py
 sitemedia/js/data/test-divs.json
 test-results
-docs/_build
+docs/_build/
 docs/_build/.*
 .metadata
 libraryuse/.idea/
+*.doctree

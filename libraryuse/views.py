@@ -23,13 +23,13 @@ def login_user(request):
             return HttpResponseRedirect('/'+hash)
     return render(request, 'admin/login.html', {'login_form': form })
 
-def is_staff_check(user):
+def is_super_check(user):
     '''Check to see if user is super.'''
     print(user.is_superuser)
     return user.is_superuser
 
 @login_required(login_url='/login/')
-@user_passes_test(is_staff_check)
+@user_passes_test(is_super_check)
 def index(request):
     context = {}
     return render_to_response('libraryuse/dashboard.html', context)
@@ -303,7 +303,7 @@ def top_academic_plan(request, library, start, end):
                 .order_by('-total') \
                 .filter(visit_time__range=[start, end]) \
                 .filter(location = library) \
-                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S') | Q(prsn_c_type = 'F') | Q(prsn_c_type = 'E'))
+                .filter(Q(prsn_c_type = 'B') | Q(prsn_c_type = 'S'))
 
     distinct = numbers.values('acpl_n').distinct().count()
 
