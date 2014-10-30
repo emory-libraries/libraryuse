@@ -37,11 +37,6 @@ class Command(BaseCommand):
             dest='refresh_esd',
             default=False,
             help='Refresh Emory Shared Data copy'),
-        make_option('--refresh-esd-historic',
-            action='store_true',
-            dest='refresh_esd_historic',
-            default=False,
-            help='Refresh Historic Emory Shared Data copy'),
         make_option('--refresh-libraryvisit',
             action='store_true',
             dest='refresh_libraryvisit',
@@ -52,16 +47,11 @@ class Command(BaseCommand):
             dest='update_libraryvisit',
             default=False,
             help='Update libraryvisit_mv materialized view'),
-        make_option('--refresh-hash-esd',
-            action='store_true',
-            dest='refresh_hash_esd',
-            default=False,
-            help='Refresh Emory Shared Data copy with a hash for the card number'),
         )
 
     @transaction.commit_manually
     def handle(self, *args, **options):
-        if not (options['refresh_esd'] or options['refresh_libraryvisit'] or options['update_libraryvisit'] or options['refresh_hash_esd'] or options['refresh_esd_historic']):
+        if not (options['refresh_esd'] or options['refresh_libraryvisit'] or options['update_libraryvisit']):
             sys.exit('Nothing to do')
 
         if options['refresh_esd']:
@@ -70,10 +60,6 @@ class Command(BaseCommand):
             self.refresh_libraryvisit()
         if options['update_libraryvisit']:
             self.update_libraryvisit()
-        if options['refresh_hash_esd']:
-            self.refresh_hash_esd()
-        if options['refresh_esd_historic']:
-            self.refresh_esd_historic()
 
     @transaction.commit_manually
     def refresh_esd(self):
@@ -94,72 +80,8 @@ class Command(BaseCommand):
                 EMPE_C_FCLT_RANK, PRSN_C_TYPE_HC, PRSN_E_TYPE_HC, EMJO8HC_C_CLSF,
                 DPRT8HC_C, DPRT8HC_N, DVSN8HC_I, DVSN8HC_N, ACCA_I, ACPR_N,
                 ACPL_N, STDN_E_CLAS, STDN_F_UNGR, STDN_F_CMPS_ON) values (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s)''', result)
-
-        except Exception, e:
-            transaction.rollback()
-            cxn_esd.close()
-            cxn_db.close()
-            raise CommandError("problem refreshing db.esd: %s" % e)
-
-        transaction.commit()
-        cxn_esd.close()
-        cxn_db.close()
-
-    @transaction.commit_manually
-    def refresh_esd_historic(self):
-        cxn_esd = connections['esd']
-        cursor_esd = cxn_esd.cursor()
-        #cursor_esd.execute("select * from V_LUD_PRSN where rownum <= 10")
-        cursor_esd.execute("select * from LUD_ECN_HSTR")
-
-        cxn_db = connections['default']
-        cursor_db = cxn_db.cursor()
-
-        try:
-            cursor_db.execute("truncate esd_historic")
-            for result in self.ResultsIterator(cursor_esd):
-                cursor_db.execute('''insert into esd-historic (PRSN_I_PBLC, PRSN_I_ECN,
-                PRSN_E_TITL_DTRY, PRSN_C_TYPE,
-                PRSN_E_TYPE, EMJO_C_CLSF, DPRT_C, DPRT_N, DVSN_I, DVSN_N,
-                EMPE_C_FCLT_RANK, PRSN_C_TYPE_HC, PRSN_E_TYPE_HC, EMJO8HC_C_CLSF,
-                DPRT8HC_C, DPRT8HC_N, DVSN8HC_I, DVSN8HC_N, ACCA_I, ACPR_N,
-                ACPL_N, STDN_E_CLAS, STDN_F_UNGR, STDN_F_CMPS_ON) values (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s)''', result)
-
-        except Exception, e:
-            transaction.rollback()
-            cxn_esd.close()
-            cxn_db.close()
-            raise CommandError("problem refreshing db.esd_historic: %s" % e)
-
-        transaction.commit()
-        cxn_esd.close()
-        cxn_db.close()
-
-    @transaction.commit_manually
-    def refresh_hash_esd(self):
-        cxn_esd = connections['esd']
-        cursor_esd = cxn_esd.cursor()
-        #cursor_esd.execute("select * from V_LUD_PRSN where rownum <= 10")
-        cursor_esd.execute("select * from V_LUD_PRSN")
-
-        cxn_db = connections['default']
-        cursor_db = cxn_db.cursor()
-
-        try:
-            cursor_db.execute("truncate esd_hash")
-            for result in self.ResultsIterator(cursor_esd):
-                cursor_db.execute('''insert into esd_hash (PRSN_I_PBLC, PRSN_I_ECN,
-                PRSN_I_HR, PRSN8HC_I_HR, PRSN_I_SA, PRSN_E_TITL_DTRY, PRSN_C_TYPE,
-                PRSN_E_TYPE, EMJO_C_CLSF, DPRT_C, DPRT_N, DVSN_I, DVSN_N,
-                EMPE_C_FCLT_RANK, PRSN_C_TYPE_HC, PRSN_E_TYPE_HC, EMJO8HC_C_CLSF,
-                DPRT8HC_C, DPRT8HC_N, DVSN8HC_I, DVSN8HC_N, ACCA_I, ACPR_N,
-                ACPL_N, STDN_E_CLAS, STDN_F_UNGR, STDN_F_CMPS_ON) values (
                 md5(%s), md5(%s), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''', result)
+                %s, %s, %s, %s, %s, %s, %s, %s)''', result)
 
         except Exception, e:
             transaction.rollback()
@@ -208,6 +130,7 @@ class Command(BaseCommand):
 
     @transaction.commit_manually
     def update_libraryvisit(self):
+        '''This updates the libraryvisit_mv table and then optimizes it.'''
 
         cxn_db = connections['default']
         cursor_db = cxn_db.cursor()
@@ -217,18 +140,17 @@ class Command(BaseCommand):
 
         try:
 
-            cmd = '''INSERT INTO libraryvisit_mv_fy2014 (id, idnumber, lastname, firstname,
-            visit_time, location, term_number, prsn_i_pblc, prsn_i_ecn,
+            cmd = '''INSERT IGNORE INTO libraryvisit_mv (id,
+            visit_time, location, prsn_i_pblc, prsn_i_ecn,
             prsn_i_hr, prsn8hc_i_hr, prsn_i_sa, prsn_e_titl_dtry, prsn_c_type,
             prsn_e_type, emjo_c_clsf, dprt_c, dprt_n, dvsn_i, dvsn_n,
             empe_c_fclt_rank, prsn_c_type_hc, prsn_e_type_hc, emjo8hc_c_clsf,
             dprt8hc_c, dprt8hc_n, dvsn8hc_i, dvsn8hc_n, acca_i, acpr_n,
             acpl_n, stdn_e_clas, stdn_f_ungr, stdn_f_cmps_on)
 
-            (SELECT concat(turnstile.idnumber,substr(turnstile.term_date,1,16)),
-            turnstile.idnumber, turnstile.lastname, turnstile.firstname,
-            str_to_date(concat(substr(turnstile.term_date,1,16),':00'), '%%Y-%%m-%%d %%T'),
-            turnstile.location, turnstile.term_number, esd.prsn_i_pblc, esd.prsn_i_ecn, esd.prsn_i_hr, esd.prsn8hc_i_hr,
+            (SELECT md5(concat(turnstile.idnumber,concat(substr(turnstile.visit_time,1,16),':00'))),
+            str_to_date(concat(substr(turnstile.visit_time,1,16),':00'), '%Y-%m-%d %T'),
+            turnstile.library, esd.prsn_i_pblc, turnstile.idnumber, esd.prsn_i_hr, esd.prsn8hc_i_hr,
             esd.prsn_i_sa, esd.prsn_e_titl_dtry, esd.prsn_c_type, esd.prsn_e_type,
             esd.emjo_c_clsf, esd.dprt_c, esd.dprt_n, esd.dvsn_i, esd.dvsn_n,
             esd.empe_c_fclt_rank, esd.prsn_c_type_hc, esd.prsn_e_type_hc, esd.emjo8hc_c_clsf,
@@ -237,14 +159,16 @@ class Command(BaseCommand):
 
             FROM turnstile, esd
 
-            WHERE (replace(turnstile.idnumber,' ', '') = esd.prsn_i_ecn) AND (DATE(turnstile.term_date) > '%s'));''' % (search_date)
+            WHERE (turnstile.idnumber = esd.prsn_i_ecn));
+            
+            ALTER TABLE libraryvisit_mv ENGINE='InnoDB';'''
 
             cursor_db.execute(cmd)
 
         except Exception, e:
             transaction.rollback()
             cxn_db.close()
-            raise CommandError("problem refreshing db.libraryvisit_mv: %s" % e)
+            raise CommandError("problem updating db.libraryvisit_mv: %s" % e)
 
         transaction.commit()
         cxn_db.close()
