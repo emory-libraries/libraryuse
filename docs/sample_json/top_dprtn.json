@@ -1,0 +1,40 @@
+{
+    data: [
+        {
+            label: "LITS: Library IT Expense",
+            value: 288
+        },
+        {
+            label: "GBS: MBA Admissions",
+            value: 191
+        },
+        {
+            label: "ECAS: Academic Support",
+            value: 154
+        },
+        <...truncated..>
+    ],
+    meta: {
+        strt_date: [
+            "2014-10-01"
+        ],
+        end_date: [
+            "2014-10-03"
+        ],
+        library: [
+            "woodruff"
+        ],
+        title: [
+            "Department"
+        ]
+    },
+    distinct: [
+        "287"
+    ],
+    total: [
+        "3585"
+    ],
+    queried_at: [
+        "2014-10-17 11:00:19.795288"
+    ]
+}

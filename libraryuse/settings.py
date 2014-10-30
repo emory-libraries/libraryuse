@@ -1,5 +1,5 @@
 # file libraryuse/settings.py
-# 
+#
 #   Copyright 2013 Emory University General Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -67,7 +67,7 @@ STATICFILES_FINDERS = (
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+     'django.template.loaders.eggs.Loader',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = [
@@ -99,8 +99,11 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join(BASE_DIR, '..', 'templates'),
-    
+
 )
+
+LOGIN_URL = '/admin'
+LOGIN_REDIRECT_URL = '/'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -111,10 +114,14 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.sitemaps',
     'django.contrib.staticfiles',
-    'django.contrib.markup',
+    #'django.contrib.markup',
     'django.contrib.humanize',
-    #'south',
+    'django_tables2',
+    'south',
+    'eullocal.django.emory_ldap',
     'libraryuse',
+    'tastypie',
+    #'tastypie_mongoengine',
 
 )
 
@@ -143,11 +150,17 @@ except ImportError:
         setup details.'''
     del sys
 
-TEST_RUNNER = 'digitizedbooks.testutil.ManagedModelTestRunner'
-
+TEST_RUNNER = 'libraryuse.utils.ManagedModelTestRunner'
 
 # disable south tests and migrations when running tests
 # - without these settings, test fail on loading initial fixtured data
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False
 
+AUTH_USER_MODEL = 'emory_ldap.EmoryLDAPUser'
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'eullocal.django.emory_ldap.backends.EmoryLDAPBackend',
+)

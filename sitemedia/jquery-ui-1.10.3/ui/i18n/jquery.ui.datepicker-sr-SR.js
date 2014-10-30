@@ -12,7 +12,7 @@ jQuery(function($){
 		'Jul','Avg','Sep','Okt','Nov','Dec'],
 		dayNames: ['Nedelja','Ponedeljak','Utorak','Sreda','Četvrtak','Petak','Subota'],
 		dayNamesShort: ['Ned','Pon','Uto','Sre','Čet','Pet','Sub'],
-		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','Su'],
+		dayNamesMin: ['Ne','Po','Ut','Sr','Če','Pe','S],
 		weekHeader: 'Sed',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,

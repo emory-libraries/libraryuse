@@ -1,0 +1,40 @@
+{
+    data: [
+    {
+        label: "School Of Medicine",
+        value: 831
+    },
+    {
+        label: "LITS: Library and IT Services",
+        value: 121
+    },
+    {
+        label: "Exec.V.P. for Health Affairs",
+        value: 108
+    },
+    <...truncated...>
+    ],
+    meta: {
+        strt_date: [
+            "2014-08-28"
+        ],
+        end_date: [
+            "2014-10-28"
+        ],
+        library: [
+            "health"
+        ],
+        title: [
+            "Faculty Division"
+        ]
+    },
+    distinct: [
+        "22"
+    ],
+    total: [
+        "1312"
+    ],
+    queried_at: [
+        "2014-10-28 20:23:54.354769"
+    ]
+}

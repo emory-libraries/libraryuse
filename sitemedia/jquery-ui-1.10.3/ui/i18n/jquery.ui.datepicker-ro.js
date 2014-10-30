@@ -15,7 +15,7 @@ jQuery(function($){
 		'Iul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
 		dayNames: ['Duminică', 'Luni', 'Marţi', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
 		dayNamesShort: ['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm'],
-		dayNamesMin: ['Du','Lu','Ma','Mi','Jo','Vi','Sâ'],
+		dayNamesMin: ['D,'L,'Ma','Mi','Jo','Vi','Sâ'],
 		weekHeader: 'Săpt',
 		dateFormat: 'dd.mm.yy',
 		firstDay: 1,
