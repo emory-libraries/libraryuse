@@ -105,6 +105,6 @@ class LibraryVisit(models.Model):
     stdn_f_cmps_on = models.CharField(max_length=1L, db_column='STDN_F_CMPS_ON', null=True) #On-campus flag of the student
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'libraryvisit_mv'
         app_label = 'libraryuse'

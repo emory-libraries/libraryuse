@@ -150,9 +150,7 @@ except ImportError:
         setup details.'''
     del sys
 
-TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
-TEST_OUTPUT_DIR = 'test-results'
-
+TEST_RUNNER = 'libraryuse.utils.ManagedModelTestRunner'
 
 # disable south tests and migrations when running tests
 # - without these settings, test fail on loading initial fixtured data
