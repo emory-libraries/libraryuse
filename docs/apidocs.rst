@@ -126,138 +126,179 @@ Total usage by library
 ----------------------
 `/total_usage/<library>/<person type>/<start date>/<end date>/`
 
-Person Types:
-^^^^^^^^^^^^^
+Person Types
+^^^^^^^^^^^^
 * all
 * student
 * faculty
 * staff
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * persn_c_type
 
-Example output:
-^^^^^^^^^^^^^^^
+Example output
+^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/totalusage.json
 
 Total students living on or off campus by library
 -------------------------------------------------
 `/on_off_campus/<library>/<Y/N>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * stdn_f_cmps_on
 * prsn_c_type (students only)
 
-Example output:
-^^^^^^^^^^^^^^^
+Example output
+^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/on_off_campus.json
 
 Totals by student classifications by library
 --------------------------------------------
 `/student_class/<library>/<stdn_e_clas>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * stdn_e_clas (*all* or a specified)
 * prsn_c_type (students only)
 
-Example output:
-^^^^^^^^^^^^^^^
+Example output
+^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/student_class.json
 
 Totals by faculty classifications by library
 --------------------------------------------
 `/faculty_staff_class/<library>/<dvsn_n>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * dvsn_n (*all* or a specified)
 * prsn_c_type (faculty only)
 
-Example output:
-^^^^^^^^^^^^^^^
+Example output
+^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/faculty_staff_class.json
 
 Degree Class
 ------------
 `/degree_class/<library>/<classificatino>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * acpl_n (*all* or a specified)
 * prsn_c_type (students, faculty and staff)
 
-Example output:
-^^^^^^^^^^^^^^^
+Example output
+^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/degree_class.json
 
 Career Class
 ------------
 `/career_class/<library>/<classificatino>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * acca_i (*all* or a specified)
 * prsn_c_type (students, faculty and staff)
 
-Example output:
-^^^^^^^^^^^^^^^
+Example output
+^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/career_class.json
 
 Top Academic Plans
 ------------------
 `/top_academic_plan/<library>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * acpl_n
 * prsn_c_type (students, faculty and staff)
 
-Ordered by:
-^^^^^^^^^^^
+Ordered by
+^^^^^^^^^^
 * Count of acpl_n
 
 Example output:
 ^^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/top_academic_plan.json
 
+Top Academic Career
+-------------------
+`/top_academic_career/<library>/<start date>/<end date>/`
+
+Filters
+^^^^^^^
+* Library
+* acca_i
+* prsn_c_type (students only)
+
+Ordered by:
+^^^^^^^^^^^
+* Count of acca_i
+
+Example output
+^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/top_academic_career.json
+
 Top Departments
 ---------------
 `/top_dprtn/<library>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * dprt_n
 
-Ordered by:
-^^^^^^^^^^^
+Ordered by
+^^^^^^^^^^
 * Count of dprt_n
 
 Example output
 ^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/top_dprtn.json
 
+Top Department by Person Type
+-----------------------------
+`/top_dprtn_type/<library>/<person_type>/<start date>/<end date>/`
+
+Filtered by
+^^^^^^^^^^^
+* Library
+* dprt_n
+
+Person Types
+^^^^^^^^^^^^
+* student
+* faculty
+* staff
+
+Ordered by
+^^^^^^^^^^
+* Count of dprt_n
+
+Example output
+^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/top_dprtn_type.json
+
 Top Divisions
 -------------
 `/top_division/<library>/<start date>/<end date>/`
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * dvsn_n
 
-Ordered by:
-^^^^^^^^^^^
+Ordered by
+^^^^^^^^^^
 * Count of dvsn_n
 
 Example output
@@ -268,20 +309,20 @@ Top Division Type
 -----------------
 `/top_division/<library>/<start date>/<end date>/`
 
-Person Types:
-^^^^^^^^^^^^^
+Person Types
+^^^^^^^^^^^^
 * all
 * student
 * faculty
 * staff
 
-Filtered by:
-^^^^^^^^^^^^
+Filters
+^^^^^^^
 * Library
 * dvsn_n
 
-Ordered by:
-^^^^^^^^^^^
+Ordered by
+^^^^^^^^^^
 * Count of dvsn_n
 
 Example output
@@ -295,8 +336,8 @@ Average by day, hour(s) and classification
 * Hours are 0 - 23
 * Days are ints with Sunday = 1...Saturday = 7
 
-Filters:
-^^^^^^^^
+Filters
+^^^^^^^
 * stdn_e_clas (student_classes)
 * acpl_n (acidemic_plans)
 * dprt_n (departments)
@@ -317,6 +358,52 @@ Example output
 ^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/total_averages.json
 
+Faculty Department Count
+------------------------
+`/faculty_dprt_count/<library>/<start date>/<end date>/`
+
+Nested and Filtered by
+^^^^^^^^^^^^^^^^^^^^^^
+* Library
+* dvsn_n
+    * dprt_n
+
+Example output
+^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/faculty_dprt_count.json
+
+Faculty Divisions and Departments
+---------------------------------
+`/faculty_divs_dprt/<library>/<start date>/<end date>/`
+
+Filters
+^^^^^^^
+* Library
+* dvsn_n
+    * dprt_n
+
+Example output
+^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/faculty_divs_dprt.json
+
+
+Academic Career Count
+---------------------
+`/academic_career_count/<library>/<start date>/<end date>/`
+
+Filters
+^^^^^^^
+* Library
+
+Counts by
+^^^^^^^^^
+* acca_i
+    * visit time count
+
+Example output
+^^^^^^^^^^^^^^
+.. literalinclude:: sample_json/academic_career_count.json
+
 Classifications
 ---------------
 `/classifications`
@@ -330,3 +417,4 @@ Classifications
 Example output
 ^^^^^^^^^^^^^^
 .. literalinclude:: sample_json/classifications.json
+

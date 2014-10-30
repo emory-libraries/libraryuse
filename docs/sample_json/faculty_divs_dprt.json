@@ -1,0 +1,36 @@
+{
+    data: {
+        divs: [
+            {
+                label: "School Of Law",
+                value: "605",
+                depts: [
+                    {
+                        label: "Law Library",
+                        value: "87"
+                    },
+                    {
+                        label: "School of Law",
+                        value: "518"
+                    }
+                ]
+            },
+            <...truncated...>
+        ]
+    }
+    meta: {
+        library: [
+            "law"
+        ],
+        strt_date: [
+            "2014-10-17"
+        ],
+        end_date: [
+            "2014-10-29"
+        ],
+        title: [
+            "Faculty Department"
+        ]
+    },
+    queried_at: "2014-10-30 08:58:51.600194"
+}

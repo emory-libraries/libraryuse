@@ -1,0 +1,40 @@
+{
+    data: [
+        {
+            label: "UCOL",
+            value: 8981
+        },
+        {
+            label: "PUBH",
+            value: 3386
+        },
+        {
+            label: "MED",
+            value: 2820
+        },
+        <...truncated...>
+    ],
+    meta: {
+        strt_date: [
+            "2014-08-29"
+        ],
+        end_date: [
+            "2014-10-29"
+        ],
+        library: [
+            "health"
+        ],
+        title: [
+            "Academic Career"
+        ]
+    },
+    distinct: [
+        "12"
+    ],
+    total: [
+        "20588"
+    ],
+    queried_at: [
+        "2014-10-29 20:08:42.895542"
+    ]
+}

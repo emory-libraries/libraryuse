@@ -1,0 +1,56 @@
+{
+    data: {
+        divs: {
+            affiliated: {
+                label: "Affiliated",
+                value: "0",
+                    depts: {
+                        american-academy-of-religion: {
+                            label: "American Academy of Religion",
+                            value: "0"
+                        },
+                        clifton-child-care-center: {
+                            label: "Clifton Child Care Center",
+                            value: "0"
+                        },
+                        credit-union: {
+                            label: "Credit Union",
+                            value: "0"
+                        },
+                        financial-aid-affiliated-organ: {
+                            label: "Financial Aid-Affiliated Organ",
+                            value: "0"
+                        },
+                        georgia-humanities-council: {
+                            label: "Georgia Humanities Council",
+                            value: "0"
+                        },
+                        other-affiliated-organizations: {
+                            label: "Other Affiliated Organizations",
+                            value: "0"
+                        },
+                        task-force-for-global-health: {
+                            label: "Task Force for Global Health",
+                            value: "0"
+                        }
+                    }
+                },
+            }
+        },
+        <...truncated...>
+    meta: {
+        library: [
+            "law"
+        ],
+        strt_date: [
+            "2014-10-17"
+        ],
+        end_date: [
+            "2014-10-29"
+        ],
+        title: [
+            "Faculty Department"
+        ]
+    },
+    queried_at: "2014-10-29 20:26:40.314974"
+}
