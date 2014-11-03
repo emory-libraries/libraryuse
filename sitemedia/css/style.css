@@ -394,6 +394,9 @@ a.list-group-item .list-group-item-heading {
     top: 100%;
 }
 
+.highcharts-container{
+  float:left;
+}
 
 @media(max-width:640px){
     .card .highcharts-button, 
