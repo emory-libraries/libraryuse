@@ -16,6 +16,7 @@ App.Router.map(function() {
     this.route('business');
     this.route('health-science');
     this.route('law');
+    this.route('pitts');
     
     this.resource('lib', { path: '/:lib' });
     
@@ -482,6 +483,12 @@ App.ReportsController = Ember.Controller.extend({
   
   isLaw:function(){
     if(this.get("lib")=="law"){
+      return true
+    }
+  }.property("lib"),
+
+  isPitts:function(){
+    if(this.get("lib")=="pitts"){
       return true
     }
   }.property("lib"),
@@ -1641,6 +1648,12 @@ App.AveragesController = Ember.Controller.extend({
       return true
     }
   }.property("lib"),
+
+  isPitts:function(){
+    if(this.get("lib")=="pitts"){
+      return true
+    }
+  }.property("lib"),
   
   t1: function(){
     return convert24to12(reportParams.get("time1"))
@@ -2020,12 +2033,14 @@ App.LibraryAllRoute = Ember.Route.extend({
     dataURL.set('names', [
     'Woodruff',
     'Health Sciences',
-    'Law'
+    'Law',
+    'Pitts'
     ]);
     dataURL.set('paths', [
     'woodruff',
     'health',
-    'law'
+    'law',
+    'pitts'
     ]);
     return data;
   },
@@ -2064,6 +2079,14 @@ App.LibRoute = Ember.Route.extend({
       dataURL.set('names', [data.title]);
       dataURL.set('paths', ["law"]);
     }
+    else if(libs=='pitts'){
+      var data = {
+        title: 'Pitts',
+        student_info:[1,2,3]
+      }
+      dataURL.set('names', [data.title]);
+      dataURL.set('paths', ["pitts"]);
+    }
     
     return data;
   },
@@ -2075,8 +2098,8 @@ App.LibRoute = Ember.Route.extend({
 
 function getLibName(path){
   var url = path,
-  libList = ['all','woodruff','health','law'],
-  libNameList = ['All', 'Woodruff','Health Science','Law'],
+  libList = ['all','woodruff','health','law', 'pitts'],
+  libNameList = ['All', 'Woodruff','Health Science','Law', 'Pitts'],
   libName = 'all';
   $.each(libList,function(i){
     if(path.indexOf(libList[i])>0){
@@ -2115,8 +2138,8 @@ App.DemoRoute = Ember.Route.extend({
     }
     
     if(library_path=='all'){
-      dataURL.set('names', ['Woodruff','Health Sciences','Law']);
-      dataURL.set('paths', ['woodruff','health','law']);
+      dataURL.set('names', ['Woodruff','Health Sciences','Law', 'Pitts']);
+      dataURL.set('paths', ['woodruff','health','law', 'pitts']);
     }
     else{
       dataURL.set('names', [library_name]);
@@ -2272,14 +2295,44 @@ App.LibraryLawView = Ember.View.create({
   }
 });
 
+//Pitts
+App.LibraryPittsRoute = Ember.Route.extend({
+  model:function(){
+    var data = {
+      title: 'Pitts',
+      student_info:['Freshman','Sophomore','Junior','Senior'],
+      faculty_info:['Faculty','Staff','Temp'],
+      dept_info:['Dept1','Dept2','Dept3'],
+      acad_info:['Acad1','Acad2','Acad3']
+    }
+    dataURL.set('names', [data.title]);
+    dataURL.set('paths', ["pitts"]);
+    dataURL.set('category',['total_usage'])
+    dataURL.set('group',['all'])
+    dataURL.set('persons','')
+    return data;
+  },
+  renderTemplate: function() {
+    this.render('library/libraries');
+    $(document).attr('title', "Pitts");            
+  }
+});
+
+App.LibraryPittsView = Ember.View.create({
+  init:function(){
+    
+  }
+});
+
 
 App.NavView = Ember.View.extend({
   templateName: "lib-navigation",
   navItems: [
-  {name:'All Libraries',path:'library.all', change:{value:'2%',net_class:'text-success'}},
-  {name:'Woodruff',path:'library.woodruff', change:{value:'2%',net_class:'text-success'}},
-  {name:'Health Science',path:'library.health-science', change:{value:'12%',net_class:'text-success'}},
-  {name:'Law',path:'library.law', change:{value:'4%',net_class:'text-success'}},
+    {name:'All Libraries',path:'library.all', change:{value:'2%',net_class:'text-success'}},
+    {name:'Woodruff',path:'library.woodruff', change:{value:'2%',net_class:'text-success'}},
+    {name:'Health Science',path:'library.health-science', change:{value:'12%',net_class:'text-success'}},
+    {name:'Law',path:'library.law', change:{value:'4%',net_class:'text-success'}},
+    {name:'Pitts',path:'library.pitts', change:{value:'4%',net_class:'text-success'}},
   ],
   didInsertElement : function(){
     var that = this;
@@ -2608,6 +2661,9 @@ function SUPERCHART(){
       }
       if(name=='Health Sciences'||name=='Health Science'){
         color='#5AA689';
+      }
+      if(name=='Pitts'||name=='Pitts'){
+        color='#9900CC';
       }
       
       seriesOptions[i] = {
@@ -2941,7 +2997,8 @@ App.JsonChartComponent = Ember.Component.extend({
         "all":0,
         "woodruff":1,
         "health-science":2,
-        "law":3
+        "law":3,
+        "pitts":4
       }
       var selectedLibTab = libTabNames[path[2]];
       $libTabs.removeClass('active');
