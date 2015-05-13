@@ -354,6 +354,7 @@
         		<li><a href="#">Business</a></li>
         		<li><a href="#">Health Science</a></li>
         		<li><a href="#">Law</a></li>
+            <li><a href="#">Pitts</a></li>
         	</ul>
         </div>
         <div class="tab-pane fade in active" id="audience">
@@ -425,6 +426,9 @@
               </li>
               <li {{bind-attr class="isLaw:active"}}>
                 <a href="#/reports/totals/law/" {{action "setLibrary" "law"}}>Law</a>
+              </li>
+              <li {{bind-attr class="isPitts:active"}}>
+                <a href="#/reports/totals/pitts/" {{action "setLibrary" "pitts"}}>Pitts</a>
               </li>
           </ul>
         </div>
@@ -598,6 +602,9 @@
               </li>
               <li {{bind-attr class="isLaw:active"}}>
                 <a href="#" {{action "setLibrary" "law"}}>Law</a>
+              </li>
+              <li {{bind-attr class="isPitts:active"}}>
+                <a href="#" {{action "setLibrary" "pitts"}}>Pitts</a>
               </li>
           </ul>
         </div>
