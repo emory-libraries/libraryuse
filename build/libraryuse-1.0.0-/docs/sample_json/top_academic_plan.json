@@ -1,0 +1,40 @@
+{
+    data: [
+        {
+            label: "Law",
+            value: 27881
+        },
+        {
+            label: "Business Administration",
+            value: 327
+        },
+        {
+            label: "Juridical Science",
+            value: 247
+        },
+        <..truncated..>
+    ],
+    meta: {
+        strt_date: [
+            "2014-07-01"
+        ],
+        end_date: [
+            "2014-10-30"
+        ],
+        library: [
+            "law"
+        ],
+        title: [
+            "Academic Plan"
+        ]
+    },
+    distinct: [
+        "53"
+    ],
+    total: [
+        "30253"
+    ],
+    queried_at: [
+        "2014-10-17 10:20:01.423390"
+    ]
+}

@@ -1,0 +1,61 @@
+{% extends "ember_site_base.html" %}
+{% load static %}
+
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}"/>
+{% endblock %}
+
+{% block ember-app-js %}
+  {# Login Scripts #}
+  {% include "libraryuse/include/login-js.html" %}
+{% endblock %}
+
+{% block content %}
+<header id="header">
+  <h1 class="site-title"><a href="/"><span class="glyphicon glyphicon-signal"></span> Library Use</a></h1>
+</header>
+<div class="col-xs-12">
+  {% if form.non_field_errors %}
+    <ul class='form-errors'>
+        {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if form.error %}
+<h2>Oopsies.</h2>
+{% endif %}
+  <div id="login" class="login card">
+      <h2 class="form-title">SIGN IN</h2>
+      <form class="form" name="LoginForm" action="/login/" method="post">
+          {% csrf_token %}
+          {% if next %}
+              <input type="hidden" name="next" value="{{ next }}" />
+          {% endif %}
+          
+          <div class="input-group">
+            <input type="hidden" id="hash" name="hash" value="" />
+            <label class="input-group-addon{% if login_form.username.errors %} error{% endif %}" for="id_username">
+              <span class="glyphicon glyphicon-user"></span>
+            </label>
+            <label class="label sr-only" for="id_username">Username</label>
+            {{ login_form.username }}
+          </div>
+          
+          <div class="input-group">
+            <label class="label sr-only" for="id_password">Password</label>
+            <label class="input-group-addon{% if login_form.password.errors %} error{% endif %}" for="id_password">
+              <span class="fa fa-key"></span>
+            </label>
+            {{ login_form.password }}
+            <span class="input-group-btn">
+              <button class="btn btn-warning" type="submit"><span class="glyphicon glyphicon-log-in"></span></button>
+            </span>
+          </div><!-- /input-group -->
+      </form>
+      <div class="errors">
+        {{ login_form.non_field_errors }}
+      </div>
+  </div>
+</div>
+{% endblock %}

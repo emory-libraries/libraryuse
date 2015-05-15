@@ -1,0 +1,41 @@
+{
+    data: {
+        advanced-standing: {
+            label: "Advanced Standing",
+            value: 55
+        },
+        freshman: {
+            label: "Freshman",
+            value: 11
+        },
+        full-standing: {
+            label: "Full Standing",
+            value: 18
+        },
+        graduate: {
+            label: "Graduate",
+            value: 0
+        },
+        <..turncated..>
+    },
+    meta: {
+        strt_date: [
+            "2014-10-01"
+        ],
+        end_date: [
+            "2014-10-03"
+        ],
+        strt_hour: [
+            "13"
+        ],
+        end_hour: [
+            "15"
+        ],
+        dow: [
+            "Thursday"
+        ],
+        queried_at: [
+            "2014-10-17 10:53:38.601905"
+        ]
+    }
+}

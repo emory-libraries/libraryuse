@@ -1,4 +1,4 @@
-__version_info__ = (1, 0, 0, '')
+__version_info__ = (1, 1, 0, 'prod')
 
 # Dot-connect all but the last. Last is dash-connected if not None.
 __version__ = '.'.join(str(i) for i in __version_info__[:-1])
@@ -7,4 +7,4 @@ if __version_info__[-1] is not None:
 
 # context processor to add version to the template environment
 def version_context(request):
-	return {'SW_VERSION': __version__}
+    return {'SW_VERSION': __version__}

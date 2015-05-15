@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block page-title %}Library Use Dashboard{% block page-subtitle %}{% endblock %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen"/>
+    <link href="{% static 'bootstrap/css/bootstrap-theme.min.css' %}" rel="stylesheet" media="screen"/>
+    <link href="{% static 'css/local.css' %}" rel="stylesheet" media="screen"/>
+    <link href="{% static 'jquery-ui-1.10.3/themes/base/jquery.ui.all.css' %}" rel="stylesheet" media="screen"/>
+    <link href="{% static 'django_tables2/themes/paleblue/css/screen.css' %}" rel="stylesheet" media="screen"/>
+    <script src="{% static 'jquery-ui-1.10.3/jquery-1.9.1.js' %}"></script>
+    <script src="{% static 'jquery-ui-1.10.3/ui/jquery.ui.core.js' %}"></script>
+    <script src="{% static 'jquery-ui-1.10.3/ui/jquery.ui.widget.js' %}"></script>
+    <script src="{% static 'jquery-ui-1.10.3/ui/jquery.ui.datepicker.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+
+    {% block head-extras %}{% endblock %}
+  </head>
+  <body {% block body-attrs %}{% endblock %}>
+    <div id="wrap">
+    
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="{% url 'index' %}">Library Use Dashboard</a>
+          <div class="nav-collapse collapse">
+			<ul class="nav">
+			<li><a href="{% url 'summary' %}">Summary</a></li>
+			<li><a href="{% url 'visualize' %}">Visualize</a></li>
+			<li><a href="{% url 'export' %}">Export</a></li>
+			
+			</ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      {% block content %}{% endblock %}
+    </div>
+
+  <div id="push"></div>
+  </div> {# end wrap #}
+
+    <div id="footer">
+      <div class="container">
+        <p class="pull-right">{{ SW_VERSION }}</p>
+        <ul class="inline muted credit">
+          <li><a href="http://www.emory.edu/">Emory University</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </body>
+</html>

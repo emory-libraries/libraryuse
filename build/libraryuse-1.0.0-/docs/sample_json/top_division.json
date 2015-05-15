@@ -1,0 +1,40 @@
+{
+    data: [
+        {
+            label: "LITS: Library and IT Services",
+            value: 1133
+        },
+        {
+            label: "Emory College",
+            value: 714
+        },
+        {
+            label: "Campus Life Activities",
+            value: 421
+        },
+        <...truncated...>
+    ],
+    meta: {
+        strt_date: [
+            "2014-10-01"
+        ],
+        end_date: [
+            "2014-10-03"
+        ],
+        library: [
+            "woodruff"
+        ],
+        title: [
+            "Faculty Division"
+        ]
+    },
+    distinct: [
+        "28"
+    ],
+    total: [
+        "3585"
+    ],
+    queried_at: [
+        "2014-10-17 10:57:03.188432"
+    ]
+}
