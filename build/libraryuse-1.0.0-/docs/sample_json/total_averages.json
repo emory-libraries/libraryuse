@@ -1,0 +1,10 @@
+{
+    start_date: "2014-10-01",
+    end_date: "2014-10-02",
+    start_hour: "13",
+    end_hour: "15",
+    dow: "5",
+    data: {
+        average: "912"
+    }
+}

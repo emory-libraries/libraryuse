@@ -1,0 +1,667 @@
+{% extends "ember_site_base.html" %}
+
+{% block content %}
+
+  <div class="global-loading" id="onLoad">
+    Initializing App <span class="fa fa-circle-o-notch fa-spin"></span>
+  </div>
+  <div class="loading-reports" style="display:none;"><span class="fa fa-circle-o-notch fa-spin"></span> Loading Reports</div>
+  
+  <span class="loading-data page-level" style="display:none;"><span class="fa fa-circle-o-notch fa-spin"></span> Fetching Data</span>
+
+{% verbatim myblock %}
+  <script type="text/x-handlebars" data-template-name="application">
+      <!-- Push Wrapper -->
+      <div class="mp-pusher" id="mp-pusher">
+        <!-- mp-menu -->
+        <nav id="mp-menu" class="mp-menu">
+          <div class="mp-level filter-all">
+            <h2> <span class="glyphicon glyphicon-filter"></span>All Categories</h2>
+            <ul>
+              <li class="icon icon-arrow-left">
+                <a href="#"><span class="glyphicon glyphicon-cog"></span> Options</a>
+                <div class="mp-level filter-settings">
+                  <h2><span class="glyphicon glyphicon-cog"></span> Options</h2>
+                  <ul>
+                  {{!-- 
+                    <li class="icon icon-arrow-left">
+                      <a href="#"><span class="glyphicon glyphicon-adjust"></span> Unique Users</a>
+                      <div class="mp-level options-unique-users">
+                        <h2><span class="glyphicon glyphicon-adjust"></span> Unique Users</h2>
+                        {{distinct-users-switch}}
+                      </div>
+                    </li>
+                    --}}
+                    <li class="icon icon-arrow-left">
+                      <a href="#"><span class="glyphicon glyphicon-time"></span> Date Range</a>
+                      <div class="mp-level options-date-range">
+                        <h2><span class="glyphicon glyphicon-time"></span> Date Range</h2>
+                        <p class="instructions"><i class="fa fa-info-circle"></i> Load data from select date ranges.<br/>
+                          <span class="text-muted">Note: Wider time ranges will take longer to load.</span>
+                        </p>
+                        <form class="col-xs-12" role="form">
+                          <div class="form-group">
+                            <label class="label" for="date1">From</label>
+                            {{view App.OptionalCalendarDatePicker valueBinding="chartStartInput" class="start form-control" id="date1" placeholder="Start Date"}}
+                          </div>
+                          <div class="form-group">
+                            <label class="label" for="date2">To</label>
+                            {{view App.OptionalCalendarDatePicker valueBinding="chartEndInput" class="end form-control" id="date2" placeholder="End Date"}}
+                          </div>
+                          <div class="button-group">
+                            {{reload-chart-data-button}}
+                          </div>
+                        </form>
+                      </div>
+                    </li>
+                    <li class="icon icon-arrow-left">
+                      <a href="#"><span class="glyphicon glyphicon-map-marker"></span> On/Off Campus</a>
+                      <div class="mp-level options-campus">
+                        <h2><span class="glyphicon glyphicon-map-marker"></span> On/Off Campus</h2>
+                        {{on-off-campus-switch}}
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="icon icon-arrow-left">
+                <a href="#"><span class="glyphicon glyphicon-user"></span> Affiliation</a>
+                <div class="mp-level filter-audience">
+                  <h2><span class="glyphicon glyphicon-user"></span> Affiliation</h2>
+                  <ul>
+                    <li class="icon icon-arrow-left">
+                      <a href="#"><span class="fa fa-graduation-cap"></span> Students</a>
+                      <div class="mp-level filter-students">
+                        <h2><span class="fa fa-graduation-cap"> Students</h2>
+                        <ul class="students">
+                          <li>
+                            <a href="#/library/all/students/all">all</a>
+                          </li>
+                          {{#each item in model.student_classes}}
+                            {{students-filter-button title=item}}
+                          {{/each}}
+                        </ul>
+                      </div>
+                    </li>
+                    <li class="icon icon-arrow-left">
+                      <a href="#"><span class="fa fa-coffee"></span> Faculty</a>
+                      <div class="mp-level filter-faculty">
+                        <h2><span class="fa fa-coffee"></span> Faculty</h2>
+                        <ul class="faculty">
+                          <li>
+                            <a href="#/library/all/faculty/all">all</a>
+                          </li>
+                          {{#each item in model.faculty_divisions}}
+                            {{faculty-filter-button title=item}}
+                          {{/each}}
+                        </ul>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              
+              <li class="icon icon-arrow-left">
+                <a href="#"><span class="glyphicon glyphicon-list-alt"></span> Degree</a>
+                <div class="mp-level filter-academic-plan">
+                  <h2><span class="glyphicon glyphicon-list-alt"></span> Degree</h2>
+                  <ul class="degree">
+                    <li>
+                      <a href="#/library/all/degree/all">all</a>
+                    </li>
+                    {{#each item in model.academic_plans}}
+                      {{degree-filter-button title=item}}
+                    {{/each}}
+                  </ul>
+                </div>
+              </li>
+              
+              <li class="icon icon-arrow-left">
+                <a href="#"><span class="glyphicon glyphicon-briefcase"></span> School</a>
+                <div class="mp-level">
+                  <h2><span class="glyphicon glyphicon-briefcase"></span> School</h2>
+                  <ul class="school">
+                    <li>
+                      <a href="#/library/all/school/all">all</a>
+                    </li>
+                    {{#each item in model.academic_career}}
+                      {{career-filter-button title=item}}
+                    {{/each}}
+                  </ul>
+                </div>
+              </li>
+
+              {{clear-filters-button}}
+            </ul>
+          </div>
+        </nav>
+        <!-- /mp-menu -->
+        <div class="scroller"><!-- this is for emulating position fixed of the nav -->
+          <div class="scroller-inner">
+            <!-- Top Navigation -->
+            <div class="nav-top clearfix">
+
+            </div>
+            <header id="header">
+              <h1 class="site-title">{{#link-to "index" classNames="logo"}}<span class="glyphicon glyphicon-signal"></span> Library Use{{/link-to}}</h1>
+              <nav class="pull-right">
+                <ul class="nav navbar-nav">
+                  {{#link-to "library" tagName="li"}}
+                      <a {{bind-attr href="view.href"}}>Charts</a>
+                  {{/link-to}}
+                  {{#link-to "reports" tagName="li"}}
+                      <a {{bind-attr href="view.href"}}>Reports</a>
+                  {{/link-to}}
+                  {{#link-to "averages" tagName="li"}}
+                      <a {{bind-attr href="view.href"}}>Averages</a>
+                  {{/link-to}}
+                  {{#link-to "download" tagName="li"}}
+                      <a {{bind-attr href="view.href"}}>Download</a>
+                  {{/link-to}}
+                  <li>
+                    <a class="logout" href="/logout" title="Logout"><span class="glyphicon glyphicon-log-out"></span></a>
+                  </li>
+                </ul>
+              </nav>
+            </header>
+            <div class="content clearfix">
+              {{outlet}}
+            </div>
+          </div><!-- /scroller-inner -->
+        </div><!-- /scroller -->
+    </div><!-- /pusher -->
+
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="catchall">
+    <div class="catchall">
+        <h2>Sorry, that url is not valid.</h2>
+        <span class="fa fa-meh-o"></span>
+    </div>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="components/reload-chart-data-button">
+    <button class="btn btn-default reload">Fetch Data</button>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="components/clear-filters-button">
+    <li class="icon">
+      <a href="#" id="clear-filters"><span class="fa fa-undo"></span> Clear Filters</a>
+    </li>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="components/distinct-users-switch">
+    <div class="switch">
+      <div class="col-xs-5">
+        <label for="cmn-toggle-1">Display Unique Only</label>
+      </div>
+      <div class="col-xs-5">
+        {{input checked=value id="cmn-toggle-1" class="cmn-toggle cmn-toggle-round" type="checkbox"}}
+        <label for="cmn-toggle-1"></label>
+      </div>
+    </div>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="components/on-off-campus-switch">
+    <div class="switch">
+      <div class="col-xs-7">
+        <label class="label" for="cmn-toggle-2">Show On-Campus</label>
+      </div>
+      <div class="col-xs-5">
+        {{input checked=value id="cmn-toggle-2" value="Y" name="campus" class="cmn-toggle cmn-toggle-round" type="radio"}}
+        <label for="cmn-toggle-2"></label>
+      </div>
+    </div>
+    
+    <div class="clearfix"></div>
+    
+    <div class="switch">
+      <div class="col-xs-7">
+        <label class="label" for="cmn-toggle-3">Show Off-Campus</label>
+      </div>
+      <div class="col-xs-5">
+        {{input checked=value id="cmn-toggle-3" value="N" name="campus" class="cmn-toggle cmn-toggle-round" type="radio"}}
+        <label for="cmn-toggle-3"></label>
+      </div>
+    </div>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="components/filter-button">
+    <li>
+      {{#if addon}}
+      <a href="#/library/{{unbound addon}}/{{unbound title}}">{{title}}</a>
+      {{else}}
+      <a href="#/library/all/{{unbound title}}">{{title}}</a>
+    {{/if}}
+  </li>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name='fourOhFour'>
+    <h2>404</h2>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="loading">
+    {{flip-loading}}
+  </script>
+
+  <script type="text/x-handlebars" data-template-name='lib-navigation'>
+    <nav class="nav-reports">
+    <ul class="nav nav-tabs nav-justified">
+    {{#each item in view.navItems}}
+      <li class="list-group">
+      {{#link-to item.path classNames="list-group-item"}}
+        <h4 class="list-group-item-heading">{{item.name}}</h4>
+        {{! net-change change=item.change}}
+      {{/link-to}}
+      </li>
+    {{/each}}
+    </ul>
+  </nav>
+  <div class="row">
+    <div class="col-xs-12">
+      <a id="trigger" class="btn btn-control btn-filter">
+      		<span class="glyphicon glyphicon-filter"></span>
+      	</a>
+    	</div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="components/net-change">
+ 	<p {{bind-attr class=':small :net-lib-change change.net_class'}}>{{change.value}}<span class="glyphicon glyphicon-arrow-up"></span></p>
+  </script>
+
+  <script type="text/x-handlebars" id="download">
+    <div class="container" id="download">
+      <header>
+        <h2>Download the Raw CSV</h2>
+      </header>
+      <div class="report-dates inputs">
+        <form class="form-inline" role="form">
+          <label class="label" for="start"><span>From</span></label>
+          <label class="label" for="end"><span>To</span></label>
+          <div class="clearfix"></div>
+          {{view App.CalendarDatePicker valueBinding="start" class="start form-control" id="start"}}
+          {{view App.CalendarDatePicker valueBinding="end" class="end form-control" id="end"}}
+        </form>
+        {{#if download_link}}
+          <a class="btn btn-default btn-download" draggable="true" {{bind-attr download='download_link'}} {{bind-attr href='download_link'}}>Download CSV</a>
+          <p class="download-message">Download will start momentarily.</p>
+        {{else}}
+          <a class="btn btn-default disabled">Download Unavailable :(</a>
+        {{/if}}
+      </div>
+      
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" id="library">
+    {{outlet}}
+  </script>
+
+  <script type="text/x-handlebars" id="library/libraries">
+    {{view App.NavView}}
+
+    <section>
+      <div class="visitor-count" style="opacity:0;">
+        <dl class="total">
+          <dt>Total Visits</dt>
+          <dd class="number"><span>0</span></dd>
+        </dl>
+        <dl class="distinct">
+          <dt>Distinct Visits</dt>
+          <dd><span class="number">0</span></dd>
+        </dl>
+      </div>
+      <div class="card chart">
+        {{json-chart}}
+      </div>
+      <div class="card chart">
+        <div id="container-lastweek" style="height: 400px; min-width: 400px">
+      </div>
+    </div>
+    </section>
+    <section>
+      {{outlet}}
+    </section>
+  </script>
+
+
+  <script type="text/x-handlebars" data-template-name="components/flip-loading">
+      <div class="loading">
+        <div class="clock"></div>
+      </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="components/filter-tabs">
+    <div class="row">
+      <a id="menu-toggle" class="btn btn-clear" data-effect="st-effect-2">
+      		<span class="glyphicon glyphicon-filter"></span>
+      	</a>
+    	</div>
+    <section id="filterTabs" class="default-hidden">
+      <ul class="nav nav-pills">
+        <li class="active"><a href="#audience" data-toggle="tab">Affiliation</a></li>
+        <li><a href="#school" data-toggle="tab">School</a></li>
+        <li><a href="#dept" data-toggle="tab">Dept</a></li>
+        <li><a href="#academic" data-toggle="tab">Academic</a></li>
+      </ul>
+
+      <!-- Tab panes -->
+      <div class="tab-content">
+        <div class="tab-pane fade" id="libs">
+        	<ul class="nav nav-pills nav-stacked">
+        		<li><a href="#">Woodruff</a></li>
+        		<li><a href="#">Business</a></li>
+        		<li><a href="#">Health Science</a></li>
+        		<li><a href="#">Law</a></li>
+            <li><a href="#">Pitts</a></li>
+        	</ul>
+        </div>
+        <div class="tab-pane fade in active" id="audience">
+        	<div class="tab-content row">
+
+          	<ul class="nav nav-pills nav-stacked">
+          		<li><a href="#student-info" data-toggle="tab">Student</a></li>
+          		<li><a href="#faculty-info" data-toggle="tab">Faculty</a></li>
+          	</ul>
+
+          <div class="tab-pane fade" id="student-info">
+          		<select>
+          			{{#each item in model.student_info}}
+        					<option {{action "select" model.title}}>{{item}}</option>
+              {{/each}}
+          		</select>
+        		</div>
+
+          	<div class="tab-pane fade" id="faculty-info">
+          		<ul class="nav nav-pills nav-square nav-toggle">
+            		{{#each item in model.faculty_info}}
+        					<li><a {{action "select" model.title}}>{{item}}</a></li>
+              {{/each}}
+        			</ul>
+          	</div>
+
+        	</div>
+        </div>
+        <div class="tab-pane fade" id="school">
+          <ul class="nav nav-pills nav-square nav-toggle">
+        		{{#each item in model.school_info}}
+    					<li><a {{action "select" model.title}}>{{item}}</a></li>
+          {{/each}}
+    			</ul>
+        </div>
+        <div class="tab-pane fade" id="dept">
+          <ul class="nav nav-pills nav-square nav-toggle">
+          	{{#each item in model.dept_info}}
+    					<li><a {{action "select" model.title}}>{{item}}</a></li>
+          {{/each}}
+        </ul>
+        </div>
+        <div class="tab-pane fade" id="academic">
+          <ul class="nav nav-pills nav-square nav-toggle">
+          	{{#each item in model.acad_info}}
+    					<li><a {{action "select" model.title}}>{{item}}</a></li>
+          {{/each}}
+        </ul>
+        </div>
+      </div>
+      <div class="control-btn">
+
+        <button class="btn btn-success hidden"><span class="glyphicon glyphicon-ok"></span></button>
+
+        <button class="btn btn-warning refresh-btn"><span class="glyphicon glyphicon-refresh"></span></button>
+      </div>
+    </section>
+  </script>
+  
+  <script type="text/x-handlebars" id="reports">
+    <div class="flex-container">
+        <div class="row">
+          <ul class="nav nav-tabs nav-justified">
+              <li {{bind-attr class="isWoodruff:active"}}>
+                <a href="#/reports/totals/woodruff/" {{action "setLibrary" "woodruff"}}>Woodruff</a>
+              </li>
+              <li {{bind-attr class="isHealth:active"}}>
+                <a href="#/reports/totals/health/" {{action "setLibrary" "health"}}>Health Science</a>
+              </li>
+              <li {{bind-attr class="isLaw:active"}}>
+                <a href="#/reports/totals/law/" {{action "setLibrary" "law"}}>Law</a>
+              </li>
+              <li {{bind-attr class="isPitts:active"}}>
+                <a href="#/reports/totals/pitts/" {{action "setLibrary" "pitts"}}>Pitts</a>
+              </li>
+          </ul>
+        </div>
+        <div class="row report-nav">
+          <div class="col-xs-12 col-md-5 pull-right">
+            <ul class="nav nav-pills report-types nav-justified">
+              <li {{bind-attr class="isTotals:active"}}>
+                <a href="#/reports/totals" {{action "setType" "totals"}}>Totals</a>
+              </li>
+              <li {{bind-attr class="isAcad:active"}}>
+                <a href="#/reports/top_academic_plan" {{action "setType" "top_academic_plan"}}>Academic</a>
+              </li>
+              <li {{bind-attr class="isCareer:active"}}>
+                <a href="#/reports/academic_career_count" {{action "setType" "academic_career_count"}}>Schools</a>
+              </li>
+              <li {{bind-attr class="isDiv:active"}}>
+                <a href="#/reports/faculty_divs_dprt" {{action "setType" "faculty_divs_dprt"}}>Divisons</a>
+              </li>
+              <li {{bind-attr class="isCampus:active"}}>
+                <a href="#/reports/on_off_campus" {{action "setType" "on_off_campus"}}>Campus</a>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="report-dates inputs col-xs-12 col-md-7">
+            <form class="form-inline" role="form">
+              <label class="label" for="start"><span>From</span></label>
+              <label class="label" for="end"><span>To</span></label>
+              <div class="clearfix"></div>
+              {{view App.CalendarDatePicker valueBinding="startDateInput" class="start form-control" id="start"}}
+              {{view App.CalendarDatePicker valueBinding="endDateInput" class="end form-control" id="end"}}
+            
+              <button {{action "loadDates"}} class="btn btn-clear load-date disabled">Load dates 
+              <span class="loading-data"><span class="fa fa-circle-o-notch fa-spin"></span></span>
+              </button>
+            </form>
+          </div>
+          
+        </div>
+        <div class="container-reports">
+          {{outlet}}
+        </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="report">
+      {{#if model.data}}
+      <div id="report-chart">
+        <div class="row">
+         <div class="col-xs-12 col-sm-6 col-md-8">
+           <h3>Total Visitors by {{model.meta.title}}s in <span class="library-name">{{model.meta.library}}</span></h3>
+           <p>Between {{formattedDate.start}} and {{formattedDate.end}}, 
+           we have had {{model.total}} visitors for <span class="library-name">{{model.meta.library}}</span>; 
+           the most coming from
+           {{#each item in firstItemInArray}}
+             the {{item.label}} {{model.meta.title}} with {{item.value}} visitors.
+           {{/each}}
+           </p>
+            <div class="loading-data" style="display:none;">
+              <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
+              <p class="extended-load text-center text-muted" style="display:none;">This might take a minute to load.</p>
+            </div>
+           <div class="chart pie"></div>
+         </div>
+         <div class="col-xs-12 col-sm-6 col-md-4">
+           {{input type='text' value=theFilter placeholder=placeholder class="form-control"}}
+           <table id="table-report" class="table disabled">
+               <thead>
+                   <tr>
+                       <th {{action "sortBy" "id"}}>{{model.meta.title}}s</th>
+                       <th>Top Visits</th>
+                       {{!-- <th>Unique Visits</th> --}}
+                   </tr>
+               </thead>
+               <tbody>
+                 {{#each item in filterPeople}}
+                   <tr>
+                     <td>{{item.label}}</td>
+                     <td class="val">{{item.value}}</td>
+                   </tr>
+                 {{/each}}
+               </tbody>
+           </table>
+         </div>
+       </div>
+       <div class="row">
+          <div class="chart line" id="acca_i"></div>
+       </div>
+       {{drawPieChart}}
+     </div>
+     {{else}}
+     <div class="row">
+       <div class="col-xs-12">
+         <h3>No Total Visitors in this time range</h3>
+         <p>Sorry, there were no results for the selected criteria. 
+         Try choosing a broader time range.</p>
+       </div>
+     </div>
+     {{/if}}
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="report-totals">
+    <div id="report-chart">
+       <div class="loading-data">
+         <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
+       </div>
+      <div class="chart totals"></div>
+      {{drawTotalsChart}}
+    </div>
+    <div class="row disabled" id="total-tables">
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <table id="student-totals" class="table table-hover">
+            <tr>
+              <td><p class="text-center text-muted"><span class="fa fa-circle-o-notch fa-spin"></span></p></td>
+            </tr>
+        </table>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <table id="faculty-totals" class="table table-hover">
+            <tr>
+              <td><p class="text-center text-muted"><span class="fa fa-circle-o-notch fa-spin"></span></p></td>
+            </tr>
+        </table>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <table id="staff-totals" class="table table-hover">
+            <tr>
+              <td><p class="text-center text-muted"><span class="fa fa-circle-o-notch fa-spin"></span></p></td>
+            </tr>
+        </table>
+      </div>
+    </div>
+  </script>
+  
+  <script type="text/x-handlebars" data-template-name="report-campus">
+    <div id="report-chart">
+       <div class="loading-data">
+         <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
+       </div>
+       <div class="row">
+         <div class="visitor-count col-xs-12 col-sm-8 col-md-4 col-md-offset-2" style="opacity:0;">
+           <dl class="on-campus">
+             <dt>On Campus</dt>
+             <dd><span class="number total">0</span> total</dd>
+             <dd><span class="number distinct">0</span> distinct</dd>
+           </dl>
+           <dl class="off-campus">
+             <dt>Off Campus</dt>
+             <dd><span class="number total">0</span> total</dd>
+             <dd><span class="number distinct">0</span> distinct</dd>
+           </dl>
+         </div>
+        <div id="onoffcampus-chart" class="col-xs-12 col-sm-4 col-md-5">
+          <div class="chart pie"></div>
+        </div>
+       </div>
+      <div class="chart line"></div>
+      {{drawCampusChart}}
+    </div>
+  </script>
+  
+  <script type="text/x-handlebars" id="averages">
+    <div class="flex-container">
+        <div class="row">
+          <ul class="nav nav-tabs nav-justified">
+              <li {{bind-attr class="isWoodruff:active"}}>
+                <a href="#" {{action "setLibrary" "woodruff"}}>Woodruff</a>
+              </li>
+              <li {{bind-attr class="isHealth:active"}}>
+                <a href="#" {{action "setLibrary" "health"}}>Health Science</a>
+              </li>
+              <li {{bind-attr class="isLaw:active"}}>
+                <a href="#" {{action "setLibrary" "law"}}>Law</a>
+              </li>
+              <li {{bind-attr class="isPitts:active"}}>
+                <a href="#" {{action "setLibrary" "pitts"}}>Pitts</a>
+              </li>
+          </ul>
+        </div>
+        <div class="row report-nav">
+          <div class="report-dates inputs col-xs-12 col-md-7">
+            <form class="form-inline" role="form">
+              <label class="label" for="start"><span>From</span></label>
+              <label class="label" for="end"><span>To</span></label>
+              <div class="clearfix"></div>
+              {{view App.CalendarDatePicker valueBinding="averagesStart" class="start form-control" id="start"}}
+              {{view App.CalendarDatePicker valueBinding="averagesEnd" class="end form-control" id="end"}}
+            
+              <button {{action "loadDatesAverages"}} class="btn btn-clear load-date disabled">Load dates 
+              <span class="loading-data"><span class="fa fa-circle-o-notch fa-spin"></span></span>
+              </button>
+            </form>
+          </div>
+          <div class="averages-dates inputs col-xs-12 col-md-5">
+            <form class="form-inline" role="form">
+              <label class="label" for="time1"><span>Between</span></label>
+              <label class="label" for="time2"><span>and</span></label>
+              <div class="clearfix"></div>
+              {{view App.HourPicker valueBinding="t1" class="timepicker start form-control" id="time1"}}
+              {{view App.HourPicker valueBinding="t2" class="timepicker end form-control" id="time2"}}
+            </form>
+          </div>
+        </div>
+        <div class="container-reports">
+          {{outlet}}
+        </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" id="avg-report">
+    <div id="averages-chart" class="text-center">
+      <h2>Weekly Averages</h2>
+      <p>This chart shows the average number of visitors to the library for the selected times.</p>
+      <div class="chart"></div>
+      {{drawAverages}}
+      <div class="loading-data" style="display:none;">
+        <p class="text-center">Calculating <span class="fa fa-circle-o-notch fa-spin"></span></p>
+      </div>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="components/json-chart">
+    <div id="container" style="height: 400px; min-width: 400px">
+      {{flip-loading}}
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" data-template-name="components/json-chart-lastweek">
+    <div id="container-lastweek" style="height: 400px; min-width: 400px">
+      {{flip-loading}}
+    </div>
+  </script>
+
+  {% endverbatim myblock %}
+
+{% endblock %}

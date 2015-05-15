@@ -1,0 +1,1 @@
+Ember.TEMPLATES['tmps/inputname'] = Ember.Handlebars.compile(data); 

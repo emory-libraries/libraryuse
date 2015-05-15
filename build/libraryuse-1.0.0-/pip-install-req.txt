@@ -1,0 +1,13 @@
+Django==1.6.6
+#pyPdf
+django-taggit
+south
+python-dateutil
+python-magic
+#django-tracking
+MySQL-python
+#cx_Oracle
+django-tables2
+http://wilson.library.emory.edu:8080/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
+eulcommon
+django-tastypie

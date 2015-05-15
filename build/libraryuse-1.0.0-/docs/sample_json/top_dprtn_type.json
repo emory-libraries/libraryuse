@@ -1,0 +1,40 @@
+{
+    data: [
+        {
+            label: "WHSC Library",
+            value: 459
+        },
+        {
+            label: "SOM: Pathology: Admin",
+            value: 29
+        },
+        {
+            label: "SON: Academic Advancement",
+            value: 26
+        },
+        <...truncated...>
+    ],
+    meta: {
+        strt_date: [
+            "2014-08-29"
+        ],
+        end_date: [
+            "2014-10-29"
+        ],
+        library: [
+            "health"
+        ],
+        title: [
+            "Department"
+        ]
+    },
+    distinct: [
+        "59"
+    ],
+    total: [
+        "774"
+    ],
+    queried_at: [
+        "2014-10-29 20:13:13.892014"
+    ]
+}
