@@ -14,3 +14,8 @@ docs/_build/.*
 .metadata
 libraryuse/.idea/
 *.doctree
+
+libraryuse/lib/*
+libraryuse/bin/*
+libraryuse/.Python
+libraryuse/include/*

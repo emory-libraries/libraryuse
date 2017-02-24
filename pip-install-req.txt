@@ -8,6 +8,6 @@ python-magic
 MySQL-python
 #cx_Oracle
 django-tables2
-http://wilson.library.emory.edu:8080/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
+-e git+https://github.com/emory-libraries/eullocal.git@0.22#egg=eullocal
 eulcommon
 django-tastypie
